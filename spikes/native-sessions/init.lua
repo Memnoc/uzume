@@ -78,7 +78,7 @@ function app.statusline()
     return string.format(" %s · %s · %s %%= pid %s / child %s · tick %s ",
       p.name, mode, (st.state or "starting"):upper(), st.pid or "…", st.child or "…", st.tick or 0)
   end
-  return " " .. s.name .. " · EDITOR · " .. mode .. " %= F1 help · F5 attention · F6 sessions "
+  return " " .. s.name .. " · EDITOR · " .. mode .. " %= SPC ? help · SPC a attention · SPC s sessions "
 end
 
 local function redraw()
@@ -89,7 +89,7 @@ local function redraw()
       parts[#parts + 1] = string.format("%%#%s#%%%dT %d %s %%T ", group, api.nvim_tabpage_get_number(s.tab), index, s.name)
     end
   end
-  parts[#parts + 1] = "%#SpikeAttention#  " .. #model.attention(app.sessions) .. " need you [F5]"
+  parts[#parts + 1] = "%#SpikeAttention#  " .. #model.attention(app.sessions) .. " need you [SPC a]"
   parts[#parts + 1] = "%#TabLineFill#%=" .. (vim.o.mouse == "" and " mouse OFF " or " mouse ON ")
   vim.o.tabline = table.concat(parts)
   vim.cmd("redrawstatus")
@@ -138,7 +138,7 @@ function app.zoom()
   local win = api.nvim_open_win(p.buf, true, {
     relative = "editor", row = 1, col = 0, width = math.max(1, vim.o.columns - 2),
     height = math.max(1, vim.o.lines - 5), border = "rounded",
-    title = " " .. p.name .. " · ZOOM · F4 restores layout ", zindex = 60,
+    title = " " .. p.name .. " · ZOOM · SPC z restores layout ", zindex = 60,
   })
   s.zoom = { win = win, pane = p }
   style(win)
@@ -256,13 +256,13 @@ local function popup(lines, title, width)
   })
   vim.wo[win].cursorline = true
   local function close() if valid(win) then api.nvim_win_close(win, true) end end
-  for _, key in ipairs({ "q", "<Esc>", "<F1>" }) do vim.keymap.set("n", key, close, { buffer = buf }) end
+  for _, key in ipairs({ "q", "<Esc>", "<leader>?" }) do vim.keymap.set("n", key, close, { buffer = buf }) end
   return buf, win, close
 end
 
 function app.attention()
   local items = model.attention(app.sessions)
-  if #items == 0 then vim.notify("Nobody needs you. F7 triggers a background request."); return end
+  if #items == 0 then vim.notify("Nobody needs you. Space b triggers a background request."); return end
   local lines = {}
   for _, item in ipairs(items) do
     lines[#lines + 1] = string.format(" %-7s  %-9s  %-12s  %ds · %s", item.state:upper(), item.project,
@@ -285,26 +285,26 @@ function app.help()
   popup({
     " THROWAWAY · simulated agents only · no network or plugins",
     "",
-    " F2 next pane       F3 tile / float      F4 zoom / restore",
-    " F5 attention       F6 next session      F7 background request",
-    " F8 mouse on/off    F9 terminate session  F1 / q close help",
+    " Press Space, then the key(s). These work in Normal mode.",
+    " Space p next pane   Space f tile/float   Space z zoom/restore",
+    " Space a attention   Space s session      Space b background need",
+    " Space m mouse       Space x terminate    Space ? help / close",
     "",
-    " Normal: Space 1 / 2 selects a session; Space p next pane",
-    " Space b background request; Space a attention; Space ? help",
+    " Space 1 / 2 selects a session",
     " Space w h/j/k/l moves a pane; tiled panes go to that edge",
-    " Space r h/j/k/l resizes; Ctrl-arrows also resize",
+    " Space r h/j/k/l resizes a pane",
     " Ctrl-h/j/k/l focuses adjacent native windows",
     " Space = balances tiled panes; Space q quits the spike",
     "",
-    " Agent terminal: i enters typing; Ctrl-\\ Ctrl-n returns",
+    " Agent terminal: i enters typing; Esc Esc returns to Normal",
+    " Then use Space shortcuts. Ordinary spaces still reach agents.",
     " Type w / b / r / c / x then Enter to change fixture state",
     " Space c continues the focused fixture from Normal mode",
-    " F-keys work from terminal input mode too",
     "",
     " Mouse: drag native separators to resize tiles",
     " Drag a floating title border to move; bottom/right to resize",
     " Shift-drag a tiled pane onto another pane to swap positions",
-    " Click session tabs to switch; F8 disables mouse handling",
+    " Click session tabs to switch; Space m disables mouse handling",
     "",
     " Status shows real PIDs, a worker PID, and heartbeat ticks",
     " Hidden sessions keep ticking; closing stops their fixtures",
@@ -425,15 +425,7 @@ local function bind(key, action, desc, modes)
   end, { silent = true, desc = desc })
 end
 
-bind("<F1>", app.help, "Spike help")
-bind("<F2>", app.cycle, "Next pane")
-bind("<F3>", app.float, "Tile / float")
-bind("<F4>", app.zoom, "Zoom / restore")
-bind("<F5>", app.attention, "Agents needing attention")
-bind("<F6>", function() app.switch() end, "Next session")
-bind("<F7>", app.trigger, "Trigger background attention")
-bind("<F8>", toggle_mouse, "Toggle mouse")
-bind("<F9>", function() app.close() end, "Terminate session")
+vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Leave terminal input for Space shortcuts" })
 for key, action in pairs({
   ["<leader>?"] = app.help, ["<leader>a"] = app.attention,
   ["<leader>p"] = app.cycle, ["<leader>b"] = app.trigger,
@@ -450,9 +442,6 @@ for _, direction in ipairs({ "h", "j", "k", "l" }) do
   bind("<leader>w" .. direction, function() app.move(direction) end, "Move pane", "n")
   bind("<leader>r" .. direction, function() app.resize(direction) end, "Resize pane", "n")
   bind("<C-" .. direction .. ">", function() vim.cmd("wincmd " .. direction) end, "Focus pane")
-end
-for key, direction in pairs({ Left = "h", Right = "l", Up = "k", Down = "j" }) do
-  bind("<C-" .. key .. ">", function() app.resize(direction) end, "Resize pane")
 end
 for _, mode in ipairs({ "n", "t" }) do
   local opts = { expr = true, silent = true, replace_keycodes = true }
@@ -476,16 +465,17 @@ local function create_session(index, name, task)
   fn.writefile({
     "-- ai-nvim / " .. name .. " / " .. task,
     "-- THROWAWAY SAMPLE. Nothing here touches your projects.",
-    "-- F1 help | F2 next pane | F3 float | F4 zoom",
-    "-- F5 attention | F6 session | F7 background request",
-    "-- F8 mouse toggle | F9 terminate this session",
+    "-- Space ? help | Space p pane | Space f float | Space z zoom",
+    "-- Space a attention | Space s session | Space b background need",
+    "-- Space m mouse | Space x terminate | Space 1/2 select session",
     "-- Space w h/j/k/l moves; Space r h/j/k/l resizes.",
     "-- Mouse: native separators resize; floating borders move/resize.",
     "-- Shift-drag tiled panes to swap. Space q exits.",
     "", "local M = {}", "",
     "-- Read here while four simulated agents work in two sessions.",
-    "-- Press F7: a hidden agent will need you without stealing focus.",
-    "-- Press F5 to select it, then Space c to continue its work.",
+    "-- Space b: a hidden agent needs you without stealing focus.",
+    "-- Space a selects it; Space c continues its work.",
+    "-- In agent input: Esc Esc returns to Normal for Space shortcuts.",
     "", "function M.describe(item)", "  return item.name .. ': ' .. item.status", "end", "", "return M",
   }, file)
   vim.cmd("edit " .. fn.fnameescape(file))

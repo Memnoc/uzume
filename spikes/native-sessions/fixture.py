@@ -58,7 +58,8 @@ print(f"\033[38;2;235;188;186m  {args.name} · SIMULATED AGENT\033[0m", flush=Tr
 print(f"  PID {state['pid']}  worker {child.pid}", flush=True)
 print("  w = input needed · b = blocked · r = review ready", flush=True)
 print("  c = continue · x = fail · q = stop (press Enter)", flush=True)
-print("  F1 help · F2 next pane · F6 next session", flush=True)
+print("  Esc Esc → Normal mode → Space ? for help", flush=True)
+print("  Space p next pane · Space s next session", flush=True)
 last = time.monotonic()
 try:
     while running:

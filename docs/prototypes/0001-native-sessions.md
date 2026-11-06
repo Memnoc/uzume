@@ -63,4 +63,8 @@ No persistent test suite was added: these are development probes and manual smok
 
 ## Further notes
 
+User evaluation found the function row inconvenient and conflicting with macOS controls. The prototype now uses Space-leader sequences for all primary actions, with on-screen hints and documentation matching them. Terminal input returns to Normal mode with Esc twice before leader actions; literal spaces remain available to agents. Function-row and Ctrl-arrow mappings have been removed. This is prototype usability feedback, not a final production keymap specification.
+
+A follow-up input smoke check verified leader navigation, float/move/resize/zoom/retile, mouse toggling, the attention-and-continue loop, help, and quit/cleanup. It also verified that spaces reach the simulated terminal command and Esc twice enters Neovim's terminal Normal mode before leader actions.
+
 Source is kept on the throwaway branch `spike/native-sessions`, under `spikes/native-sessions/`, with the root `./spike` launcher. Main should retain design/findings and this branch pointer, not absorb the prototype as production implementation. Run it from that branch, report interaction friction, and settle the next design changes before production tickets.
