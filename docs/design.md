@@ -84,7 +84,7 @@ MNvim's README and Treesitter implementation differ about the branch/pin in use.
 
 ## Next steps and open design work
 
-1. Confirm the [native-session prototype](prototypes/0001-native-sessions.md) scope and run it as a throwaway experiment.
+1. Evaluate the approved [native-session prototype](prototypes/0001-native-sessions.md) with Memnoc; the implementation and technical findings live on `spike/native-sessions`.
 2. Verify terminal key routing, visibility versus process lifetime, cleanup of spawned processes, and resizing under concurrent output.
 3. Prototype the local review interaction separately, including stable snapshots and revision feedback.
 4. Choose snapshot/storage boundaries and reliable per-agent lifecycle and feedback mechanisms from evidence.
