@@ -6,12 +6,14 @@ The design combines native Neovim editing with our own pane and session manageme
 
 ## Project status
 
-Design stage. No implementation or runnable distribution exists yet. Individual decisions have been agreed with Memnoc; prototype scope and the full specification still need confirmation.
+Design and prototype stage. A throwaway native-session experiment lives on branch `spike/native-sessions`; there is no production distribution yet. The first prototype scope has been approved; the full specification remains open.
+
+Run the experiment from this branch with `./spike`. See its [usage guide](spikes/native-sessions/README.md) for controls and boundaries.
 
 - [Design record](docs/design.md): agreed behavior, deferred features, and open questions.
 - [Domain glossary](CONTEXT.md): the meaning of sessions, panes, tasks, and reviews.
 - [Architecture decisions](docs/adr/README.md): choices and their tradeoffs.
-- [First prototype proposal](docs/prototypes/0001-native-sessions.md): a bounded experiment for hands-on evaluation.
+- [First prototype](docs/prototypes/0001-native-sessions.md): scope, technical findings, and pending hands-on evaluation.
 
 ## Development approach
 

@@ -1,6 +1,6 @@
 # First prototype proposal: native sessions and pane interaction
 
-Status: proposed; scope not yet confirmed. No prototype code exists.
+Status: scope approved by Memnoc on 2026-11-06; throwaway prototype implemented on branch `spike/native-sessions`. Human evaluation is pending.
 
 ## Question
 
@@ -42,3 +42,25 @@ The primary verdict is whether the interaction feels worth building upon. Record
 ## Follow-up experiment
 
 Separately prototype the side-by-side review loop: fixed snapshot, navigation, comments, explicit submission, queued/interrupt controls, newer-change indicator, and refresh. Initially use fixtures for agent delivery. Real CLI lifecycle and input behavior must be verified before committing to delivery guarantees.
+
+## Initial findings
+
+The native API experiment supports continuing with hands-on evaluation. On macOS with Neovim `v0.12.0-dev-2155+g1e6c4ea896`, direct RPC exercises and terminal input checks verified:
+
+- Four fixture agents and four spawned workers run across two project tabs, and hidden-session heartbeat counters continue advancing.
+- Triggering attention in a hidden session leaves the current session and focus in place; the selector identifies the project, agent, reason, and waiting time.
+- A terminal window can become a float, move, resize, zoom, restore, and become a tiled window again without restarting its job.
+- Injected mouse events move and resize floating windows and swap tiled panes; native separators retain native mouse resizing.
+- Keyboard session selection, terminal input, function-key focus changes from terminal input, and leader-based floating work through a PTY.
+- Explicit session termination removes that session's two agent processes and two child workers while the other session continues.
+- Normal exit removes the remaining fixture processes and the scratch directory.
+- Forced termination of only Neovim also leaves no fixture agents/workers: the launcher's fallback cleanup removes remaining owned processes and scratch state.
+- Mouse-off input, help, and pane transitions also work at an 80-by-24 grid; a wider terminal is recommended for reading side-by-side panes.
+
+Retiling currently chooses a right-side position rather than restoring the original tile slot. Zoom preserves the underlying layout. Those are intentionally different operations in the spike and need user feedback.
+
+No persistent test suite was added: these are development probes and manual smoke checks, in keeping with Northstar's throwaway spike workflow. Linux, minimum supported Neovim, terminal-specific behavior in Ghostty/WezTerm, real agent workers, and end-to-end latency/FPS are unverified. Simulated lifecycle evidence is not a substitute for probing Codex and Claude.
+
+## Further notes
+
+Source is kept on the throwaway branch `spike/native-sessions`, under `spikes/native-sessions/`, with the root `./spike` launcher. Main should retain design/findings and this branch pointer, not absorb the prototype as production implementation. Run it from that branch, report interaction friction, and settle the next design changes before production tickets.

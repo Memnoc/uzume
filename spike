@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+"""Throwaway launcher. Run ./spike; no plugins, downloads, or user config."""
+import json
+import os
+from pathlib import Path
+import shutil
+import signal
+import subprocess
+import sys
+import tempfile
+import time
+
+
+def interrupted(_sig, _frame):
+    raise KeyboardInterrupt
+
+
+def owned(pid, token):
+    result = subprocess.run(
+        ["ps", "-p", str(pid), "-o", "args="], capture_output=True, text=True
+    )
+    return result.returncode == 0 and token in result.stdout and "fixture.py" in result.stdout
+
+
+def cleanup(root, token):
+    # Only signal fixture PIDs that still identify this exact invocation.
+    pids = set()
+    for path in root.glob("agent-*.json"):
+        try:
+            state = json.loads(path.read_text())
+            pids.update(p for p in (state.get("pid"), state.get("child")) if p)
+        except (OSError, ValueError):
+            pass
+    for sig in (signal.SIGTERM, signal.SIGKILL):
+        for pid in pids:
+            if owned(pid, token):
+                try:
+                    os.kill(pid, sig)
+                except ProcessLookupError:
+                    pass
+        if sig == signal.SIGTERM:
+            time.sleep(0.15)
+
+
+def main():
+    signal.signal(signal.SIGTERM, interrupted)
+    signal.signal(signal.SIGHUP, interrupted)
+    nvim = shutil.which("nvim")
+    if not nvim:
+        print("This spike needs Neovim 0.11+ and Python 3 on PATH.", file=sys.stderr)
+        return 1
+    source = Path(__file__).resolve().parent / "spikes" / "native-sessions"
+    root = Path(tempfile.mkdtemp(prefix="ai-nvim-spike-"))
+    token = root.name
+    env = dict(os.environ)
+    for key in ("CONFIG", "DATA", "STATE", "CACHE"):
+        path = root / key.lower()
+        path.mkdir()
+        env[f"XDG_{key}_HOME"] = str(path)
+    env.update(
+        NVIM_APPNAME="ai-nvim-spike",
+        AINVIM_SPIKE_ROOT=str(root),
+        AINVIM_SPIKE_SOURCE=str(source),
+        AINVIM_SPIKE_PYTHON=sys.executable,
+        AINVIM_SPIKE_TOKEN=token,
+        NVIM_LOG_FILE=str(root / "nvim.log"),
+    )
+    for key in ("NVIM", "NVIM_LISTEN_ADDRESS", "VIMINIT", "EXINIT", "LUA_INIT"):
+        env.pop(key, None)
+    print(f"THROWAWAY ai-nvim spike · scratch: {root}", flush=True)
+    command = [nvim, "-u", str(source / "init.lua"), "-i", "NONE", "--noplugin", *sys.argv[1:]]
+    editor = None
+    try:
+        editor = subprocess.Popen(command, env=env, cwd=root)
+        return editor.wait()
+    except KeyboardInterrupt:
+        if editor and editor.poll() is None:
+            editor.terminate()
+            try:
+                editor.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                editor.kill()
+                editor.wait()
+        return 130
+    finally:
+        cleanup(root, token)
+        shutil.rmtree(root)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
