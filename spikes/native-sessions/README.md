@@ -1,5 +1,8 @@
 # Native sessions spike
 
+For real work in the prepared Drudwyn worktrees, use `./spike --drudwyn` and the
+[pilot guide](PILOT.md). The rest of this page describes the default fixture mode.
+
 Throwaway experiment: can native Neovim windows and terminal jobs provide comfortable pane management and concurrent sessions with predictable termination?
 
 This is an interaction and lifecycle probe, not an MVP or a replacement for your daily editor. The UI is deliberately small. No real agents, accounts, plugins, or downloads are involved.

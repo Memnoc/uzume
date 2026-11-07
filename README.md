@@ -6,9 +6,9 @@ The design combines native Neovim editing with our own pane and session manageme
 
 ## Project status
 
-Design and prototype stage. A throwaway native-session experiment lives on branch `spike/native-sessions`; there is no production distribution yet. The first prototype scope has been approved; the full specification remains open.
+Design and prototype stage. The original fixture experiment lives on `spike/native-sessions`; this branch, `spike/drudwyn-pilot`, adds a real-project trial. There is no production distribution yet; the full specification remains open.
 
-Run the experiment from this branch with `./spike`. See its [usage guide](spikes/native-sessions/README.md) for controls and boundaries.
+Run `./spike --drudwyn` for the prepared Drudwyn worktrees, or `./spike` for disposable fixtures. See the [pilot guide](spikes/native-sessions/PILOT.md) for the next hands-on trial.
 
 - [Design record](docs/design.md): agreed behavior, deferred features, and open questions.
 - [Domain glossary](CONTEXT.md): the meaning of sessions, panes, tasks, and reviews.

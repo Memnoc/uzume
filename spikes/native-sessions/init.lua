@@ -3,6 +3,7 @@ local api, fn = vim.api, vim.fn
 local source = assert(vim.env.AINVIM_SPIKE_SOURCE, "Launch this prototype with ./spike")
 local root = assert(vim.env.AINVIM_SPIKE_ROOT)
 local model = dofile(source .. "/model.lua")
+local live = vim.env.AINVIM_REAL_CONFIG and vim.json.decode(table.concat(fn.readfile(vim.env.AINVIM_REAL_CONFIG), "\n"))
 assert(fn.has("nvim-0.11") == 1, "The native-session spike needs Neovim 0.11+")
 
 vim.g.mapleader = " "
@@ -45,7 +46,7 @@ local colors = {
 }
 for name, value in pairs(colors) do api.nvim_set_hl(0, name, value) end
 
-local app = { sessions = {}, current = 1, quitting = false }
+local app = { sessions = {}, current = 1, quitting = false, real = live ~= nil }
 _G.AiSpike = app -- Inspection surface for manual experiments over the local RPC socket.
 local function valid(win) return win and api.nvim_win_is_valid(win) end
 local function session() return app.sessions[app.current] end
@@ -75,6 +76,10 @@ function app.statusline()
   local mode = s.zoom and s.zoom.pane == p and "ZOOM" or (p.floating and "FLOAT" or "TILE")
   if p.kind == "agent" then
     local st = p.state or {}
+    if live then
+      return string.format(" %s · %s · %s %%= %s · pid %s ", p.name, mode,
+        (st.state or "idle"):upper(), st.evidence or "not started", st.child or "—")
+    end
     return string.format(" %s · %s · %s %%= pid %s / child %s · tick %s ",
       p.name, mode, (st.state or "starting"):upper(), st.pid or "…", st.child or "…", st.tick or 0)
   end
@@ -82,7 +87,7 @@ function app.statusline()
 end
 
 local function redraw()
-  local parts = { "%#TabLineFill# ai-nvim / SPIKE  " }
+  local parts = { "%#TabLineFill# ai-nvim / " .. (live and "PILOT" or "SPIKE") .. "  " }
   for index, s in ipairs(app.sessions) do
     if s.alive and api.nvim_tabpage_is_valid(s.tab) then
       local group = index == app.current and "TabLineSel" or "TabLine"
@@ -221,6 +226,7 @@ function app.resize(direction)
 end
 
 function app.send(index, pane_id, command)
+  if live then vim.notify("Use the agent terminal to give instructions (i enters input)."); return end
   local s = app.sessions[index]
   if not s or not s.alive then return end
   for _, p in ipairs(s.panes) do
@@ -230,6 +236,7 @@ end
 
 local kinds = { "w", "b", "r" }
 function app.trigger()
+  if live then vim.notify("This pilot uses real agent signals; there are no simulated requests."); return end
   local index = model.next_session(app.sessions, app.current)
   local s = index and app.sessions[index]
   if not s then return end
@@ -262,7 +269,11 @@ end
 
 function app.attention()
   local items = model.attention(app.sessions)
-  if #items == 0 then vim.notify("Nobody needs you. Space b triggers a background request."); return end
+  if #items == 0 then
+    vim.notify(live and "No attention signals received. Inspect agent terminals if hooks are not active."
+      or "Nobody needs you. Space b triggers a background request.")
+    return
+  end
   local lines = {}
   for _, item in ipairs(items) do
     lines[#lines + 1] = string.format(" %-7s  %-9s  %-12s  %ds · %s", item.state:upper(), item.project,
@@ -282,6 +293,35 @@ function app.attention()
 end
 
 function app.help()
+  if live then
+    popup({
+      " DRUDWYN PILOT · real CLIs · separate persistent worktrees",
+      "",
+      " Space o opens the current CLI without submitting a task",
+      " Space t starts it with the prepared .ai-nvim-task.md task",
+      " If already running, type: Read .ai-nvim-task.md and do the task",
+      " Codex: review/enable these session status hooks via /hooks",
+      " Authentication and permissions remain in the official CLI",
+      "",
+      " Space 1 Codex / sessions    Space 2 Claude / workspaces",
+      " Space s next session       Space a attention / Enter jump",
+      " Space p next pane          Space f tile/float",
+      " Space z zoom/restore       Space m mouse on/off",
+      " Space w h/j/k/l move       Space r h/j/k/l resize",
+      " Ctrl-h/j/k/l focus         Space = balance tiles",
+      " Space x terminate session  Space q quit (checks unsaved edits)",
+      "",
+      " Terminal: i types; Esc Esc returns to Normal for Space keys",
+      " Mouse: drag separators; floating title moves, edges resize",
+      " Shift-drag tiled panes to swap. Space ? opens this help.",
+      "",
+      " Status 'process' means lifecycle only; 'hook' is agent evidence",
+      " Hidden sessions continue. Terminating stops owned processes.",
+      " Worktree files persist; save editor changes with :w.",
+      " This pilot has no autosave, review snapshots, or feedback queue.",
+    }, "ai-nvim · Drudwyn pilot", 82)
+    return
+  end
   popup({
     " THROWAWAY · simulated agents only · no network or plugins",
     "",
@@ -316,7 +356,15 @@ function app.close(index, confirmed)
   index = index or app.current
   local s = app.sessions[index]
   if not s or not s.alive then return end
-  if not confirmed and fn.confirm("Terminate " .. s.name .. " and its simulated agents?", "&Cancel\n&Terminate", 1) ~= 2 then return end
+  if live then
+    for _, buf in ipairs(api.nvim_list_bufs()) do
+      if vim.bo[buf].modified then
+        vim.notify("Save or discard modified buffers before terminating a session.", vim.log.levels.WARN)
+        return
+      end
+    end
+  end
+  if not confirmed and fn.confirm("Terminate " .. s.name .. " and its " .. (live and "agents?" or "simulated agents?"), "&Cancel\n&Terminate", 1) ~= 2 then return end
   if app.current == index then app.unzoom() end
   s.alive = false
   local jobs = {}
@@ -329,7 +377,7 @@ function app.close(index, confirmed)
     app.switch(next_index)
     vim.cmd("tabclose! " .. api.nvim_tabpage_get_number(s.tab))
   elseif not app.quitting then
-    vim.cmd("qa!")
+    vim.cmd(live and "qa" or "qa!")
   end
   if not app.quitting then redraw() end
 end
@@ -434,7 +482,9 @@ for key, action in pairs({
   ["<leader>x"] = function() app.close() end,
   ["<leader>1"] = function() app.switch(1) end,
   ["<leader>2"] = function() app.switch(2) end,
-  ["<leader>q"] = function() vim.cmd("qa!") end,
+  ["<leader>q"] = function() vim.cmd(live and "confirm qall" or "qa!") end,
+  ["<leader>o"] = function() if live then app.start_agent("open") end end,
+  ["<leader>t"] = function() if live then app.start_agent("task") end end,
   ["<leader>="] = function() vim.cmd("wincmd =") end,
   ["<leader>c"] = function() local p = focused(); if p then app.send(app.current, p.id, "c") end end,
 }) do bind(key, action, "Spike action", "n") end
@@ -511,6 +561,68 @@ local function create_session(index, name, task)
   vim.cmd("wincmd =")
 end
 
+function app.start_agent(action)
+  if not live then return end
+  local s = session()
+  local p = s.panes[2]
+  app.unzoom()
+  focus(p)
+  if p.job and not p.exited then
+    vim.notify("Agent already running. Press i and ask it to read .ai-nvim-task.md.")
+    return
+  end
+  local old = p.buf
+  p.buf = api.nvim_create_buf(false, true)
+  api.nvim_win_set_buf(p.win, p.buf)
+  pcall(api.nvim_buf_delete, old, { force = true })
+  p.exited = false
+  p.state = { state = "starting", evidence = "process" }
+  fn.delete(p.statefile)
+  p.job = fn.jobstart({ vim.env.AINVIM_SPIKE_PYTHON, source .. "/agent.py", vim.env.AINVIM_REAL_CONFIG, s.spec.id, action }, {
+    term = true, cwd = s.cwd,
+    on_exit = function(_, code)
+      p.exited = true
+      p.state = { state = code == 0 and "stopped" or "failed", evidence = "process",
+        reason = "CLI exited with code " .. code .. "; inspect terminal", since = os.time() }
+      if s.alive and not app.quitting then redraw() end
+    end,
+  })
+  assert(p.job > 0, "Unable to start agent supervisor")
+  vim.bo[p.buf].bufhidden = "hide"
+  style(p.win)
+  vim.cmd("startinsert")
+end
+
+local function create_live_session(index, spec)
+  if index > 1 then vim.cmd("tabnew") end
+  local s = { name = spec.name, cwd = spec.cwd, spec = spec, tab = api.nvim_get_current_tabpage(), panes = {}, alive = true }
+  app.sessions[index], app.current = s, index
+  vim.cmd("tcd " .. fn.fnameescape(s.cwd))
+  vim.cmd("edit " .. fn.fnameescape(s.cwd .. "/" .. spec.file))
+  vim.bo.filetype = "rust"
+  vim.cmd("syntax enable")
+  s.panes[1] = { id = 1, name = "Code", kind = "editor", buf = api.nvim_get_current_buf(), win = api.nvim_get_current_win(), floating = false }
+  style(s.panes[1].win)
+  vim.wo.number = true
+  vim.cmd("vnew")
+  local p = { id = 2, name = spec.agent, kind = "agent", buf = api.nvim_get_current_buf(), win = api.nvim_get_current_win(),
+    floating = false, statefile = root .. "/agent-" .. spec.id .. ".json", state = { state = "idle" } }
+  s.panes[2] = p
+  vim.bo[p.buf].buftype = "nofile"
+  api.nvim_buf_set_lines(p.buf, 0, -1, false, {
+    "ai-nvim · Drudwyn pilot · " .. spec.agent, "", "Branch: " .. spec.branch,
+    "Worktree: " .. spec.cwd, "", "Space o: open CLI (login and hook setup first)",
+    "Space t: launch CLI with the prepared task", "", "Task: add Ctrl-u to clear this navigator's filter",
+    "Read .ai-nvim-task.md for scope and acceptance criteria.", "", "No agent starts until you choose.",
+    "Space ? shows controls. Worktree files persist after exit.",
+  })
+  vim.bo[p.buf].modified = false
+  vim.bo[p.buf].modifiable = false
+  style(p.win)
+  focus(s.panes[1])
+  vim.cmd("wincmd =")
+end
+
 api.nvim_create_autocmd("TabEnter", { callback = function()
   local tab = api.nvim_get_current_tabpage()
   for index, s in ipairs(app.sessions) do if s.tab == tab then app.current = index end end
@@ -542,8 +654,12 @@ api.nvim_create_autocmd("VimLeavePre", { callback = function()
 end })
 
 vim.schedule(function()
-  create_session(1, "atlas", "feature/search")
-  create_session(2, "harbor", "feature/export")
+  if live then
+    for index, spec in ipairs(live.sessions) do create_live_session(index, spec) end
+  else
+    create_session(1, "atlas", "feature/search")
+    create_session(2, "harbor", "feature/export")
+  end
   app.switch(1)
   focus(session().panes[1])
   app.timer = vim.uv.new_timer()
