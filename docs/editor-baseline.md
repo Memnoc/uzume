@@ -84,3 +84,8 @@ This is the first part of the baseline inventory. Completion, language support,
 formatting, diagnostics, Git, debugging/testing, and the remaining custom extras
 still need their own mapping. The first runnable editor now supplies the mapped
 navigation and visual foundation; it does not yet supply those language tools.
+
+The subsequent [Extras increment](prototypes/0004-extras-and-languages.md) adds
+Rust, Lua, C/C++, web language tooling and Smear Cursor, with **Space l** opening
+the feature catalog. The remaining baseline extras and full parity are still
+open; the linked record distinguishes verified behavior from pending coverage.

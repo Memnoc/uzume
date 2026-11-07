@@ -31,3 +31,5 @@ The initial reference terminals are Ghostty and WezTerm on macOS and Linux. Kitt
 Branding, Rust component boundaries, plugin selection, and exact version pins are not settled.
 
 The next hands-on trial focuses on the editor: `spike/editor-baseline`, in `/Users/matteostara/Code/ai-nvim-editor`, is registered as **ai-nvim** in `nvims`. Plain `nvim` remains LazyVim. See the [editor preview record](docs/prototypes/0003-editor-baseline.md). The [Drudwyn agent pilot](docs/prototypes/0002-drudwyn-pilot.md) remains available separately on `spike/drudwyn-pilot`.
+
+The editor preview now includes an [Extras catalog and language packs](docs/prototypes/0004-extras-and-languages.md). **Space l** opens the catalog; Rust, Lua, C/C++, TypeScript/React/HTML/CSS, and Smear Cursor are enabled initially.
