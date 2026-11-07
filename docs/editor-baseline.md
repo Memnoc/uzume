@@ -1,6 +1,7 @@
 # Editor baseline: navigation and explorer
 
-Status: agreed behavior and inspected reference, not implemented editor parity.
+Status: first navigation/visual increment implemented on `spike/editor-baseline`;
+full editor parity remains incomplete. See the [evaluation record](prototypes/0003-editor-baseline.md).
 Recorded after initial Drudwyn pilot feedback on 2026-11-07.
 
 ## Interaction direction
@@ -81,5 +82,5 @@ is not automatically available in an independent distribution.
 
 This is the first part of the baseline inventory. Completion, language support,
 formatting, diagnostics, Git, debugging/testing, and the remaining custom extras
-still need their own mapping. No runtime or keymap changes were made by this
-documentation update.
+still need their own mapping. The first runnable editor now supplies the mapped
+navigation and visual foundation; it does not yet supply those language tools.

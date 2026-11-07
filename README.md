@@ -6,9 +6,11 @@ The design combines native Neovim editing with our own pane and session manageme
 
 ## Project status
 
-Design and prototype stage. The original fixture experiment lives on `spike/native-sessions`; this branch, `spike/drudwyn-pilot`, adds a real-project trial. There is no production distribution yet; the full specification remains open.
+Design and prototype stage. This branch, `spike/editor-baseline`, provides the first independent editor preview. There is no production distribution yet; the full specification remains open.
 
-Run `./spike --drudwyn` for the prepared Drudwyn worktrees, or `./spike` for disposable fixtures. See the [pilot guide](spikes/native-sessions/PILOT.md) for the next hands-on trial.
+Run `nvims` and choose **ai-nvim**, or use `NVIM_APPNAME=ai-nvim nvim`. See the [editor guide](editor/README.md) for setup, familiar controls, and the current boundaries. Plain `nvim` keeps the existing LazyVim configuration.
+
+The earlier agent pilot remains available in `/Users/matteostara/Code/ai-nvim` on `spike/drudwyn-pilot`. It is separate from this editor preview while we evaluate the editor first.
 
 - [Design record](docs/design.md): agreed behavior, deferred features, and open questions.
 - [Domain glossary](CONTEXT.md): the meaning of sessions, panes, tasks, and reviews.

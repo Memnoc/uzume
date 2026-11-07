@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+"""Install exact editor-spike packages; optionally register with Memnoc's nvims."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import tarfile
+import tempfile
+import time
+
+SOURCE = Path(__file__).resolve().parent / "editor"
+APP = "ai-nvim"
+
+
+def install(cache):
+    raw = (SOURCE / "plugins.lock.json").read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    data = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / APP
+    releases = data / "releases"
+    releases.mkdir(parents=True, exist_ok=True)
+    target = releases / digest[:12]
+    if (target / ".complete").is_file():
+        if (target / ".complete").read_text().strip() != digest:
+            raise RuntimeError("Package bundle identity mismatch: " + str(target))
+        print("Pinned packages already installed: " + digest[:12])
+        return
+    if target.exists():
+        raise RuntimeError("Incomplete bundle exists; inspect it before retrying: " + str(target))
+    with tempfile.TemporaryDirectory(prefix=".install-", dir=releases) as temporary:
+        staging = Path(temporary)
+        bundle = staging / "bundle"
+        for plugin in json.loads(raw)["plugins"]:
+            repo = cache / plugin["name"]
+            commit = plugin["commit"]
+            available = repo.is_dir() and subprocess.run(
+                ["git", "-C", str(repo), "cat-file", "-e", commit + "^{commit}"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            ).returncode == 0
+            if not available:
+                repo = staging / (plugin["name"] + ".git")
+                subprocess.run(["git", "clone", "--filter=blob:none", "--no-checkout", plugin["url"], str(repo)], check=True)
+            dest = bundle / "pack" / APP / "opt" / plugin["name"]
+            dest.mkdir(parents=True)
+            archive = staging / "package.tar"
+            with archive.open("wb") as output:
+                subprocess.run(["git", "-C", str(repo), "archive", "--format=tar", commit], stdout=output, check=True)
+            with tarfile.open(archive) as package:
+                package.extractall(dest, filter="data")
+            print("Installed " + plugin["name"] + " @ " + commit[:12])
+        docs = sorted(bundle.glob("pack/ai-nvim/opt/*/doc"))
+        lua = "for _, p in ipairs({" + ",".join(json.dumps(str(p), ensure_ascii=False) for p in docs) + "}) do vim.cmd('helptags ' .. vim.fn.fnameescape(p)) end"
+        env = dict(os.environ, NVIM_APPNAME=APP, NVIM_LOG_FILE=str(staging / "nvim.log"))
+        subprocess.run(["nvim", "--headless", "-u", "NONE", "-i", "NONE", "-c", "lua " + lua, "-c", "qa!"], env=env, check=True)
+        (bundle / ".complete").write_text(digest + "\n")
+        bundle.rename(target)
+    print("Bundle: " + str(target))
+
+
+def register():
+    config = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / APP
+    shell = Path.home() / ".zshrc"
+    original = shell.read_text()
+    old = "for candidate in KickstartNeovim LazyVim NvChad FrontVim MemnocVim; do"
+    new = "for candidate in KickstartNeovim LazyVim NvChad FrontVim MemnocVim ai-nvim; do"
+    if old not in original and new not in original:
+        raise RuntimeError("nvims has changed; register ai-nvim in its candidate list manually")
+    if config.exists() or config.is_symlink():
+        if not config.is_symlink() or config.resolve() != SOURCE.resolve():
+            raise RuntimeError("Refusing to replace existing configuration: " + str(config))
+    else:
+        config.parent.mkdir(parents=True, exist_ok=True)
+        config.symlink_to(SOURCE, target_is_directory=True)
+    if old in original:
+        if original.count(old) != 1:
+            raise RuntimeError("Ambiguous nvims definition; no shell change made")
+        backup = shell.with_name(".zshrc.before-ai-nvim-" + str(time.time_ns()))
+        shutil.copy2(shell, backup)
+        shell.write_text(original.replace(old, new, 1))
+        print("Shell backup: " + str(backup))
+    print("Registered " + str(config) + " -> " + str(SOURCE))
+    print("Open a new shell, run nvims, and choose ai-nvim. nvim/default stays unchanged.")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--plugin-cache", type=Path,
+                        default=Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / "nvim/lazy")
+    parser.add_argument("--register", action="store_true", help="add ~/.config/ai-nvim and the nvims candidate")
+    args = parser.parse_args()
+    install(args.plugin_cache)
+    if args.register:
+        register()
+    print("Configuration source: " + str(SOURCE))
+
+
+if __name__ == "__main__":
+    main()

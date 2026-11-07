@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "help_tags": true,
+  "plugins": [
+    {
+      "name": "mini.icons",
+      "url": "https://github.com/nvim-mini/mini.icons.git",
+      "commit": "eab3e692d796d78ea6ffc978d8a380ff26fcf4e3"
+    },
+    {
+      "name": "rose-pine",
+      "url": "https://github.com/rose-pine/neovim.git",
+      "commit": "ff483051a47e27d84bdef47703538df1ed9f4a47"
+    },
+    {
+      "name": "snacks.nvim",
+      "url": "https://github.com/folke/snacks.nvim.git",
+      "commit": "882c996cf28183f4d63640de0b4c02ec886d01f2"
+    },
+    {
+      "name": "which-key.nvim",
+      "url": "https://github.com/folke/which-key.nvim.git",
+      "commit": "3aab2147e74890957785941f0c1ad87d0a44c15a"
+    },
+    {
+      "name": "bufferline.nvim",
+      "url": "https://github.com/akinsho/bufferline.nvim.git",
+      "commit": "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3"
+    },
+    {
+      "name": "lualine.nvim",
+      "url": "https://github.com/nvim-lualine/lualine.nvim.git",
+      "commit": "221ce6b2d999187044529f49da6554a92f740a96"
+    },
+    {
+      "name": "gitsigns.nvim",
+      "url": "https://github.com/lewis6991/gitsigns.nvim.git",
+      "commit": "ef707fb93301a9b856f36eae4c8f56f5b988a794"
+    },
+    {
+      "name": "flash.nvim",
+      "url": "https://github.com/folke/flash.nvim.git",
+      "commit": "5f0f270fdc7c5b0c21d903ee85b9cb06f2ac636a"
+    },
+    {
+      "name": "mini.pairs",
+      "url": "https://github.com/nvim-mini/mini.pairs.git",
+      "commit": "03eb1f0062a2cee5314d1ac3939246e4bb21352e"
+    }
+  ]
+}
