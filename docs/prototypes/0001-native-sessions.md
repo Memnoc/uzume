@@ -1,6 +1,6 @@
 # First prototype proposal: native sessions and pane interaction
 
-Status: scope approved by Memnoc on 2026-11-06; throwaway prototype implemented on branch `spike/native-sessions`. Human evaluation is pending.
+Status: scope approved by Memnoc on 2026-11-06; throwaway prototype implemented on branch `spike/native-sessions`. Memnoc reports that the basic interactions work; realistic workflow evaluation remains open.
 
 ## Question
 
@@ -62,6 +62,8 @@ Retiling currently chooses a right-side position rather than restoring the origi
 No persistent test suite was added: these are development probes and manual smoke checks, in keeping with Northstar's throwaway spike workflow. Linux, minimum supported Neovim, terminal-specific behavior in Ghostty/WezTerm, real agent workers, and end-to-end latency/FPS are unverified. Simulated lifecycle evidence is not a substitute for probing Codex and Claude.
 
 ## Further notes
+
+On 2026-11-07, Memnoc selected Drudwyn (`/Users/matteostara/Code/tmux-agent-watch`) for the next real-project experiment. The fixture trial established that basic interactions work, but Memnoc could not assess attention and switching flow without meaningful project work. Exact shortcuts can be refined later; Space-leader controls and avoiding required function-row keys remain settled. The next pilot should use real agent terminals and isolated worktrees, with its concrete Drudwyn task still to be chosen. This selection does not establish real-agent lifecycle integration or authorize arbitrary backlog implementation.
 
 User evaluation found the function row inconvenient and conflicting with macOS controls. The prototype now uses Space-leader sequences for all primary actions, with on-screen hints and documentation matching them. Terminal input returns to Normal mode with Esc twice before leader actions; literal spaces remain available to agents. Function-row and Ctrl-arrow mappings have been removed. This is prototype usability feedback, not a final production keymap specification.
 
