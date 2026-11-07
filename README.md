@@ -17,6 +17,11 @@ To try it, switch to `spike/native-sessions` and run `./spike`. Its controls and
 
 ## Development approach
 
+Every feature change includes a write-up of behavior, controls, implementation,
+dependencies and stored state, verification, and known limits. The editor-preview
+branch maintains the current index at `docs/features/README.md`; this branch
+retains validated prototype findings.
+
 Use Northstar and ask one design question at a time. Record decisions during the interview; use throwaway spikes to resolve interaction and technical uncertainty. Before the production specification, complete Northstar's compliance triage, then create the spec and incremental tickets. Implement with appropriate TDD and crosscheck, and use harden to verify the assembled workflows. Test small increments with Memnoc rather than building the whole distribution before feedback.
 
 The initial reference terminals are Ghostty and WezTerm on macOS and Linux. Kitty is an additional compatibility target. Animation polish follows a usable core.
