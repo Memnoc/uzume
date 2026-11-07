@@ -29,3 +29,5 @@ The initial reference terminals are Ghostty and WezTerm on macOS and Linux. Kitt
 - [TUIOS](https://github.com/Gaurav-Gosain/tuios): flexible terminal window management inspiration.
 
 Branding, Rust component boundaries, plugin selection, and exact version pins are not settled.
+
+The next hands-on trial is prepared on `spike/drudwyn-pilot`: run `./spike --drudwyn` from that branch. See the [Drudwyn pilot record](docs/prototypes/0002-drudwyn-pilot.md) for scope and verification.

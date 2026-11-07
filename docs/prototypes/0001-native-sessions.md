@@ -1,6 +1,6 @@
 # First prototype proposal: native sessions and pane interaction
 
-Status: scope approved by Memnoc on 2026-11-06; throwaway prototype implemented on branch `spike/native-sessions`. Human evaluation is pending.
+Status: scope approved by Memnoc on 2026-11-06; throwaway prototype implemented on branch `spike/native-sessions`. Memnoc reports that the basic interactions work; realistic workflow evaluation remains open.
 
 ## Question
 
@@ -62,5 +62,11 @@ Retiling currently chooses a right-side position rather than restoring the origi
 No persistent test suite was added: these are development probes and manual smoke checks, in keeping with Northstar's throwaway spike workflow. Linux, minimum supported Neovim, terminal-specific behavior in Ghostty/WezTerm, real agent workers, and end-to-end latency/FPS are unverified. Simulated lifecycle evidence is not a substitute for probing Codex and Claude.
 
 ## Further notes
+
+On 2026-11-07, Memnoc selected Drudwyn for the next real-project experiment, then clarified that the new `/Users/matteostara/Code/tmux-drudwyn` clone should be used. The fixture trial established that basic interactions work, but Memnoc could not assess attention and switching flow without meaningful project work. Exact shortcuts can be refined later; Space-leader controls and avoiding required function-row keys remain settled. Memnoc approved the clear-filter task; the [Drudwyn pilot](0002-drudwyn-pilot.md) prepares separate worktrees for the session and workspace navigators. This selection does not establish real-agent lifecycle integration or authorize arbitrary backlog implementation.
+
+User evaluation found the function row inconvenient and conflicting with macOS controls. The prototype now uses Space-leader sequences for all primary actions, with on-screen hints and documentation matching them. Terminal input returns to Normal mode with Esc twice before leader actions; literal spaces remain available to agents. Function-row and Ctrl-arrow mappings have been removed. This is prototype usability feedback, not a final production keymap specification.
+
+A follow-up input smoke check verified leader navigation, float/move/resize/zoom/retile, mouse toggling, the attention-and-continue loop, help, and quit/cleanup. It also verified that spaces reach the simulated terminal command and Esc twice enters Neovim's terminal Normal mode before leader actions.
 
 Source is kept on the throwaway branch `spike/native-sessions`, under `spikes/native-sessions/`, with the root `./spike` launcher. Main should retain design/findings and this branch pointer, not absorb the prototype as production implementation. Run it from that branch, report interaction friction, and settle the next design changes before production tickets.
