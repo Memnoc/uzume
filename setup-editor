@@ -15,7 +15,7 @@ SOURCE = Path(__file__).resolve().parent / "editor"
 APP = "ai-nvim"
 
 
-def install(cache):
+def install(cache, syntax_cache):
     raw = (SOURCE / "plugins.lock.json").read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     data = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / APP
@@ -50,6 +50,14 @@ def install(cache):
             with tarfile.open(archive) as package:
                 package.extractall(dest, filter="data")
             print("Installed " + plugin["name"] + " @ " + commit[:12])
+        syntax = json.loads(raw).get("syntax", {})
+        for relative, expected in syntax.get("files", {}).items():
+            source = syntax_cache / relative
+            if not source.is_file() or hashlib.sha256(source.read_bytes()).hexdigest() != expected:
+                raise RuntimeError("Pinned syntax resource missing or changed: " + str(source))
+            dest = bundle / "pack" / APP / "opt" / "syntax" / relative
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, dest)
         docs = sorted(bundle.glob("pack/ai-nvim/opt/*/doc"))
         lua = "for _, p in ipairs({" + ",".join(json.dumps(str(p), ensure_ascii=False) for p in docs) + "}) do vim.cmd('helptags ' .. vim.fn.fnameescape(p)) end"
         env = dict(os.environ, NVIM_APPNAME=APP, NVIM_LOG_FILE=str(staging / "nvim.log"))
@@ -57,6 +65,27 @@ def install(cache):
         (bundle / ".complete").write_text(digest + "\n")
         bundle.rename(target)
     print("Bundle: " + str(target))
+
+
+def discover_tools(cache):
+    names = ["rust-analyzer", "rustfmt", "lua-language-server", "stylua", "clangd", "vtsls",
+             "vscode-html-language-server", "vscode-css-language-server", "vscode-json-language-server",
+             "vscode-eslint-language-server", "prettier", "tailwindcss-language-server", "emmet-ls"]
+    paths = {}
+    for name in names:
+        candidates = [cache / "bin" / name, cache / "packages/eslint-lsp/node_modules/.bin" / name]
+        if shutil.which(name):
+            candidates.append(Path(shutil.which(name)))
+        for candidate in candidates:
+            if candidate.is_file() and os.access(candidate, os.X_OK):
+                paths[name] = str(candidate)
+                break
+    data = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / APP
+    target = data / "tool-paths.json"
+    temporary = target.with_suffix(".tmp")
+    temporary.write_text(json.dumps(paths, indent=2) + "\n")
+    temporary.replace(target)
+    print("External tools found (read-only references): " + str(len(paths)) + "/" + str(len(names)))
 
 
 def register():
@@ -89,8 +118,11 @@ def main():
     parser.add_argument("--plugin-cache", type=Path,
                         default=Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / "nvim/lazy")
     parser.add_argument("--register", action="store_true", help="add ~/.config/ai-nvim and the nvims candidate")
+    parser.add_argument("--syntax-cache", type=Path, default=Path.home() / ".local/share/nvim/site")
+    parser.add_argument("--tool-cache", type=Path, default=Path.home() / ".local/share/nvim/mason")
     args = parser.parse_args()
-    install(args.plugin_cache)
+    install(args.plugin_cache, args.syntax_cache)
+    discover_tools(args.tool_cache)
     if args.register:
         register()
     print("Configuration source: " + str(SOURCE))

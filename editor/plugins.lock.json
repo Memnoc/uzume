@@ -46,6 +46,131 @@
       "name": "mini.pairs",
       "url": "https://github.com/nvim-mini/mini.pairs.git",
       "commit": "03eb1f0062a2cee5314d1ac3939246e4bb21352e"
+    },
+    {
+      "name": "nvim-lspconfig",
+      "url": "https://github.com/neovim/nvim-lspconfig.git",
+      "commit": "993d048db0d83d8e8ba3f9cb376456321acdcce3",
+      "extra": "languages"
+    },
+    {
+      "name": "nvim-cmp",
+      "url": "https://github.com/hrsh7th/nvim-cmp.git",
+      "commit": "fe29aba4117227a6df637bc41e4b4fb4e98864a0",
+      "extra": "languages"
+    },
+    {
+      "name": "cmp-nvim-lsp",
+      "url": "https://github.com/hrsh7th/cmp-nvim-lsp.git",
+      "commit": "cd4ee08a988deb47ac3726f418fb27fe1a95729d",
+      "extra": "languages"
+    },
+    {
+      "name": "cmp-buffer",
+      "url": "https://github.com/hrsh7th/cmp-buffer.git",
+      "commit": "b74fab3656eea9de20a9b8116afa3cfc4ec09657",
+      "extra": "languages"
+    },
+    {
+      "name": "cmp-path",
+      "url": "https://github.com/hrsh7th/cmp-path.git",
+      "commit": "c642487086dbd9a93160e1679a1327be111cbc25",
+      "extra": "languages"
+    },
+    {
+      "name": "conform.nvim",
+      "url": "https://github.com/stevearc/conform.nvim.git",
+      "commit": "016802de402556da54c36bd7359b441266b01cdd",
+      "extra": "languages"
+    },
+    {
+      "name": "lazydev.nvim",
+      "url": "https://github.com/folke/lazydev.nvim.git",
+      "commit": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d",
+      "extra": "lua"
+    },
+    {
+      "name": "nvim-ts-autotag",
+      "url": "https://github.com/windwp/nvim-ts-autotag.git",
+      "commit": "d7220b55e16ed3c04e88086256def5d282429493",
+      "extra": "web"
+    },
+    {
+      "name": "smear-cursor.nvim",
+      "url": "https://github.com/sphamba/smear-cursor.nvim.git",
+      "commit": "f6cb57c342268177f719acc3968b9d8de3ecc969",
+      "extra": "smear"
     }
-  ]
+  ],
+  "syntax": {
+    "platform": "darwin-arm64",
+    "files": {
+      "parser/c.so": "4b46e7c2998d2bed84fc691768bba9f93b244b4d0ba951cf1c1d3619ac77bcf3",
+      "parser/cpp.so": "829ff950ba0151b1e9104688ccb4796a15f5032b3974cb08ea5765950fa3a9f6",
+      "parser/html.so": "e5b7413f247b0f0b91402124435e9c166c640fe579342448b2b42b6163a97a3a",
+      "parser/javascript.so": "d276f99137f2293ce3472a3f73c312d6e59b43b5b1c9b6e05c8c136f79463717",
+      "parser/json.so": "eddbacd871607b8a0a15daed03c6adb462182b4829c7987b798ffbdde8c7f32b",
+      "parser/lua.so": "2a81c6f4cbe12688d8190514102242540ed33cfa1e977ede7870272a9edc8c06",
+      "parser/rust.so": "2e406103560a709cf6ce9003ec202df5b0924584c2285152805e31457d4e54f9",
+      "parser/tsx.so": "d5dc6860bb3dcef5f4b5fa76d47ebbfd48849a232490dbfefbece7400e67d90f",
+      "parser/typescript.so": "5153562996e0f18ca11c6caf95ca157889e69fd7ded2a60a87444fce522cc230",
+      "queries/c/folds.scm": "f909cc918deec9a7845203a1c86d29b6177fbe0cb8603b83ef3d81b6a9276a59",
+      "queries/c/highlights.scm": "2c473f14247cb168380627ebafe911ebc07052eb71c52950946380156be964f7",
+      "queries/c/indents.scm": "f23c147d7b9522c6d4f4b761a4ea7de1f32090af36974527cbca6a1fd46facde",
+      "queries/c/injections.scm": "496571d8af1ee16934245f69b5d39f897baa431251ef1f67048323c0dea637c0",
+      "queries/c/locals.scm": "b3ecf04dadb49555af03644686fb68c3ce3ccfd98af33f003371beb5a37652b0",
+      "queries/cpp/folds.scm": "a1e1ba255956cfb30e720b7ef251027339ec7305a25d6771e20fba611728fb0a",
+      "queries/cpp/highlights.scm": "a10230678cc32f0c45eab0d3109f5bbef9fa65210efb9f0576d0a3ebacc752a8",
+      "queries/cpp/indents.scm": "7ea910f1d0308158db49c22ba83d5ace260869d727daa7c12995d2a10ef5c14b",
+      "queries/cpp/injections.scm": "cf1a52cb953a35f2a2715129cdd4312443bde423bc49aa132b9da74ef234f096",
+      "queries/cpp/locals.scm": "7047179aee75f5e85b0fadd1da4a1856b32d68d6694952738a257ca13a5e4a52",
+      "queries/ecma/folds.scm": "a97b18e52b7bc8b70075ed1a78dad12e72e5e5ae769bb212d8276186a972dd91",
+      "queries/ecma/highlights.scm": "37834547ebaa9c160cad87eabd38387d4722b1b40d44bab54d8e71d1feff9b9e",
+      "queries/ecma/indents.scm": "f1d506f5dd8079717187afb84e9c9cac951de3496f4dbbdae8750cd01c2740d5",
+      "queries/ecma/injections.scm": "b781a95b85af58d00dd129ea2c73858af3ea19678c2e7132ccc6596469c7c6db",
+      "queries/ecma/locals.scm": "ef34af720ae42c4c04b7fbf1c28f5f2403b00eab524dc66e5264aff0eda8a819",
+      "queries/html/folds.scm": "554602944873b08eec04ffe76ab79b5d4609f75394490c124397426a9b0d3e44",
+      "queries/html/highlights.scm": "51bd6796b8e61616ad967d31a68f6b53fc4ba44ecdec4001ec7f83fbe5f2d763",
+      "queries/html/indents.scm": "fedd128d8b417fd28567bab0932d7a3786ed59e5b4a4383e5fa25e26b621d73e",
+      "queries/html/injections.scm": "8fc292c0ba2d60e3808b7a58815d5cb8e7aee94c4d1310b9d1e0eec6b4462ee3",
+      "queries/html/locals.scm": "ac78830a6a7eab92a71ba4e5448f104e059ae1e88e355e68a3035191a260be74",
+      "queries/html_tags/highlights.scm": "169e5655724ef9f67087ff02ed9b58855aff5783a90c76ce5640fc9fc22eca7e",
+      "queries/html_tags/indents.scm": "d9a4998f3b138a948aaf239f2930f8b0d88bb9dcb8f2b188a91416f27c66dbcd",
+      "queries/html_tags/injections.scm": "f7404de989e7d13705c1a9bf9491097f777362b011331e5d97530cf1e129f8ce",
+      "queries/javascript/folds.scm": "b6473f9af85876eaca477fbe61462e80f316c5b12387be62fe1b40cae72914c2",
+      "queries/javascript/highlights.scm": "d429c015300e55e5dbbe11c119b844bd6f56755e46d0d2152cb4443616ef2856",
+      "queries/javascript/indents.scm": "b6473f9af85876eaca477fbe61462e80f316c5b12387be62fe1b40cae72914c2",
+      "queries/javascript/injections.scm": "b6473f9af85876eaca477fbe61462e80f316c5b12387be62fe1b40cae72914c2",
+      "queries/javascript/locals.scm": "7eaa5782e942a7a335a033cc26976a37cdb677be65283ce8608fede6bffd3742",
+      "queries/json/folds.scm": "7946e857230de4899bc8eed17744fe0672c404bfdcc53118dfdedd7bb509af92",
+      "queries/json/highlights.scm": "a7860933f0da33d282b46e697fd2ea8102fae34d44e1a2e6bfdc39b910975bd1",
+      "queries/json/indents.scm": "02cfe175f0cc599803b5a236441bab01ff99998e792f8c02c3b00d0d28b31d37",
+      "queries/json/injections.scm": "e8bc96da2faabe257a32d805d3954e200215d94a85fce4d521530c89e0969244",
+      "queries/json/locals.scm": "9c7b66bb2fe5b7bc4441ae6d95eedebab7dabbbb9d74e9e6a042bcf6b91af590",
+      "queries/jsx/folds.scm": "2010b94da6016d00ebe18e31d321df127c11aa3fb75d39ae2e2a32d1fce042ff",
+      "queries/jsx/highlights.scm": "fbeaa6de60604615a8dc7c18eb6e0d33f32aee51628b57e6e03b0c8baf687568",
+      "queries/jsx/indents.scm": "014d00e54eb822ac0c8718f8d05e65c561d7a0a08bafc9b1b4dde8ceb8569c55",
+      "queries/jsx/injections.scm": "85ded87ac041c56b6f0fde461983878d48dd29c51205c01908446ec26fc08d62",
+      "queries/lua/folds.scm": "4e18315fb845cb6cc08fa97798298cea72c636389e626c1f336452bc9ad37238",
+      "queries/lua/highlights.scm": "ac7dfa89d16ba817c3681aa47c22bdb4441a78a89ed827a757efa755992de67f",
+      "queries/lua/indents.scm": "593b6b01a3a7fccf8b01dfc80de058c813bf3fa83c1f24a6244326b96e19ec51",
+      "queries/lua/injections.scm": "a2ee92c2f00f39ebeeb1d0cc06302dba58c4f1dda77a2f0c9e5d7d7beab0b1ff",
+      "queries/lua/locals.scm": "826bec7f13e70d25dc78ac06bd4bd67e89a2011ebd1dc6b8442cf67c2bd2290b",
+      "queries/rust/folds.scm": "e990d25ccf16b731621cda0536b517267396b02c33b2e6e3b3b3c6dfb6f4c000",
+      "queries/rust/highlights.scm": "4e0f5994f30ee545fc63435054a0b029c7d0222632c5c787c4e9c249dc0ef20f",
+      "queries/rust/indents.scm": "7060269eabc738bafd64ee8f686450b0f2f0b847e6e006ec2d4cb9c7ad6770bc",
+      "queries/rust/injections.scm": "7dde97bbdabd208f984e13627bd4daae0f73012c41faafab39d670b607710f4e",
+      "queries/rust/locals.scm": "a31540dbd462ba6699a5e494764aee2bbfdaea560915d708f6da4d4df4ad3ec5",
+      "queries/tsx/folds.scm": "0631577ba119c6b1f9fbabe70d70ad17ae81e4e7d8afb0e2309bd8acee0f5f76",
+      "queries/tsx/highlights.scm": "0631577ba119c6b1f9fbabe70d70ad17ae81e4e7d8afb0e2309bd8acee0f5f76",
+      "queries/tsx/indents.scm": "0631577ba119c6b1f9fbabe70d70ad17ae81e4e7d8afb0e2309bd8acee0f5f76",
+      "queries/tsx/injections.scm": "0631577ba119c6b1f9fbabe70d70ad17ae81e4e7d8afb0e2309bd8acee0f5f76",
+      "queries/tsx/locals.scm": "4005262cb792c982cc97218b384dbd4d41a1b8fdd08374a7c1e45ecf3cd49460",
+      "queries/typescript/folds.scm": "e5b1b0552e8312f1d048ecfaa9a7fc96e32533e3e173e9185dee563c473ae224",
+      "queries/typescript/highlights.scm": "0caa2987e274d06aeb8f9a8a521c8348fc0dd92683b52a303338d066f0432137",
+      "queries/typescript/indents.scm": "b197d236e16cb5b9acd93c48daf411f9d64b5ee43c0ea42abba97c9c671101d1",
+      "queries/typescript/injections.scm": "aeabdbe587f8334f44483234914b64294aff416f7d2bb322b6a64ae44b936b12",
+      "queries/typescript/locals.scm": "f1c37f388e906d56626469108f8cc0e1268291b9974501cf3479e9f06908405c"
+    }
+  }
 }

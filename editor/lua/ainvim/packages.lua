@@ -11,11 +11,16 @@ function M.load()
   vim.opt.packpath:prepend(path)
   -- Native opt packages, installed from exact commits. Startup never updates.
   for _, plugin in ipairs(vim.json.decode(lock).plugins) do
-    vim.cmd.packadd(plugin.name)
+    if not plugin.extra or require("ainvim.extras").enabled(plugin.extra) then
+      vim.cmd.packadd(plugin.name)
+    end
     if plugin.name == "mini.icons" then
       require("mini.icons").setup()
       require("mini.icons").mock_nvim_web_devicons()
     end
+  end
+  if require("ainvim.extras").enabled("languages") then
+    vim.cmd.packadd("syntax")
   end
   vim.g.ainvim_release = release
 end

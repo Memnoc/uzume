@@ -6,8 +6,10 @@ LazyVim navigation and visual feel before adding agent sessions?
 This first increment supplies Rose Pine, a Snacks sidebar and floating pickers,
 WhichKey's Helix leader menus, buffer/status lines, Git signs and hunk actions,
 Flash navigation, paired delimiters, and the familiar shell terminal shortcuts.
-Nine plugins are pinned to exact commits and loaded with Neovim's native package
-support. There is no dependency on LazyVim or a plugin-manager runtime.
+The base and optional plugins are pinned to exact commits and loaded with
+Neovim's native package support. There is no dependency on LazyVim or a
+plugin-manager runtime. **Space l** (or `:Extras`) manages the language packs and
+Smear Cursor; see [Extras](EXTRAS.md) for controls and tool requirements.
 
 ## Launch
 
@@ -45,17 +47,18 @@ otherwise it downloads the declared repository and extracts the pinned commit.
    through changes. **Space uM** toggles the mouse. **Space qq** quits with normal
    unsaved-buffer confirmation. Save files with `:w` or **Ctrl-s**.
 
-This increment uses native syntax highlighting. Language servers, automatic
-completion, formatters, advanced Treesitter features, debugging/tests, previews,
-and the remaining custom extras are still pending. Diagnostic displays are
-ready for later language support; their presence does not mean a server is
-installed. Agent sessions and the custom review suite remain in the separate
-pilot, not this editor preview.
+Rust, Lua, C/C++, and TypeScript/React/HTML/CSS packs now supply language servers,
+completion, diagnostics and formatting. Native Treesitter handles the captured
+language parsers, including TSX; CSS retains native Vim syntax highlighting.
+Smear Cursor is enabled and can be toggled with **Space ua**. Debugging/test
+adapters, remaining language previews/custom extras, agent sessions and the
+custom review suite are still separate work.
 
 Unlike the original fixture spike, edits to opened files and normal editor
 recovery/history persist. Source-file saving remains explicit. Root detection
-currently uses `.git` (including worktrees), `lua`, then cwd; LSP-root precedence
-will be evaluated with the language tooling increment.
+uses the attached LSP root, then `.git` (including worktrees), `lua`, and cwd.
+Formatting runs on explicit saves by default; **Space uf** toggles it globally,
+**Space uF** per buffer, and **Space cf** formats explicitly.
 
 ## Installation and pins
 
@@ -65,6 +68,10 @@ will be evaluated with the language tooling increment.
 
 Requires Neovim 0.11+, Python 3.12+, Git, `rg`, and `fd`. A Nerd Font provides the
 icons, as in the current LazyVim setup. The shell picker also needs `fzf`.
+This local preview's captured parser binaries are for macOS ARM64. Installation
+also requires the exact parser/query cache identified in the lockfile; portable
+parser builds are not implemented yet. Language executables are discovered as
+read-only external tools, not installed or updated by this script.
 
 The installer adds only the `ai-nvim` entry to Memnoc's existing `nvims` list,
 backs up `.zshrc`, and refuses to replace an unrelated config. It is idempotent.
