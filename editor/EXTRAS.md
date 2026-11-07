@@ -5,6 +5,37 @@ then **Ctrl-s** to save. Restart ai-nvim to apply saved changes. Closing with
 Escape discards changes that were not saved. The menu marks changes that require
 a restart and shows required/optional tool availability in its preview.
 
+The menu border keeps the controls visible: **Ctrl-n/p** moves, **Enter** toggles,
+**Ctrl-s** saves, and one **Esc** cancels. Type to filter; arrow keys also move.
+The preview appears beside the list in wide terminals and below it in narrower
+ones. The icon legend stays at the top even when details are out of view.
+
+| Indicator | Meaning |
+| --- | --- |
+| ✓ | Selected to be enabled |
+| ○ | Selected to be disabled |
+| * unsaved | Different from the last saved choice; Ctrl-s commits it |
+| ↻ restart | Different from the currently running configuration |
+| missing tools | A required executable was not found; details list it |
+
+Icons have different shapes as well as colors. The preview spells out both
+**Selected** and **Running now** so a draft toggle is not mistaken for an
+immediate change. Cancelling does not undo preferences saved earlier.
+
+## How it is built
+
+This is our own small manager inspired by LazyExtras, not LazyExtras itself.
+[extras.lua](lua/ainvim/extras.lua) owns the catalog, preferences and Snacks picker.
+It separates the startup state, saved choices for the next launch, and a draft
+copy for the open menu. Enter edits only the draft. Ctrl-s validates all catalog
+choices and atomically renames a temporary JSON file into place; Esc drops the
+draft. [packages.lua](lua/ainvim/packages.lua) and
+[languages.lua](lua/ainvim/languages.lua) use startup choices to load features.
+There is no dependency on LazyVim or lazy.nvim, and no general third-party
+Extras marketplace or custom-pack editor yet.
+
+## Available packs
+
 The requested packs are enabled initially:
 
 | Pack | Provides |
@@ -71,3 +102,7 @@ the current mechanism is a local, working editor experiment.
 Smear mirrors the existing color/target settings, excludes picker/input/menu
 buffers, and does not animate terminal input. It is independent of other Snacks
 animations. No FPS or terminal-specific performance guarantee has been measured.
+
+See the [feature index](../docs/features/README.md) for the rest of the editor,
+and the [prototype record](../docs/prototypes/0004-extras-and-languages.md) for
+verification and remaining evaluation.

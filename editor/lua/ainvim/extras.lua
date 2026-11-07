@@ -88,7 +88,18 @@ function M.show()
   local function items()
     local result = {}
     for _, entry in ipairs(M.catalog) do
-      local lines = { "# " .. entry.name, "", entry.description, "", "## Tools" }
+      local lines = {
+        "# " .. entry.name,
+        "",
+        entry.description,
+        "",
+        "Selected: " .. (draft[entry.id] and "Enabled" or "Disabled"),
+        "Running now: " .. (M.active[entry.id] and "Enabled" or "Disabled"),
+        draft[entry.id] ~= M.desired[entry.id] and "Unsaved change — Ctrl-s to save."
+          or (draft[entry.id] ~= M.active[entry.id] and "Saved — restart to apply." or "No pending change."),
+        "",
+        "## Tools",
+      }
       local missing = false
       for _, tool in ipairs(entry.tools) do
         local location = require("ainvim.tools").find(tool)
@@ -103,28 +114,55 @@ function M.show()
       end
       vim.list_extend(lines, {
         "",
-        "Enter: toggle  ·  Ctrl-s: save  ·  Esc: close",
+        "Type: filter  ·  Ctrl-n/p or arrows: move",
+        "Enter: toggle  ·  Ctrl-s: save  ·  Esc: cancel",
         "Changes take effect on restart. No tools are downloaded by this menu.",
       })
       result[#result + 1] = {
         id = entry.id,
         text = entry.name,
-        label = (draft[entry.id] and "[on]  " or "[off] ")
-          .. entry.name
-          .. (draft[entry.id] ~= M.active[entry.id] and "  (restart)" or "")
-          .. (missing and "  · missing tools" or ""),
+        enabled = draft[entry.id],
+        unsaved = draft[entry.id] ~= M.desired[entry.id],
+        restart = draft[entry.id] ~= M.active[entry.id],
+        missing = missing,
         preview = { text = table.concat(lines, "\n"), ft = "markdown" },
       }
     end
     return result
   end
   Snacks.picker({
-    title = "Extras · Enter toggle · Ctrl-s save",
+    title = "Extras",
     items = items(),
     preview = "preview",
-    layout = { preset = "default" },
+    layout = function()
+      local wide = vim.o.columns >= 120
+      return {
+        layout = {
+          box = "vertical",
+          width = 0.9,
+          height = 0.85,
+          border = "rounded",
+          title = " Extras · ✓ enabled · ○ disabled ",
+          title_pos = "center",
+          footer = " Ctrl-n/p move · Enter toggle · Ctrl-s save · Esc cancel ",
+          footer_pos = "center",
+          { win = "input", height = 1, border = "bottom", title = " Type to filter ", title_pos = "left" },
+          {
+            box = wide and "horizontal" or "vertical",
+            { win = "list", border = "none", height = not wide and 6 or nil },
+            { win = "preview", title = " Details ", border = wide and "left" or "top", width = wide and 0.5 or nil },
+          },
+        },
+      }
+    end,
     format = function(item)
-      return { { item.label } }
+      return {
+        { item.enabled and "✓ " or "○ ", item.enabled and "DiagnosticOk" or "Comment" },
+        { item.text },
+        { item.unsaved and "  * unsaved" or "", "DiagnosticWarn" },
+        { item.restart and "  ↻ restart" or "", "DiagnosticInfo" },
+        { item.missing and "  · missing tools" or "", "DiagnosticWarn" },
+      }
     end,
     confirm = function(picker, item)
       if not item then
@@ -141,8 +179,14 @@ function M.show()
       end,
     },
     win = {
-      input = { keys = { ["<C-s>"] = { "save_extras", mode = { "i", "n" } } } },
-      list = { keys = { ["<C-s>"] = "save_extras" } },
+      input = {
+        keys = {
+          ["<C-s>"] = { "save_extras", mode = { "i", "n" } },
+          ["<Esc>"] = { "close", mode = { "i", "n" } },
+        },
+      },
+      list = { keys = { ["<C-s>"] = "save_extras", ["<Esc>"] = "close" } },
+      preview = { keys = { ["<C-s>"] = "save_extras", ["<Esc>"] = "close" } },
     },
   })
 end

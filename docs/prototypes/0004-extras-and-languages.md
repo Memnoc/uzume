@@ -95,3 +95,29 @@ pilot remains available; this increment does not integrate agent sessions.
 
 Main retains this record. Implementation and `editor/EXTRAS.md` stay on the
 editor spike branch.
+
+## Follow-up: discoverable controls and feature write-ups
+
+Memnoc requested ongoing write-ups explaining each feature and its implementation,
+and controls visible directly in the Extras menu. The editor branch now keeps a
+feature index at `docs/features/README.md`, covering editor/navigation, languages,
+cursor animation, installation/isolation/pins, and the separate agent pilot.
+`editor/EXTRAS.md` explains the custom manager, its state model and shortcuts.
+Future feature changes must update these guides with behavior, usage,
+implementation, dependencies/state, verification and remaining limits.
+
+The menu now has a persistent icon legend (✓ enabled, ○ disabled) and a border
+footer listing Ctrl-n/p movement, Enter toggle, Ctrl-s save and Esc cancel.
+Unsaved choices and changes awaiting restart have separate markers. The preview
+spells out selected versus running state. One Escape closes from input or list,
+discarding the current draft. Previously saved choices remain saved. The details
+sit beside the list in wide terminals and below it when opened below 120 columns.
+
+Disposable real-PTY probes passed at 150×45 and 80×24: rendered icon rows,
+legend/footer text fitting the frame, draft/restart markers, preview state and
+single-Escape cancellation without writing preferences. The existing interaction
+probe also passed filtering, save, discard, restart activation, all-disabled
+loading, temporary Smear toggle and HTML tag closing. Formatting, whitespace and
+local guide links were checked. These probes used isolated ai-nvim data; the
+user's pack preferences were not changed. This does not establish behavior at
+all terminal sizes or animation performance.

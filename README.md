@@ -15,11 +15,16 @@ Run `nvims` and choose **ai-nvim**, or use `NVIM_APPNAME=ai-nvim nvim`. See the 
 The earlier agent pilot remains available in `/Users/matteostara/Code/ai-nvim` on `spike/drudwyn-pilot`. It is separate from this editor preview while we evaluate the editor first.
 
 - [Design record](docs/design.md): agreed behavior, deferred features, and open questions.
+- [Feature guide](docs/features/README.md): available features, shortcuts, implementation and limits.
 - [Domain glossary](CONTEXT.md): the meaning of sessions, panes, tasks, and reviews.
 - [Architecture decisions](docs/adr/README.md): choices and their tradeoffs.
 - [First prototype](docs/prototypes/0001-native-sessions.md): scope, technical findings, and pending hands-on evaluation.
 
 ## Development approach
+
+Every feature change includes an updated feature write-up: behavior, controls,
+implementation, dependencies and stored state, verification, and known limits.
+Keep the feature index current and distinguish implemented features from plans.
 
 Use Northstar and ask one design question at a time. Record decisions during the interview; use throwaway spikes to resolve interaction and technical uncertainty. Before the production specification, complete Northstar's compliance triage, then create the spec and incremental tickets. Implement with appropriate TDD and crosscheck, and use harden to verify the assembled workflows. Test small increments with Memnoc rather than building the whole distribution before feedback.
 

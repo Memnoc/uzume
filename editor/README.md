@@ -10,6 +10,8 @@ The base and optional plugins are pinned to exact commits and loaded with
 Neovim's native package support. There is no dependency on LazyVim or a
 plugin-manager runtime. **Space l** (or `:Extras`) manages the language packs and
 Smear Cursor; see [Extras](EXTRAS.md) for controls and tool requirements.
+The [feature guide](../docs/features/README.md) explains every current feature
+group, its implementation, shortcuts, stored state and known limits.
 
 ## Launch
 
