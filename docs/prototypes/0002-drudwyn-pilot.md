@@ -1,6 +1,6 @@
 # Drudwyn real-project pilot
 
-Date: 2026-11-07. Status: prepared for hands-on evaluation; not production code.
+Date: 2026-11-07. Status: initial hands-on feedback received; not production code.
 Throwaway branch: `spike/drudwyn-pilot`.
 
 ## Question and authorization
@@ -80,11 +80,22 @@ heavy output remain unverified.
 
 ## Next observation
 
-Use the task in both sessions and record where an attention signal is missing,
-switching loses the reading position, or terminal/Normal mode friction gets in
-the way. Refine those interactions before finalizing shortcuts or expanding the
-distribution. Code review snapshots and feedback delivery remain a separate
-experiment. This pilot is not approval to ship the prototype as the distro.
+Memnoc reports that the AI workflow feels more accessible than opening a
+separate terminal. However, the editor lacks the feel, visual appeal, and
+functionality of the current LazyVim configuration. The next priority is a solid
+editor experience, then determining how the AI workflow best fits within it.
+
+For sessions/workspaces, Memnoc prefers Neovim/LazyVim-style floating or anchored
+menus that can expand and collapse through keyboard shortcuts. Their default
+placement and exact interaction are still open; the pilot's tab presentation
+is not a final navigation decision.
+
+This feedback supports keeping agents close to code but does not validate full
+editor parity, authenticated lifecycle reliability, or a production keymap.
+Complete the editor baseline inventory and evaluate an editor-focused increment
+before expanding AI features. Keep the existing pilot as a reference. Code
+review snapshots and feedback delivery remain separate work. This pilot is not
+approval to ship the prototype as the distro.
 
 ## Further notes
 

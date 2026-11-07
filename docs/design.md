@@ -29,6 +29,7 @@ Four directly launched agents are the initial everyday performance workload, not
 - Moving, resizing, tiling, floating, zooming, and switching panes must be keyboard accessible.
 - Mouse dragging and resizing are supported; mouse support can be disabled. Keyboard use remains central.
 - Drudwyn's compact navigation, visible shortcuts, restrained borders, and agent-state cues are references. Preserve the current configuration's visual preferences unless a change is deliberately agreed.
+- Most navigation menus, including session/workspace quick switching, should float; selected persistent tools should be anchored. Menus expand/collapse through keyboard shortcuts. The file explorer is an essential anchored sidebar with the existing LazyVim/Snacks shortcuts, including `<leader>e` and explorer-local `a`. Exact session-menu hierarchy remains open. See the [editor baseline](editor-baseline.md).
 - Ghostty and WezTerm are primary reference terminals on macOS and Linux. Kitty is an additional compatibility target.
 - Smooth input and resizing matter in the first usable version. Animation polish follows the working product and remains configurable/off-switchable.
 - GPU-accelerated terminals are the intended environment. Hardware thresholds, terminal version requirements, and any hard compatibility gate require measurements before adoption.
@@ -84,11 +85,17 @@ MNvim's README and Treesitter implementation differ about the branch/pin in use.
 
 ## Next steps and open design work
 
-1. Evaluate the approved [native-session prototype](prototypes/0001-native-sessions.md) with Memnoc; the implementation and technical findings live on `spike/native-sessions`.
-2. Verify terminal key routing, visibility versus process lifetime, cleanup of spawned processes, and resizing under concurrent output.
-3. Prototype the local review interaction separately, including stable snapshots and revision feedback.
-4. Choose snapshot/storage boundaries and reliable per-agent lifecycle and feedback mechanisms from evidence.
-5. Complete the LazyVim capability and binding inventory; choose native equivalents or plugins and review any behavioral differences with Memnoc.
+The first Drudwyn pilot feedback changes the order: agents inside Neovim feel
+more accessible than a separate terminal, but the editor does not yet meet the
+user's LazyVim expectations for appearance or functionality. Establish a solid
+editor experience before expanding agent features. This preserves the independent
+distribution decision; it does not select LazyVim as the implementation base.
+
+1. Complete the LazyVim capability, visual, and binding inventory, including inherited defaults. Use the actual configuration as the acceptance reference: Rose Pine, Snacks pickers/explorer, leader-menu discovery, code navigation, completion, diagnostics, formatting, and terminal behavior. Account for the remaining extras without silently dropping them.
+2. Agree and build the first editor-focused increment, choosing native equivalents or pinned plugins where they preserve behavior. Evaluate everyday reading and editing with Memnoc before integrating more AI UI.
+3. Design keyboard-toggleable session/workspace menus within that editor experience; settle floating versus anchored defaults and expand/collapse behavior one question at a time.
+4. Reintroduce the validated agent workflow into the editor, then verify terminal key routing, attention, process lifetime/cleanup, and resizing under concurrent output. Existing pilot code remains available for comparison.
+5. Prototype local review separately, including stable snapshots and revision feedback; choose storage boundaries and per-agent lifecycle/delivery mechanisms from evidence.
 6. Complete Northstar's compliance triage before writing the production spec. Record the relevant source-code persistence and explicit external-handoff boundaries without expanding the product into an authentication or policy platform.
 7. Set up canonical repository guidance and the ticket tracker, then produce the spec and incremental implementation tickets.
 
