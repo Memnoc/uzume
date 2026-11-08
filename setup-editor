@@ -13,6 +13,11 @@ import time
 
 SOURCE = Path(__file__).resolve().parent / "editor"
 APP = "ai-nvim"
+LAUNCHER = '''# Uzume direct launcher (keeps the preview's existing data and state).
+function uzume() {
+  NVIM_APPNAME=ai-nvim command nvim "$@"
+}
+'''
 
 
 def install(cache, syntax_cache):
@@ -96,28 +101,31 @@ def register():
     new = "for candidate in KickstartNeovim LazyVim NvChad FrontVim MemnocVim ai-nvim; do"
     if old not in original and new not in original:
         raise RuntimeError("nvims has changed; register ai-nvim in its candidate list manually")
+    if original.count(old) + original.count(new) != 1:
+        raise RuntimeError("Ambiguous nvims definition; no shell change made")
+    updated = original.replace(old, new, 1)
+    if LAUNCHER not in updated:
+        updated = updated.rstrip() + "\n\n" + LAUNCHER
     if config.exists() or config.is_symlink():
         if not config.is_symlink() or config.resolve() != SOURCE.resolve():
             raise RuntimeError("Refusing to replace existing configuration: " + str(config))
     else:
         config.parent.mkdir(parents=True, exist_ok=True)
         config.symlink_to(SOURCE, target_is_directory=True)
-    if old in original:
-        if original.count(old) != 1:
-            raise RuntimeError("Ambiguous nvims definition; no shell change made")
+    if updated != original:
         backup = shell.with_name(".zshrc.before-ai-nvim-" + str(time.time_ns()))
         shutil.copy2(shell, backup)
-        shell.write_text(original.replace(old, new, 1))
+        shell.write_text(updated)
         print("Shell backup: " + str(backup))
     print("Registered " + str(config) + " -> " + str(SOURCE))
-    print("Open a new shell, run nvims, and choose ai-nvim. nvim/default stays unchanged.")
+    print("Open a new shell and run uzume, or run nvims and choose ai-nvim. nvim/default stays unchanged.")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--plugin-cache", type=Path,
                         default=Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / "nvim/lazy")
-    parser.add_argument("--register", action="store_true", help="add ~/.config/ai-nvim and the nvims candidate")
+    parser.add_argument("--register", action="store_true", help="add ~/.config/ai-nvim, the nvims candidate, and the uzume command")
     parser.add_argument("--syntax-cache", type=Path, default=Path.home() / ".local/share/nvim/site")
     parser.add_argument("--tool-cache", type=Path, default=Path.home() / ".local/share/nvim/mason")
     args = parser.parse_args()

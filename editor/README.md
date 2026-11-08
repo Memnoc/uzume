@@ -17,12 +17,12 @@ group, its implementation, shortcuts, stored state and known limits.
 
 Uzume currently uses the original `ai-nvim` installation name to preserve the preview's existing settings and state.
 
-After registration, open a new terminal and run `nvims`, then choose **ai-nvim**.
+After registration, open a new terminal and run `uzume`. It forwards all arguments to Neovim, so `uzume .` and `uzume path/to/file` work too. In an existing shell, run `source ~/.zshrc` once to load the command. You can also run `nvims`, then choose **ai-nvim**.
 The **default** entry and plain `nvim` retain the existing LazyVim configuration.
 To launch directly:
 
 ```sh
-NVIM_APPNAME=ai-nvim nvim /Users/matteostara/Code/tmux-drudwyn/src/session_navigator.rs
+uzume /Users/matteostara/Code/tmux-drudwyn/src/session_navigator.rs
 ```
 
 Configuration lives in this checkout's `editor/`, linked as `~/.config/ai-nvim`.
@@ -94,8 +94,9 @@ without modifying them. At runtime,
 Mason installs missing tools for supported files into ai-nvim’s own directory;
 see [Tool installation](../docs/features/tool-installation.md).
 
-The installer adds only the `ai-nvim` entry to Memnoc's existing `nvims` list,
-backs up `.zshrc`, and refuses to replace an unrelated config. It is idempotent.
+The installer adds the `ai-nvim` entry to Memnoc's existing `nvims` list and a
+`uzume` shell function that launches the same configuration. It backs up `.zshrc`
+and refuses to replace an unrelated config. Registration is idempotent.
 No global `NVIM_APPNAME` is exported and the `nvim` command/aliases are unchanged.
 
 `plugins.lock.json` determines a separate immutable package bundle. Plugin
@@ -105,5 +106,5 @@ behavior. Changing plugin pins requires an explicit installer run; old bundles
 remain available. This is not yet the distribution’s Neovim installer, upgrade UI, or complete release/rollback mechanism.
 
 Keep this worktree while its configuration link is installed. To remove the
-preview, remove only that link and the `ai-nvim` candidate in `nvims`; remove its
+preview, remove only that link, the `uzume` function, and the `ai-nvim` candidate in `nvims`; remove its
 separate data/state/cache only if the local history is no longer wanted.

@@ -12,7 +12,7 @@ Uzume takes its name from **Ame-no-Uzume**, the Japanese goddess whose dance hel
 
 Design and prototype stage. This branch, `spike/editor-baseline`, provides the first independent editor preview. There is no production distribution yet; the full specification remains open.
 
-Run `nvims` and choose **ai-nvim**, or use `NVIM_APPNAME=ai-nvim nvim`. See the [editor guide](editor/README.md) for setup, familiar controls, and the current boundaries. Plain `nvim` keeps the existing LazyVim configuration.
+Run `uzume`, or `uzume path/to/file` to open a file directly. The existing `nvims` → **ai-nvim** entry also works. See the [editor guide](editor/README.md) for setup, familiar controls, and the current boundaries. Plain `nvim` keeps the existing LazyVim configuration.
 
 The project is now named **Uzume**. The preview retains its original `ai-nvim` installation name and `ainvim` Lua namespace so existing settings, tools, and saved state continue to work. Renaming those identifiers will need a migration.
 
