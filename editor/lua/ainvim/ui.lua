@@ -1,3 +1,12 @@
+local dashboard_accents = {
+  SnacksDashboardHeader = "iris",
+  SnacksDashboardTitle = "iris",
+  SnacksDashboardIcon = "iris",
+  SnacksDashboardDesc = "text",
+  SnacksDashboardFile = "text",
+  SnacksDashboardKey = "rose",
+}
+
 require("rose-pine").setup({
   variant = "main",
   -- A gentle mauve tint for neutral text, scoped to Rose Pine's main variant.
@@ -8,6 +17,22 @@ require("rose-pine").setup({
       muted = "#8b7c98",
     },
   },
+  -- Register the dashboard's default links so Moon and Dawn retain their look.
+  highlight_groups = {
+    SnacksDashboardHeader = { link = "Title" },
+    SnacksDashboardTitle = { link = "Title" },
+    SnacksDashboardIcon = { link = "Special" },
+    SnacksDashboardDesc = { link = "Special" },
+    SnacksDashboardFile = { link = "Special" },
+    SnacksDashboardKey = { link = "Number" },
+  },
+  before_highlight = function(group, highlight, palette)
+    local accent = dashboard_accents[group]
+    if accent and require("rose-pine.config").options.variant == "main" then
+      highlight.link = nil
+      highlight.fg = palette[accent]
+    end
+  end,
 })
 vim.cmd.colorscheme("rose-pine")
 

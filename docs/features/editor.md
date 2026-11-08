@@ -18,16 +18,25 @@ pressing Space and pausing; no function-row key is required.
 
 Uzume gives Rose Pine's main variant a gentle mauve text palette: ordinary text
 uses `#e0d4eb`, comments and secondary text `#a99ab8`, and muted text `#8b7c98`.
-The base, surface, and overlay backgrounds and the syntax/diagnostic accent
-palette remain upstream defaults. These are theme-local palette settings in
-[ui.lua](../../editor/lua/ainvim/ui.lua), not global highlight overrides or a
-`ColorScheme` hook. **Space uC** can switch to another installed colorscheme;
+The dashboard's logo, headings, and navigation icons use iris (`#c4a7e7`), labels
+and filenames use the pale mauve text color, and shortcut letters use rose
+(`#ebbcba`). Filetype icons retain their own recognizable colors. The base,
+surface, and overlay backgrounds and the syntax/diagnostic accent palette remain
+upstream defaults. These settings live in [ui.lua](../../editor/lua/ainvim/ui.lua)
+and use Rose Pine's palette and `before_highlight` callback, scoped to its main
+variant. No global `ColorScheme` hook forces these colors onto other themes.
+**Space uC** can switch to another installed colorscheme;
 its own colors take over. Rose Pine Moon and Dawn keep their original palettes.
 Switching back to Rose Pine main restores the mauve tint. To use its unmodified
-palette, remove the `palette.main` overrides from the setup table.
+palette and dashboard colors, remove the `palette.main` overrides and the
+`before_highlight` callback from the setup table.
 Startup checks compared the main editor backgrounds and syntax, diagnostic, and
 diff highlights against stock Rose Pine, then verified switching to Habamax,
 Moon, and Dawn and back without the mauve settings leaking into those themes.
+The first palette-only change left the dashboard cyan because Snacks links its
+header and labels to accent groups. A subsequent PTY check inspects the actual
+dashboard extmarks and resolved highlight colors, covering the logo, headings,
+navigation icons, labels, and shortcut keys.
 
 The home screen centers a small ASCII cave-and-sun emblem above the Uzume
 wordmark, matching the repository logo. The shared artwork lives in
