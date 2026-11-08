@@ -38,12 +38,17 @@ header and labels to accent groups. A subsequent PTY check inspects the actual
 dashboard extmarks and resolved highlight colors, covering the logo, headings,
 navigation icons, labels, and shortcut keys.
 
-The home screen centers a small ASCII cave-and-sun emblem above the Uzume
-wordmark, matching the repository logo. The shared artwork lives in
+The home screen centers a two-color cave-and-sun emblem above the Uzume
+wordmark, closely following the repository SVG. The shared artwork lives in
 [branding.lua](../../editor/lua/ainvim/branding.lua) and also appears after the
-last project is closed. It uses ordinary ASCII characters and the dashboard's
-theme highlight, with no image renderer or extra plugin. File, search, explorer,
-and quit shortcuts remain below the startup artwork.
+last project is closed. Unicode half-block characters reproduce the solid arch,
+rounded sun, and baseline using normal text rendering, with no image renderer,
+conversion utility, or graphics-protocol dependency. The arch follows
+`SnacksDashboardHeader`; the sun follows `DiagnosticError` (Rose Pine's love
+color). Both adapt to the active colorscheme. The icon occupies 20 columns and
+10 rows; windows shorter than 30 rows use a compact name beneath it instead of
+the five-line ASCII wordmark. File, search, explorer, and quit shortcuts remain
+below the startup artwork.
 Disposable PTY checks verified the rendered header and shortcuts at 120×36 and
 80×24, the new-file action, and the dashboard shown after closing the last project.
 

@@ -195,7 +195,6 @@ function M.close(item)
     Snacks.dashboard.open({
       win = 0,
       preset = {
-        header = require("ainvim.branding").header .. "\n\nNo project open",
         keys = {
           {
             key = "p",
@@ -207,7 +206,11 @@ function M.close(item)
           { key = "q", desc = "Quit", action = ":qa" },
         },
       },
-      sections = { { section = "header", padding = 2 }, { section = "keys" } },
+      sections = {
+        require("ainvim.branding").section,
+        { text = "No project open", align = "center", padding = 2 },
+        { section = "keys" },
+      },
     })
   end
 end
