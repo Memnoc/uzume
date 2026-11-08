@@ -16,15 +16,11 @@ local function decorate(dashboard)
     return
   end
 
-  -- Pad only the disposable dashboard buffer; menu positions stay untouched.
   local count = api.nvim_buf_line_count(buf)
-  if count < height then
-    local modifiable = vim.bo[buf].modifiable
-    vim.bo[buf].modifiable = true
-    api.nvim_buf_set_lines(buf, count, -1, false, vim.fn["repeat"]({ "" }, height - count))
-    vim.bo[buf].modifiable = modifiable
-  end
   local function mark(row, col, text)
+    if row >= count then
+      return
+    end
     local line = api.nvim_buf_get_lines(buf, row, row + 1, false)[1] or ""
     local first = #(line:match("^%s*") or "")
     local last = vim.fn.strdisplaywidth(line:gsub("%s+$", ""))
@@ -39,16 +35,12 @@ local function decorate(dashboard)
       hl_mode = "combine",
     })
   end
-  mark(1, 3, "╭───────")
-  mark(1, width - 11, "───────╮")
-  for _, row in ipairs({ 2, 3, height - 4, height - 3 }) do
-    mark(row, 3, "│")
-    mark(row, width - 4, "│")
+  local top = dashboard.row or 0
+  for index, glyph in ipairs({ "·", "┆", "│", "│", "┆", "·" }) do
+    local row = top + (index - 1) * 2
+    mark(row, 3, glyph)
+    mark(row, width - 4, glyph)
   end
-  mark(math.floor(height / 2), 3, "◇")
-  mark(math.floor(height / 2), width - 4, "◇")
-  mark(height - 2, 3, "╰───────")
-  mark(height - 2, width - 11, "───────╯")
 end
 
 -- Half-block rendering of docs/assets/uzume-logo.svg: arch, sun, then arch.
