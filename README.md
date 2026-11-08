@@ -42,3 +42,5 @@ The editor preview now includes an [Extras catalog and language packs](docs/prot
 The editor spike now includes a Mason-backed catalog and automatic missing-tool
 installation for supported files. See the [workflow findings](docs/prototypes/0005-mason-workflow.md)
 for the validated behavior, version boundaries and remaining checks.
+
+The editor preview now includes [native Drudwyn-style navigators](docs/prototypes/0007-native-navigators.md): **Space aw** for workspace/windows and **Space as** for sessions. Switching, filtering, renaming, confirmed close and manual local layout save are available without tmux; managed agents and full autosave remain pending.
