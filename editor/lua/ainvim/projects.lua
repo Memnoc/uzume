@@ -12,7 +12,7 @@ function M.list()
   local projects, by_root = {}, {}
   for _, window in ipairs(native.list()) do
     if not vim.t[window.tab].ainvim_unassigned then
-      local root = canonical(window.root)
+      local root = canonical(vim.t[window.tab].uzume_project_root or window.root)
       local project = by_root[root]
       if not project then
         project = {
@@ -28,11 +28,12 @@ function M.list()
       project.windows[#project.windows + 1] = {
         id = "w" .. window.tab,
         tab = window.tab,
-        root = root,
+        root = window.root,
         project = root,
         name = window.name,
         panes = window.windows,
         current = window.current,
+        agent = require("uzume.agents").window_status(window.tab),
       }
       project.current = project.current or window.current
     end
@@ -230,7 +231,7 @@ function M.setup()
   api.nvim_create_autocmd("TabEnter", {
     group = api.nvim_create_augroup("ainvim_projects", { clear = true }),
     callback = function()
-      local root = vim.t.ainvim_root
+      local root = vim.t.uzume_project_root or vim.t.ainvim_root
       if root and not vim.t.ainvim_unassigned then
         M.last[canonical(root)] = api.nvim_get_current_tabpage()
       end

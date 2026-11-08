@@ -128,8 +128,8 @@ The first-save behavior is implemented in [save.lua](../../editor/lua/ainvim/sav
 The shells use Snacks terminals and Neovim terminal buffers. Separate terminal
 identities prevent the right and floating shortcuts from opening the same pane.
 Hiding a terminal preserves its job; confirmed navigator close terminates the
-affected terminal. Supervised agent input routing still belongs to the separate
-pilot.
+affected terminal. Managed [agent terminals](agents.md) use double Escape for
+editor controls and pass single Escape, jk and Ctrl-w through to the CLI.
 
 Terminal input uses a steady block cursor, configured through Neovim's native
 `guicursor` option in [options.lua](../../editor/lua/ainvim/options.lua).
@@ -188,4 +188,5 @@ The [baseline record](../prototypes/0003-editor-baseline.md) documents real PTY
 checks of explorer toggle/create/rename/mkdir, search, WhichKey and distinct
 shells. The [language record](../prototypes/0004-extras-and-languages.md) covers
 code features. Not every inherited plugin action has been exercised; broader
-editing coverage, Linux/terminal coverage and integrated agents remain future work.
+editing coverage and Linux/terminal coverage remain future work. Integrated
+agent tasks are described in the [agent workflow](agents.md).

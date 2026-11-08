@@ -83,14 +83,16 @@ function M.split(direction, shell)
     vim.bo[buf].buftype == ""
       or vim.bo[buf].buftype == "terminal"
       or vim.bo[buf].filetype == "ainvim_session"
-      or vim.bo[buf].filetype == "ainvim_slot",
+      or vim.bo[buf].filetype == "ainvim_slot"
+      or vim.bo[buf].filetype == "uzume_task",
     "Choose an editor pane first"
   )
   local fresh = shell or vim.bo[buf].buftype ~= ""
   vim.cmd("belowright " .. (direction == "right" and (fresh and "vnew" or "vsplit") or (fresh and "new" or "split")))
   if shell then
     local created, newbuf = api.nvim_get_current_win(), api.nvim_get_current_buf()
-    local ok, job = pcall(vim.fn.jobstart, vim.fn.split(vim.o.shell), { term = true, cwd = project.root })
+    local ok, job =
+      pcall(vim.fn.jobstart, vim.fn.split(vim.o.shell), { term = true, cwd = vim.t.ainvim_root or project.root })
     if not ok or job <= 0 then
       api.nvim_win_close(created, true)
       api.nvim_buf_delete(newbuf, { force = true })
@@ -326,6 +328,7 @@ end
 
 function M.transfer()
   local win, buf = current()
+  assert(not vim.b[buf].uzume_agent_id, "Agent panes belong to their task window; move or float them within it")
   local project = require("ainvim.projects").current()
   local choices = vim.tbl_filter(function(window)
     return not window.current

@@ -11,6 +11,7 @@ require("ainvim.extras").setup()
 require("ainvim.languages").setup()
 require("ainvim.installer").setup()
 require("ainvim.navigator").setup()
+require("uzume.agents").setup()
 if require("ainvim.extras").enabled("smear") then
   require("smear_cursor").setup({
     hide_target_hack = true,

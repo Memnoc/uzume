@@ -9,9 +9,12 @@ approved-by: project maintainer
 
 Terminology refinement, 2026-11-08: the current model uses **Project → Windows →
 Panes**, with no separate user-facing session entity. See the [design update](../design.md#projects-windows-panes-and-concurrent-work).
-The isolation and stop-on-close requirements below remain; the earlier
-one-session-per-worktree mapping is under revision. Worktree ownership within
-project windows must be settled before concurrent agent integration. The text
+The isolation and stop-on-close requirements below remain. The accepted mapping
+is one independent AI task per window, with its own branch and worktree and an
+editor pane beside its agent. Windows retain their parent project identity even
+when their checkouts differ. Switching preserves processes; closing stops them
+and retains checkout files. New task worktrees start at the parent project's
+committed HEAD, excluding uncommitted files. This was confirmed before integration. The text
 below preserves the original decision context.
 
 ## Context

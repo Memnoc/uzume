@@ -9,7 +9,7 @@ A local working environment rooted in a directory, usually a Git repository or c
 _Avoid_: session, project session as a separate entity, distro profile
 
 **Task**:
-A unit of work within a **Project**; independent features use separate branches and worktrees, while deliberate collaboration may share a checkout.
+A unit of work within a **Project**. Starting an AI task creates a dedicated **Window**, branch, and worktree, with editor and agent panes side by side. Independent tasks remain isolated; deliberate shared-checkout collaboration is a later extension.
 
 **Window**:
 A switchable container belonging to one **Project**, containing one or more **Panes** and retaining their layout. A window is distinct from an individual pane or a file buffer.
@@ -59,7 +59,7 @@ A tested combination of the distro, a distro-managed Neovim version, and selecte
 
 | Theirs | Ours | Notes |
 | --- | --- | --- |
-| Tabs sharing a project directory | Project | The preview groups by canonical directory; this is not another native Neovim session object. |
+| Tabs sharing an explicit project root | Project | Task tabs may use different worktree directories while retaining the same project identity. |
 | Tab page | Window | Retains its pane layout while another window is active. |
 | Editor/terminal window | Pane | Native UI terminology differs from our product hierarchy; auxiliary picker windows are not managed panes. |
 

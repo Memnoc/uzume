@@ -71,8 +71,13 @@ Rust, Lua, C/C++, and TypeScript/React/HTML/CSS packs now supply language server
 completion, diagnostics and formatting. Native Treesitter handles the captured
 language parsers, including TSX; CSS retains native Vim syntax highlighting.
 Smear Cursor is enabled and can be toggled with **Space ua**. Debugging/test
-adapters, remaining language previews/custom extras, supervised agent sessions and the
-custom review suite are still separate work.
+adapters, remaining language previews/custom extras and the custom review suite
+are still separate work.
+
+**Space ac** creates a Codex task; **Space aC** creates a Claude task. Each gets a
+dedicated branch/worktree and an editor/agent window under the project. Use
+**Esc Esc** for editor controls, **Space aa** for attention and **Space ar** to
+restart a stopped task CLI. See [AI tasks](../docs/features/agents.md).
 
 Unlike the original fixture spike, edits to opened files and normal editor
 recovery/history persist. Source-file saving remains explicit. Root detection

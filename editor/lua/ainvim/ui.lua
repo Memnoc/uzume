@@ -110,7 +110,7 @@ Snacks.setup({
 require("which-key").setup({
   preset = "helix",
   spec = {
-    { "<leader>a", group = "projects/windows" },
+    { "<leader>a", group = "agents/projects" },
     { "<leader>b", group = "buffer" },
     { "<leader>c", group = "code" },
     { "<leader>f", group = "file/find" },
@@ -177,6 +177,9 @@ require("lualine").setup({
       },
     },
     lualine_x = {
+      function()
+        return require("uzume.agents").summary()
+      end,
       "diff",
       {
         "filetype",

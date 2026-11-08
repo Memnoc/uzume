@@ -222,8 +222,8 @@ end, "Terminal (Root Dir)")
 map("n", "<leader>fT", function()
   terminal("float")
 end, "Terminal (cwd)")
--- Single Escape and jk mirror the user's shell terminal mappings. Agent CLI
--- input routing remains a separate decision when agents return to this editor.
+-- Ordinary shell mappings. Managed agent buffers override these so CLI input
+-- keeps single Escape, jk and Ctrl-w; double Escape enters editor controls.
 map("t", "<Esc>", [[<C-\><C-n>]], "Leave Terminal Input")
 map("t", "jk", [[<C-\><C-n>]], "Leave Terminal Input")
 map("t", "<C-w>", [[<C-\><C-n><C-w>]], "Terminal Window Commands")

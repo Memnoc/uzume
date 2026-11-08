@@ -45,6 +45,10 @@ language tools now install automatically through isolated, pinned Mason when you
 open supported files. The [tool workflow](docs/features/tool-installation.md)
 covers catalog views, manual installation, disabling automation and retries.
 
+**Space ac** starts a Codex task; **Space aC** starts Claude Code. Each task opens
+in its own branch/worktree window under the current project. **Space aa** shows
+agent attention. See the [AI task guide](docs/features/agents.md).
+
 - [Design record](docs/design.md): agreed behavior, deferred features, and open questions.
 - [Feature guide](docs/features/README.md): available features, shortcuts, implementation and limits.
 - [Domain glossary](CONTEXT.md): the meaning of projects, windows, panes, tasks, and reviews.

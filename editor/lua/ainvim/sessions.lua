@@ -16,6 +16,7 @@ local function editable(win)
     or vim.bo[buf].buftype == "terminal"
     or vim.bo[buf].filetype == "snacks_dashboard"
     or vim.bo[buf].filetype == "ainvim_session"
+    or vim.bo[buf].filetype == "uzume_task"
 end
 local function tiled_windows(tab)
   return vim.tbl_filter(function(win)
@@ -162,6 +163,8 @@ function M.create(path, opts)
   vim.cmd.tabnew()
   vim.cmd.tcd(vim.fn.fnameescape(path))
   api.nvim_tabpage_set_var(0, "ainvim_root", path)
+  vim.t.uzume_project_root = opts.project_root or path
+  vim.t.uzume_task = opts.task
   api.nvim_tabpage_set_var(0, "ainvim_name", opts.name or "Editor")
   vim.t.ainvim_project_name = opts.project_name or vim.fs.basename(path)
   if opts.shell then
@@ -171,7 +174,7 @@ function M.create(path, opts)
       error("Could not start shell: " .. tostring(job))
     end
     vim.cmd.startinsert()
-  else
+  elseif not opts.empty then
     M.home()
   end
   return api.nvim_get_current_tabpage()
@@ -242,6 +245,8 @@ function M.save()
       titles = titles,
       home = home,
       project_name = vim.t[session.tab].ainvim_project_name,
+      project_root = vim.t[session.tab].uzume_project_root,
+      task = vim.t[session.tab].uzume_task,
     }
   end
   local layout = vim.fn.readfile(temporary)
@@ -286,9 +291,12 @@ function M.restore()
     for index, tab in ipairs(api.nvim_list_tabpages()) do
       local session = saved.sessions[index]
       if session then
+        vim.t[tab].ainvim_unassigned = nil
         api.nvim_tabpage_set_var(tab, "ainvim_name", session.project_name and session.name or "Editor")
         vim.t[tab].ainvim_project_name = session.project_name or session.name
         api.nvim_tabpage_set_var(tab, "ainvim_root", session.root)
+        vim.t[tab].uzume_project_root = session.project_root or session.root
+        vim.t[tab].uzume_task = session.task
         for _, win in ipairs(M.windows(tab)) do
           vim.w[win.win].ainvim_name = session.titles[api.nvim_buf_get_name(win.buf)]
         end
