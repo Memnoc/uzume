@@ -1,5 +1,10 @@
 # Session and workspace navigators
 
+Design note, 2026-11-08: the next increment adopts **Project → Windows → Panes**
+and prioritizes window/pane management before agents. This guide describes the
+current preview, whose session labels and window/pane conflation have not yet
+been migrated. See the [updated design](../design.md#projects-windows-panes-and-concurrent-work).
+
 The editor preview now has native **Session Navigator** and **Workspace
 Navigator** overlays, following Memnoc's Drudwyn screenshots. They use the same
 dark surface, square border, salmon heading/selection, flat rows, muted secondary

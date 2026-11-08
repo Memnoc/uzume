@@ -7,6 +7,13 @@ approved-by: Memnoc
 
 # ADR-0002: Isolate independent tasks and terminate agents with their session
 
+Terminology refinement, 2026-11-08: the current model uses **Project → Windows →
+Panes**, with no separate user-facing session entity. See the [design update](../design.md#projects-windows-panes-and-concurrent-work).
+The isolation and stop-on-close requirements below remain; the earlier
+one-session-per-worktree mapping is under revision. Worktree ownership within
+project windows must be settled before concurrent agent integration. The text
+below preserves the original decision context.
+
 ## Context
 
 Agents must work concurrently without independent features overwriting one shared checkout. Persistent background processes are undesirable when a user intentionally ends a session, but switching projects must preserve concurrent work.
