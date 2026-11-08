@@ -39,14 +39,16 @@ local function decorate(dashboard)
       hl_mode = "combine",
     })
   end
-  mark(1, 3, "╭────")
-  mark(1, width - 8, "────╮")
-  mark(2, 3, "│")
-  mark(2, width - 4, "│")
-  mark(height - 3, 3, "│")
-  mark(height - 3, width - 4, "│")
-  mark(height - 2, 3, "╰────")
-  mark(height - 2, width - 8, "────╯")
+  mark(1, 3, "╭───────")
+  mark(1, width - 11, "───────╮")
+  for _, row in ipairs({ 2, 3, height - 4, height - 3 }) do
+    mark(row, 3, "│")
+    mark(row, width - 4, "│")
+  end
+  mark(math.floor(height / 2), 3, "◇")
+  mark(math.floor(height / 2), width - 4, "◇")
+  mark(height - 2, 3, "╰───────")
+  mark(height - 2, width - 11, "───────╯")
 end
 
 -- Half-block rendering of docs/assets/uzume-logo.svg: arch, sun, then arch.

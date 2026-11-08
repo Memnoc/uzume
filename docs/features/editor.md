@@ -50,8 +50,10 @@ color). Both adapt to the active colorscheme. The icon occupies 11 columns and
 30 rows use a compact name beneath it instead of
 the five-line ASCII wordmark. File, search, explorer, and quit shortcuts remain
 below the startup artwork.
-Subtle corner brackets decorate the home screen's outer margins when its window
-is at least 90 columns wide and 28 rows tall. They follow the theme's `NonText`
+Extended corner brackets and small midpoint diamonds decorate the home screen's
+outer margins when its window is at least 90 columns wide and 28 rows tall.
+The corners have eight-cell horizontal strokes and two-cell vertical extensions,
+with open space along the sides. They follow the theme's `NonText`
 highlight (muted mauve in Uzume), resize with the dashboard, and disappear in
 compact windows. They are virtual text in the dashboard buffer, add no panes or
 focus targets, and avoid any content extending into the margins.
