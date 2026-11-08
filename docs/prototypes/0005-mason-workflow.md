@@ -111,3 +111,19 @@ copy is wanted. Evaluate the progress notifications and transition from editing
 without a tool to editing with an attached server.
 
 Primary reference: [Mason documentation](https://github.com/mason-org/mason.nvim/blob/2a6940af80375532e5e9e7c1f2fc6319a1b7a69d/doc/mason.txt).
+
+## Follow-up: managed core tools installed for Memnoc
+
+On 2026-11-08, at the user's request, installed all nine core packages into the
+registered ai-nvim data directory: rust-analyzer 2026-08-31, LuaLS 3.19.1,
+StyLua v2.5.2, clangd 22.1.6, vtsls 0.3.0, HTML/CSS/JSON servers 4.10.0,
+and Prettier 3.9.6. Mason receipts match `tools.lock.json`. Optional ESLint,
+Tailwind and Emmet remain available through existing external executables;
+rustfmt remains supplied by the Rust toolchain.
+
+Disposable Rust, Lua, C, TSX, HTML, CSS and JSON fixtures confirmed server
+attachment from ai-nvim's own `mason/bin` paths and formatting availability.
+Rust/Lua/TypeScript diagnostics, C definition lookup, native syntax and
+TypeScript completion checks passed. No project source files, pack preferences,
+or default LazyVim configuration were changed. Restart already running editors
+to ensure their existing language-server processes use the new managed copies.
