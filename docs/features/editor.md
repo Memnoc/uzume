@@ -94,6 +94,16 @@ Hiding a terminal preserves its job; confirmed navigator close terminates the
 affected terminal. Supervised agent input routing still belongs to the separate
 pilot.
 
+Terminal input uses a steady block cursor, configured through Neovim's native
+`guicursor` option in [options.lua](../../editor/lua/ainvim/options.lua).
+Normal editing cursor shapes and Smear Cursor settings are unchanged. This
+applies to Uzume's terminal buffers; the host terminal controls its own shell
+cursor. Ghostty's `cursor-style-blink = false` sets its default, while WezTerm's
+`default_cursor_style = "SteadyBlock"` and `cursor_blink_rate = 0` disable blinking.
+Uzume's installer does not change either terminal application's configuration.
+Verified in a real Neovim 0.11.6 PTY session: terminal input was active and output
+requested the steady block cursor (`DECSCUSR 2`), with no blinking cursor request.
+
 ## Reading changes and recovery
 
 | Control | Action |

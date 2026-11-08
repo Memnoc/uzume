@@ -4,6 +4,8 @@ opt.background = "dark"
 opt.number = true
 opt.relativenumber = true
 opt.cursorline = true
+-- Keep terminal input steady instead of Neovim's default blinking block.
+opt.guicursor:append("t:block-blinkon0-TermCursor")
 opt.signcolumn = "yes"
 opt.laststatus = 3
 opt.showmode = false
