@@ -12,7 +12,7 @@ Drudwyn project
 
 The status line shows **project / window**. The top buffer bar still lists
 shared Neovim buffers; it is not a window or project switcher. **Space ap**
-opens projects, **Space aw** opens windows, and **Space wp** selects panes in
+opens projects, **Space aw** opens windows, and **Space pp** selects panes in
 the current window. **Space as** remains an alias for projects.
 
 ## Start a project and its windows
@@ -30,30 +30,33 @@ under one project remains an agent-integration design question.
 
 ## Keyboard controls
 
-Press **Space w** and pause to discover these actions in WhichKey. In a shell,
+Press **Space w** for window controls or **Space p** for pane controls. Pause
+for WhichKey. Pane focus, movement and resizing have short submenus to keep the
+main menu readable; directions are labelled Left, Down, Up and Right. In a shell,
 press **Esc** first to leave terminal input; `i` resumes typing into the shell.
 
 | Control | Action |
 | --- | --- |
+| Space ww | Pick a window (Space aw remains available) |
 | Space wn / wN | New editor window / new shell window in this project |
 | Space w] / w[ | Next / previous window in this project |
-| Space ws / wv | Split editor pane below / right |
+| Space wd | Confirm closing the whole window and its terminal jobs |
+| Space ps / pv | Split editor Down / Right |
 | Space - / Space \| | Familiar aliases for editor splits |
-| Space wt / wT | Start a new shell pane below / right |
-| Ctrl-h/j/k/l or Space wh/j/k/l | Focus the adjacent pane |
-| Space wH/J/K/L | Move a tiled pane to that edge; move a floating pane left/down/up/right |
-| Space wx | Swap contents/views with the next visible pane |
-| Space wo | Move the pane to another window in the same project |
-| Space w> / w< | Increase / decrease width by five cells |
-| Space w+ / w- | Increase / decrease height by two cells |
-| Space w= | Equalize tiled pane sizes |
-| Space wf | Float the current pane / dock it back into its original tile |
-| Space wm or Space uZ | Fullscreen / restore the pane |
-| Space wz | Hide the pane, retaining its buffer and running shell |
-| Space wr | Restore the most recently hidden pane in this window |
-| Space wp | Pick a visible or hidden pane; Enter focuses/restores it |
-| Space wd | Confirm closing the pane and stopping its terminal job |
-| Space wD | Confirm closing the whole window and its terminal jobs |
+| Space pt / pT | Start a new shell pane Down / Right |
+| Ctrl-h/j/k/l, or Space pg then h/j/k/l | Focus Left / Down / Up / Right |
+| Space pM then h/j/k/l | Move Left / Down / Up / Right (tile edge or floating position) |
+| Space px | Swap contents/views with the next visible pane |
+| Space po | Move the pane to another window in the same project |
+| Space pR then > / < | Increase / decrease width by five cells |
+| Space pR then + / - | Increase / decrease height by two cells |
+| Space pR then = | Equalize tiled pane sizes |
+| Space pf | Float the current pane / dock it back into its original tile |
+| Space pm or Space uZ | Fullscreen / restore the pane |
+| Space pz | Hide the pane, retaining its buffer and running shell |
+| Space pr | Restore the most recently hidden pane in this window |
+| Space pp | Pick a visible or hidden pane; Enter focuses/restores it |
+| Space pd | Confirm closing the pane and stopping its terminal job |
 
 Editor splits share the current file buffer, as ordinary Neovim splits do.
 Splitting from a terminal or home with the editor command creates a new editable
@@ -66,6 +69,13 @@ the terminal's cleanup ownership moves to the destination window. Transfers are
 limited to the same project, avoiding an implicit change of project for an
 already-running process. Shared terminal views block transfer/close where that
 would affect another view.
+
+The old pane bindings under Space w have moved to Space p; they are not duplicate
+aliases in the window menu. In particular, **Space pd closes a pane** and
+**Space wd closes the whole window**, both with confirmation. The previous
+Space wD binding is removed. Ctrl-h/j/k/l and the Space - / Space | split aliases
+remain available. Uppercase **M** and **R** select the Move and Resize submenus;
+lowercase **m** toggles fullscreen and **r** restores a hidden pane.
 
 ## Floating, fullscreen and mouse
 

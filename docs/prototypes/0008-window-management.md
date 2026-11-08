@@ -110,3 +110,25 @@ Remaining limits: shared buffer lists, in-memory floating/hidden arrangements,
 no automatic project persistence, no cross-project pane transfer, and no
 task-worktree grouping within a project. Heavy-output responsiveness, animation,
 agent attention and process-tree supervision remain separate increments.
+
+## Follow-up: separate window and pane menus
+
+Memnoc found the combined menu too long and requested clear directional names
+and distinct window/pane prefixes. Space w now contains six window actions:
+pick (ww), new editor (wn), new shell (wN), next/previous (w]/w[), and close (wd).
+Pane actions moved to Space p. Focus (pg), Move (pM), and Resize (pR) are short
+submenus; h/j/k/l entries are labelled Left, Down, Up and Right. Split labels use
+Down and Right; resize labels are Wider, Narrower, Taller, Shorter and Equalize.
+
+Float/dock is pf, fullscreen/restore pm, hide pz, restore hidden pr, pane picker
+pp, swap px, transfer po and close pane pd. Existing Ctrl-h/j/k/l focus and
+Space - / Space | split aliases remain. Old pane mappings are not duplicated in
+the window menu. In particular, pd closes a pane and wd closes the whole window,
+both still confirmed; the previous wD binding is removed. Project navigation is
+unchanged. Home/placeholder hints and current feature guides use the new keys.
+
+The disposable `.probe/windows/menus.py` inspected the actual rendered WhichKey
+menus (including virtual text), then drove the new split, direction, resize,
+float/fullscreen, hide/restore, pane/window close and window-picker shortcuts.
+All passed. Runtime window/pane behavior is unchanged; this increment reorganizes
+bindings and descriptions. Formatting and whitespace checks passed.

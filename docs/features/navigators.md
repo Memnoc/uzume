@@ -53,7 +53,7 @@ canonical directory switches to its existing project. The command equivalent is:
 `:AiSession` remains a compatibility alias. No Git worktree or directory is
 created. A new project starts with an editor window showing its name, directory
 and controls beside the explorer. **n** opens a separate shell window; **e** opens
-another editor window. **Space w** exposes pane splitting, positioning, resizing,
+another editor window. **Space w** exposes window controls; **Space p** exposes pane splitting, positioning, resizing,
 floating/fullscreen, hide/restore and close; see [Window management](window-management.md).
 
 The top buffer bar continues to list shared Neovim buffers. The status line names

@@ -33,7 +33,7 @@ local function placeholder(text)
   local buf = api.nvim_create_buf(false, true)
   vim.bo[buf].bufhidden = "wipe"
   vim.bo[buf].filetype = "ainvim_slot"
-  api.nvim_buf_set_lines(buf, 0, -1, false, { "", "  " .. text, "  Space wp: panes · Space wr: restore hidden pane" })
+  api.nvim_buf_set_lines(buf, 0, -1, false, { "", "  " .. text, "  Space pp: panes · Space pr: restore hidden pane" })
   vim.bo[buf].modifiable = false
   return buf
 end

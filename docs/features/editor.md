@@ -25,7 +25,7 @@ pressing Space and pausing; no function-row key is required.
 | Space ul / uL | Toggle line numbers / relative numbers |
 | Space ug / ud | Toggle indent guides / diagnostics |
 | Space uM | Toggle mouse support |
-| Space uz / wm | Zen mode / maximize the current window |
+| Space uz / pm | Zen mode / maximize the current window |
 
 ## Explorer and finding code
 
@@ -65,7 +65,7 @@ terminal's original directory. `rg` and `fd` provide external search tools.
 | Space - / Space \| | Split below / right |
 | Ctrl-h/j/k/l | Move between panes |
 | Ctrl-w + / - / > / < | Native tiled pane resizing |
-| Space wd / wD | Confirm close pane / whole window |
+| Space pd / wd | Confirm close pane / whole window |
 | Space aw / Space ap | Window navigator / project navigator (Space as is an alias) |
 | Ctrl-/ | Toggle right-side shell |
 | Space 9 | Toggle floating shell |
@@ -79,7 +79,7 @@ selection, creation, naming, confirmed closing and manual local layout save.
 Inside either menu, **n** opens a shell window, **e** an editor window, and
 **N** prompts for an existing project directory. Projects group native tabs;
 each tab is a window with its own pane layout. `:AiProject /existing/directory`
-is also available. **Space w** exposes the [window/pane controls](window-management.md),
+is also available. **Space w** exposes window controls and **Space p** the [pane controls](window-management.md),
 including split, move, resize, float/fullscreen and hide/restore.
 New editor windows show a labelled, non-editable home view and the project explorer.
 They do not create a source file to save. To write a new file, use **Space fn**

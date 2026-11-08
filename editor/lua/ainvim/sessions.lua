@@ -100,7 +100,8 @@ function M.home()
     "  Space Space   Find a file in this project",
     "  Space aw      Windows (n shell, e editor)",
     "  Space ap      Switch or manage projects",
-    "  Space w       Split, move, resize, float or close panes",
+    "  Space w       Create, switch or close windows",
+    "  Space p       Split, move, resize, float or close panes",
     "  Space fn      Start a new file; Ctrl-s asks for its name",
     "",
   })

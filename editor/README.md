@@ -37,8 +37,9 @@ otherwise it downloads the declared repository and extracts the pinned commit.
    Use a disposable directory when trying file operations.
 2. **Space Space** finds files; **Space /** searches project text. **Space ,**
    selects buffers. These are floating pickers; opening a file keeps the explorer.
-3. Press **Space** and pause for the leader menu. **Space f**, **Space s**, and
-   **Space w** retain their familiar groups. **Space ?** shows buffer-local help.
+3. Press **Space** and pause for the leader menu. **Space f**, **Space s**,
+   **Space w** (windows), and **Space p** (panes) expose their control groups.
+   **Space ?** shows buffer-local help.
 4. **Shift h/l** cycles buffers; **Space bd** closes a buffer while retaining the
    window layout. **Space |** and **Space -** create splits; **Ctrl-h/j/k/l** moves
    between them. Native **Ctrl-w** resizing remains available without arrow keys.
@@ -56,12 +57,12 @@ otherwise it downloads the declared repository and extracts the pinned commit.
    The menus show rename, confirmed close, local
    layout save and filter controls. See [Native navigators](../docs/features/navigators.md)
    for the full workflow and restore limits.
-8. Try **Space wv** for a right-hand editor split, **Space wt** for a shell below,
-   **Space wf** to float/dock a pane, and **Space wm** to fullscreen/restore it.
-   **Space wH/J/K/L** moves panes; **Space w>/< and w+/-** resize them. **Space wz**
-   hides, **Space wr** restores, and **Space wp** picks a pane. **Space wd** closes
-   a pane; **Space wD** closes its whole window, with confirmation and job cleanup.
-   Press **Space w** and pause for the full menu. See [Window management](../docs/features/window-management.md).
+8. Try **Space pv** for a right-hand editor split, **Space pt** for a shell below,
+   **Space pf** to float/dock a pane, and **Space pm** to fullscreen/restore it.
+   **Space pM** opens Move (Left/Down/Up/Right); **Space pR** opens Resize. **Space pz**
+   hides, **Space pr** restores, and **Space pp** picks a pane. **Space pd** closes
+   a pane; **Space wd** closes its whole window, with confirmation and job cleanup.
+   Press **Space w** for windows or **Space p** for panes and pause for the menu. See [Window management](../docs/features/window-management.md).
 
 Rust, Lua, C/C++, and TypeScript/React/HTML/CSS packs now supply language servers,
 completion, diagnostics and formatting. Native Treesitter handles the captured
