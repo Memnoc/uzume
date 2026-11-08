@@ -1,56 +1,4 @@
 local M = {}
-local decoration_ns = vim.api.nvim_create_namespace("ainvim.dashboard_corners")
-
-local function decorate(dashboard)
-  local api = vim.api
-  local buf, win = dashboard.buf, dashboard.win
-  if not api.nvim_buf_is_valid(buf) or not api.nvim_win_is_valid(win) then
-    return
-  end
-  if api.nvim_win_get_buf(win) ~= buf or vim.bo[buf].filetype ~= "snacks_dashboard" then
-    return
-  end
-  api.nvim_buf_clear_namespace(buf, decoration_ns, 0, -1)
-  local width, height = api.nvim_win_get_width(win), api.nvim_win_get_height(win)
-  if width < 90 or height < 28 then
-    return
-  end
-
-  local count = api.nvim_buf_line_count(buf)
-  if count < height then
-    local modifiable = vim.bo[buf].modifiable
-    vim.bo[buf].modifiable = true
-    api.nvim_buf_set_lines(buf, count, -1, false, vim.fn["repeat"]({ "" }, height - count))
-    vim.bo[buf].modifiable = modifiable
-    count = height
-  end
-  local function mark(row, col, text)
-    if row >= count then
-      return
-    end
-    local line = api.nvim_buf_get_lines(buf, row, row + 1, false)[1] or ""
-    local first = #(line:match("^%s*") or "")
-    local last = vim.fn.strdisplaywidth(line:gsub("%s+$", ""))
-    -- Leave content visible if a custom section extends into a margin.
-    if last > col and first < col + vim.fn.strdisplaywidth(text) then
-      return
-    end
-    api.nvim_buf_set_extmark(buf, decoration_ns, row, 0, {
-      virt_text = { { text, "NonText" } },
-      virt_text_pos = "overlay",
-      virt_text_win_col = col,
-      hl_mode = "combine",
-    })
-  end
-  mark(1, 3, "•───────")
-  mark(1, width - 11, "───────•")
-  for _, row in ipairs({ 2, 3, height - 4, height - 3 }) do
-    mark(row, 3, "│")
-    mark(row, width - 4, "│")
-  end
-  mark(height - 2, 3, "•───────")
-  mark(height - 2, width - 11, "───────•")
-end
 
 -- Half-block rendering of docs/assets/uzume-logo.svg: arch, sun, then arch.
 -- Each row is 11 terminal cells wide; the middle segment uses the sun color.
@@ -97,17 +45,7 @@ function M.section(dashboard)
   for _, line in ipairs(compact and { "U Z U M E" } or wordmark) do
     row({ line })
   end
-  return {
-    text = text,
-    align = "center",
-    padding = 2,
-    render = function()
-      -- Snacks writes the content after rendering items; decorate it afterward.
-      vim.schedule(function()
-        decorate(dashboard)
-      end)
-    end,
-  }
+  return { text = text, align = "center", padding = 2 }
 end
 
 return M
