@@ -44,3 +44,5 @@ installation for supported files. See the [workflow findings](docs/prototypes/00
 for the validated behavior, version boundaries and remaining checks.
 
 The editor preview now includes [native Drudwyn-style navigators](docs/prototypes/0007-native-navigators.md): **Space aw** for workspace/windows and **Space as** for sessions. Switching, filtering, renaming, confirmed close and manual local layout save are available without tmux; managed agents and full autosave remain pending.
+
+The editor preview now implements **project → windows → panes** with [native window-management controls](docs/prototypes/0008-window-management.md). **Space ap** selects projects, **Space aw** selects complete windows, and **Space w** exposes split, move, resize, float/fullscreen, hide/restore and scoped close. Hands-on window-management evaluation comes before agent integration.
