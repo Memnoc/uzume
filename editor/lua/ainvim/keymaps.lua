@@ -2,6 +2,12 @@ local function map(mode, lhs, rhs, desc, extra)
   vim.keymap.set(mode, lhs, rhs, vim.tbl_extend("force", { silent = true, desc = desc }, extra or {}))
 end
 local root = require("ainvim.project").root
+map("n", "<leader>aw", function()
+  require("ainvim.navigator").open("workspaces")
+end, "Workspace Navigator")
+map("n", "<leader>as", function()
+  require("ainvim.navigator").open("sessions")
+end, "Session Navigator")
 local function pick(source, project)
   return function()
     Snacks.picker[source](project and { cwd = root() } or {})

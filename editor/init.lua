@@ -10,12 +10,13 @@ require("ainvim.autocmds")
 require("ainvim.extras").setup()
 require("ainvim.languages").setup()
 require("ainvim.installer").setup()
+require("ainvim.navigator").setup()
 if require("ainvim.extras").enabled("smear") then
   require("smear_cursor").setup({
     hide_target_hack = true,
     cursor_color = "none",
     smear_terminal_mode = false,
-    filetypes_disabled = { "snacks_picker_input", "snacks_picker_list", "snacks_input", "wk" },
+    filetypes_disabled = { "snacks_picker_input", "snacks_picker_list", "snacks_input", "wk", "ainvim_navigator" },
   })
   Snacks.toggle({
     name = "Smear Cursor",

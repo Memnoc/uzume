@@ -80,6 +80,7 @@ Snacks.setup({
 require("which-key").setup({
   preset = "helix",
   spec = {
+    { "<leader>a", group = "agents/workspaces" },
     { "<leader>b", group = "buffer" },
     { "<leader>c", group = "code" },
     { "<leader>f", group = "file/find" },

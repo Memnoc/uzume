@@ -48,12 +48,17 @@ otherwise it downloads the declared repository and extracts the pinned commit.
 6. **Space gs** opens Git status, **Space gd** shows hunks, and **]h/[h** moves
    through changes. **Space uM** toggles the mouse. **Space qq** quits with normal
    unsaved-buffer confirmation. Save files with `:w` or **Ctrl-s**.
+7. **Space aw** opens the Workspace Navigator; **Space as** opens the Session
+   Navigator. Use `:AiSession /existing/project/or/worktree` for another session,
+   then j/k and Enter to switch. The menus show rename, confirmed close, local
+   layout save and filter controls. See [Native navigators](../docs/features/navigators.md)
+   for the full workflow and restore limits.
 
 Rust, Lua, C/C++, and TypeScript/React/HTML/CSS packs now supply language servers,
 completion, diagnostics and formatting. Native Treesitter handles the captured
 language parsers, including TSX; CSS retains native Vim syntax highlighting.
 Smear Cursor is enabled and can be toggled with **Space ua**. Debugging/test
-adapters, remaining language previews/custom extras, agent sessions and the
+adapters, remaining language previews/custom extras, supervised agent sessions and the
 custom review suite are still separate work.
 
 Unlike the original fixture spike, edits to opened files and normal editor

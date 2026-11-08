@@ -66,6 +66,7 @@ terminal's original directory. `rg` and `fd` provide external search tools.
 | Ctrl-h/j/k/l | Move between windows |
 | Ctrl-w + / - / > / < | Native window resizing |
 | Space wd | Close window |
+| Space aw / Space as | Workspace/window navigator / session navigator |
 | Ctrl-/ | Toggle right-side shell |
 | Space 9 | Toggle floating shell |
 | Space ft / fT | Floating shell at project root / cwd |
@@ -73,10 +74,15 @@ terminal's original directory. `rg` and `fd` provide external search tools.
 | Ctrl-s / :w | Save source file |
 | Space qq | Quit, confirming unsaved changes |
 
+The [native navigators](navigators.md) provide Drudwyn-style session/window
+selection, naming, confirmed closing and manual local layout save. Sessions are
+native tabs; use `:AiSession /existing/project/or/worktree` to create another.
+
 The shells use Snacks terminals and Neovim terminal buffers. Separate terminal
 identities prevent the right and floating shortcuts from opening the same pane.
-Closing a visible pane is not a supervised agent-session operation. Agent input
-routing and lifecycle controls belong to the separate pilot.
+Hiding a terminal preserves its job; confirmed navigator close terminates the
+affected terminal. Supervised agent input routing still belongs to the separate
+pilot.
 
 ## Reading changes and recovery
 
