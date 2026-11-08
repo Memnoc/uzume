@@ -16,6 +16,15 @@ indent guides, status-column UI, input prompts and warning/error notifications.
 Indent-guide animation is disabled. WhichKey's Helix-style menu appears after
 pressing Space and pausing; no function-row key is required.
 
+The home screen pairs an ASCII cave-and-sun emblem with the Uzume wordmark,
+matching the repository logo. The shared artwork lives in
+[branding.lua](../../editor/lua/ainvim/branding.lua) and also appears after the
+last project is closed. It uses ordinary ASCII characters and the dashboard's
+theme highlight, with no image renderer or extra plugin. File, search, explorer,
+and quit shortcuts remain below the startup artwork.
+Disposable PTY checks verified the rendered header and shortcuts at 120×36 and
+80×24, the new-file action, and the dashboard shown after closing the last project.
+
 | Control | Action |
 | --- | --- |
 | Space sk / Space ? | Search all mappings / show buffer mappings |

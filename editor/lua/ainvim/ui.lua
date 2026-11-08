@@ -26,14 +26,7 @@ Snacks.setup({
   dashboard = {
     enabled = true,
     preset = {
-      header = table.concat({
-        [[  /\ \▔\___  ___/\   /(●)_ __ ___  ]],
-        [[ /  \/ / _ \/ _ \ \ / / | '_ ` _ \ ]],
-        [[/ /\  /  __/ (_) \ V /| | | | | | |]],
-        [[\_\ \/ \___|\___/ \_/ |_|_| |_| |_|]],
-        [[───────────────────────────────────]],
-        "Uzume",
-      }, "\n"),
+      header = require("ainvim.branding").header,
       keys = {
         {
           icon = " ",

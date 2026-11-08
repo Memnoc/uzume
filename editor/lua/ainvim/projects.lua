@@ -195,7 +195,7 @@ function M.close(item)
     Snacks.dashboard.open({
       win = 0,
       preset = {
-        header = "Uzume\n\nNo project open",
+        header = require("ainvim.branding").header .. "\n\nNo project open",
         keys = {
           {
             key = "p",
