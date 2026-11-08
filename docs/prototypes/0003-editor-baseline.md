@@ -1,7 +1,7 @@
 # Editor baseline preview
 
 Date: 2026-11-07. Status: installed for hands-on evaluation.
-Branch: `spike/editor-baseline`. Checkout: `/Users/matteostara/Code/ai-nvim-editor`.
+Branch: `spike/editor-baseline`. Checkout: `/Users/matteostara/Code/uzume` (renamed from `ai-nvim-editor` on 2026-11-08).
 
 ## Question and scope
 

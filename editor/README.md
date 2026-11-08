@@ -25,7 +25,8 @@ To launch directly:
 uzume /Users/matteostara/Code/tmux-drudwyn/src/session_navigator.rs
 ```
 
-Configuration lives in this checkout's `editor/`, linked as `~/.config/ai-nvim`.
+The active checkout is `/Users/matteostara/Code/uzume`. Configuration lives in its
+`editor/` directory, linked as `~/.config/ai-nvim`.
 Neovim uses its own `ai-nvim` data, cache, and state directories. It never loads
 your daily LazyVim configuration or shares its plugin installation. The initial
 setup copies committed plugin contents from the local cache when available;
