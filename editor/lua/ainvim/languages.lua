@@ -24,6 +24,17 @@ function M.setup()
   if not extras.enabled("languages") then
     return
   end
+  -- Keep a default for new buffers and request hints after capability registration.
+  vim.lsp.inlay_hint.enable(true)
+  Snacks.util.lsp.on({ method = "textDocument/inlayHint" }, function(buf)
+    if
+      vim.api.nvim_buf_is_valid(buf)
+      and vim.bo[buf].buftype == ""
+      and vim.lsp.inlay_hint.is_enabled({ bufnr = buf })
+    then
+      vim.lsp.inlay_hint.enable(true, { bufnr = buf })
+    end
+  end)
   local cmp = require("cmp")
   cmp.setup({
     enabled = function()

@@ -63,6 +63,7 @@ checkout, and are written atomically. No editor restart is forced.
 
 - **gd**, **gr**, **gI**, **gy**: definition, references, implementation, type definition.
 - **K**, **gK**: hover and signature information.
+- **Space uh**: toggle native inlay hints for this buffer; enabled by default.
 - **Space ca**, **Space cr**, **Space cs**: code action, rename, document symbols.
 - **Ctrl-Space**, **Ctrl-n/p**, **Enter**: request, select, accept completion.
 - **Tab / Shift-Tab**: move through an active native snippet.

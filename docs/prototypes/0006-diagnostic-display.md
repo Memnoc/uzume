@@ -62,3 +62,22 @@ editor and asserting visible diagnostic output. Successful server attachment
 and diagnostic publication alone do not establish a usable diagnostic display.
 No architecture change is needed for this fix. Main retains the finding; runtime
 code remains on the editor spike branch.
+
+## Follow-up: native inlay hints
+
+Memnoc confirmed the diagnostic display fix and requested inlay hints enabled
+by default with Space uh to toggle them. Language setup now enables the native
+Neovim hint default and uses the existing Snacks capability callback to request
+hints once a supporting server attaches/registers its capability. The callback
+respects a buffer whose hints were explicitly turned off. The existing Snacks
+inlay-hint toggle supplies Space uh and its WhichKey description.
+
+The toggle is buffer-local for the current session. New buffers default to
+hints enabled; no saved preference or additional plugin was introduced. Actual
+hint content depends on the server and workspace state. Initial fresh-workspace
+probes returned empty hint responses for the standard-library example; a minimal
+Rust scalar fixture verified real rendered `: i32` hints, off/on keyboard behavior,
+and preservation of a disabled buffer's state across buffer switches. Neovim
+0.11.6 also passed startup with the enabled default and mapping. Feature and
+shortcut guides now describe the behavior. The disposable successful probe is
+retained under `.probe/debug/inlay-hints.py`.

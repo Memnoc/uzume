@@ -29,6 +29,7 @@ coordinates formatting; Neovim handles LSP requests and diagnostics.
 | --- | --- |
 | gd / gr / gI / gy | Definition / references / implementation / type definition |
 | K / gK | Hover / signature information |
+| Space uh | Toggle native inlay hints for the current buffer (enabled by default) |
 | Space ca / cr | Code action / rename |
 | Space cs / ss / sS | Document symbols / document symbols / workspace symbols |
 | Ctrl-Space | Request completion |

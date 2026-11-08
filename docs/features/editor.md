@@ -105,7 +105,11 @@ leave Insert mode. Long inline text may be clipped by the window width; use
 **Space cd** for the full diagnostic float, **]d / [d** to navigate, or
 **Space sD** for the buffer's diagnostic picker. **Space ud** toggles diagnostics.
 Gray inferred types, such as `Args` and `Option<String>`, are inlay hints rather
-than error messages; this display fix does not enable them.
+than error messages. Native LSP inlay hints are enabled by default when language
+packs are loaded; **Space uh** toggles them for the current buffer. The toggle
+lasts for that buffer in the current editor session; other buffers keep their
+own setting and new buffers start enabled. A server must provide hints for them
+to appear. This uses Neovim plus the existing Snacks toggle, with no new plugin.
 
 The [diagnostic display investigation](../prototypes/0006-diagnostic-display.md)
 records the real Rust reproduction and why the earlier baseline hid messages.
