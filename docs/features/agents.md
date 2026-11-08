@@ -1,8 +1,11 @@
 # AI tasks and agent terminals
 
 Start a task inside an open Git project. Uzume creates a new branch and worktree,
-then opens a dedicated window with an editor landing pane on the left and the
-selected official CLI on the right. Task windows remain grouped under the same
+then opens a dedicated window with a searchable file chooser on the left and
+the selected official CLI on the right. Choose a file and press Enter to open it
+in the left editor pane; the agent stays visible and running. The chooser is
+rooted in the new worktree, so you inspect the same files the agent edits.
+Escape dismisses the chooser; Space Space or Space e lets you choose later. Task windows remain grouped under the same
 project. Codex and Claude Code are the initial adapters; tmux is not required.
 
 ## Controls
@@ -67,6 +70,8 @@ are not inferred in this increment.
 
 - [worktrees.lua](../../editor/lua/uzume/worktrees.lua) creates worktrees through
   asynchronous argument-array Git calls. It never runs task names as shell code.
+- [task_editor.lua](../../editor/lua/uzume/task_editor.lua) opens the file chooser
+  within the left pane and restores normal editor options when a file opens.
 - [agents.lua](../../editor/lua/uzume/agents.lua) owns terminal buffers, task
   metadata, status polling, attention and launch/restart controls.
 - [supervisor.py](../../editor/agent/supervisor.py) runs the official CLI in the

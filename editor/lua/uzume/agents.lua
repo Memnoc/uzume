@@ -204,28 +204,12 @@ function M.start(kind, label, done)
         task = task,
         empty = true,
       })
-      -- A scratch landing page avoids producing an unnamed source file to save.
-      local buf = api.nvim_get_current_buf()
-      vim.bo[buf].buftype, vim.bo[buf].bufhidden = "nofile", "wipe"
-      vim.bo[buf].filetype = "uzume_task"
-      vim.b[buf].snacks_main = true
-      api.nvim_buf_set_lines(buf, 0, -1, false, {
-        "",
-        "  " .. label,
-        "  " .. task.branch,
-        "",
-        "  " .. task.cwd,
-        "",
-        "  Space e       Explorer in this worktree",
-        "  Space Space   Find task files",
-        "  Space aa      Agents and attention",
-        "  Space ww      Project windows",
-        "  Space ar      Start a fresh CLI after it exits",
-        "",
-        "  Closing retains files and branch.",
-      })
-      vim.bo[buf].modifiable = false
-      return launch(task, tab, project.name, kind)
+      local editor = require("uzume.task_editor").create(task)
+      local item = launch(task, tab, project.name, kind)
+      if previous == origin then
+        require("uzume.task_editor").pick(editor, task)
+      end
+      return item
     end)
     if previous ~= origin and api.nvim_win_is_valid(previous) then
       vim.cmd.stopinsert()

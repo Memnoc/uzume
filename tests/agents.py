@@ -106,6 +106,18 @@ try:
         else:
             do('require("uzume.agents").start(' + json.dumps(kind) + ',"same name")')
         wait(lambda: js('#require("uzume.agents").list()') == count)
+        wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+        wait(lambda: js('#Snacks.picker.get({source="files"})[1]:items()') > 0)
+        assert lua('Snacks.picker.get({source="files"})[1]:cwd()') == lua('vim.t.ainvim_root')
+        picker = js('(function() local p=Snacks.picker.get({source="files"})[1]; return {main=p.main, root=vim.api.nvim_win_get_config(p.layout.root.win)} end)()')
+        assert picker['root']['relative'] == 'win' and picker['root']['win'] == picker['main']
+        keys('<CR>')
+        wait(lambda: lua('vim.bo.filetype') != 'snacks_picker_input')
+        assert js('vim.api.nvim_get_current_win()') == picker['main']
+        assert lua('vim.api.nvim_buf_get_name(0)') == lua('vim.t.ainvim_root') + '/example.txt'
+        assert js('vim.wo.number') is True
+
+    do('require("uzume.agents").focus(require("uzume.agents").list()[4]); vim.cmd.startinsert()')
     wait(lambda: lua('vim.api.nvim_get_mode().mode') == 't')
     keys('<Esc><Esc>')
     wait(lambda: lua('vim.api.nvim_get_mode().mode').startswith('n'))
