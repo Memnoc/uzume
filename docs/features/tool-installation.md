@@ -3,8 +3,8 @@
 The editor now uses **Mason** to install language servers and formatters into
 ai-nvim's own data directory. Our Extras catalog owns pack choices, versions,
 filetype triggers and retry policy. Native Neovim still configures and starts
-language servers; Mason is the installer. We do not import LazyVim,
-mason-lspconfig, or a separate automatic-tool-installer plugin.
+language servers; Mason is the installer. Language integrations are configured
+directly, without mason-lspconfig or a separate automatic-tool-installer plugin.
 
 ## Everyday workflow
 
@@ -124,7 +124,7 @@ immutable merely by pinning the top-level package.
 Downloads contact package registries/upstream release hosts. Our installer does
 not send source buffers, project contents or credentials. Downloaded tools and
 package installation scripts have their own behavior; this is ordinary local
-package installation, not a sandbox for those programs. LazyVim's existing Mason
+package installation, not a sandbox for those programs. An existing external Mason
 installation is only read when resolving previously discovered external tools.
 New managed installs use ai-nvim's directory.
 

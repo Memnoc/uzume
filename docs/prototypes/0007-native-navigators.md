@@ -1,14 +1,14 @@
 # Native Drudwyn-style navigators
 
 Date: 2026-11-08. Status: implemented on `spike/editor-baseline`; awaiting
-Memnoc's visual/usability feedback in the real editor.
+the maintainer's visual/usability feedback in the real editor.
 
 ## Question and reference
 
 Can native Neovim surfaces reproduce the Drudwyn session/window picker flow
 without requiring tmux, while retaining the established editor controls?
 
-Memnoc identified prefix-w and prefix-s as the most-used Drudwyn features and
+The maintainer identified prefix-w and prefix-s as the most-used Drudwyn features and
 provided the 08.51.19 workspace and 08.51.32 session screenshots. These settle
 the presentation: floating flat lists, dark background, thin square frame,
 salmon heading/selection, muted secondary information, workspace/agent sections,
@@ -86,7 +86,7 @@ floating/tiling layout management, and full restoration remain later increments.
 
 ## Follow-up: creation from the navigators
 
-Memnoc requested a way to spawn windows and sessions from these menus. Both now
+The maintainer requested a way to spawn windows and sessions from these menus. Both now
 show **n window** and **N session** in the footer. `n` creates a right-hand native
 shell split in the selected entry's session, including hidden sessions, and
 focuses terminal input. With no filtered selection it uses the current session.
@@ -106,7 +106,7 @@ unchanged. No new plugin, external multiplexer or persisted preference was added
 
 ## Follow-up: session home and first-save recovery
 
-Memnoc found the new session indistinguishable from an unnamed file and reported
+The maintainer found the new session indistinguishable from an unnamed file and reported
 being unable to save it. The disposable command
 `python3 .probe/navigation/unnamed-save.py` reproduced the exact sequence—N,
 Enter, Ctrl-s—with `E32: No file name`. The error came from using a normal blank

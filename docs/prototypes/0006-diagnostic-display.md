@@ -4,8 +4,8 @@ Date: 2026-11-08. Status: fixed in the editor preview on `spike/editor-baseline`
 
 ## Report and reproduction
 
-Memnoc reported that the Rust LSP did not seem to behave like LazyVim and supplied
-screenshots. The accessible editor screenshot showed a missing semicolon after
+A report of missing Rust diagnostics included comparison screenshots. The
+accessible editor screenshot showed a missing semicolon after
 `args.next()`, inline rust-analyzer/rustc messages, underlines and severity icons.
 The other accessible replacement image was unrelated and excluded. The original
 ai-nvim screenshot remained inaccessible in macOS's capture directory, so this
@@ -30,10 +30,10 @@ per-server override suppressing it, or different server settings affecting the
 reported diagnostic set. Changing only native `virtual_text` in the disposable
 session rendered the existing error, confirming the first explanation.
 
-Our baseline retained `virtual_text = false` from My-LazyVim's early options.
-LazyVim's LSP plugin subsequently configures a virtual-text table, overriding
-that early value. We copied an intermediate setting rather than the effective
-runtime behavior. rust-analyzer itself was already producing the diagnostic.
+The baseline set `virtual_text = false`, suppressing inline messages. The
+reference runtime enabled them through a later override; the prototype had
+copied an intermediate setting rather than the effective behavior.
+rust-analyzer itself was already producing the diagnostic.
 
 ## Fix and controls
 
@@ -65,7 +65,7 @@ code remains on the editor spike branch.
 
 ## Follow-up: native inlay hints
 
-Memnoc confirmed the diagnostic display fix and requested inlay hints enabled
+The maintainer confirmed the diagnostic display fix and requested inlay hints enabled
 by default with Space uh to toggle them. Language setup now enables the native
 Neovim hint default and uses the existing Snacks capability callback to request
 hints once a supporting server attaches/registers its capability. The callback

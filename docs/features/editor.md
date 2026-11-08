@@ -2,7 +2,7 @@
 
 The editor restores the familiar reading and editing workflow before agent
 sessions return. It is an independent Lua configuration using selected plugins;
-it does not import LazyVim. [ui.lua](../../editor/lua/ainvim/ui.lua) configures
+it owns its configuration directly. [ui.lua](../../editor/lua/ainvim/ui.lua) configures
 Rose Pine, the dashboard, Snacks, WhichKey, bufferline, lualine, Git signs,
 Flash and paired delimiters. [keymaps.lua](../../editor/lua/ainvim/keymaps.lua)
 is the complete mapping reference.
@@ -114,9 +114,8 @@ This is not yet the planned side-by-side agent-review suite. Diagnostic data
 comes from the language servers described in [Languages](languages.md).
 
 Errors and warnings appear inline beside code, with underlines and severity
-icons in the gutter. This uses Neovim's native diagnostics, matching LazyVim's
-effective LSP display: four spaces before the message, a dot prefix, and source
-labels when multiple diagnostic sources are present. Updates wait until you
+icons in the gutter. This uses Neovim's native diagnostics with four spaces
+before the message, a dot prefix, and source labels when multiple diagnostic sources are present. Updates wait until you
 leave Insert mode. Long inline text may be clipped by the window width; use
 **Space cd** for the full diagnostic float, **]d / [d** to navigate, or
 **Space sD** for the buffer's diagnostic picker. **Space ud** toggles diagnostics.
@@ -141,5 +140,5 @@ source autosave. State stays in ai-nvim's own Neovim directories.
 The [baseline record](../prototypes/0003-editor-baseline.md) documents real PTY
 checks of explorer toggle/create/rename/mkdir, search, WhichKey and distinct
 shells. The [language record](../prototypes/0004-extras-and-languages.md) covers
-code features. Not every inherited plugin action has been exercised; full
-LazyVim parity, Linux/terminal coverage and integrated agents remain future work.
+code features. Not every inherited plugin action has been exercised; broader
+editing coverage, Linux/terminal coverage and integrated agents remain future work.

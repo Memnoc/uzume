@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install exact editor-spike packages; optionally register with Memnoc's nvims."""
+"""Install pinned editor packages; optionally register zsh launch commands."""
 import argparse
 import hashlib
 import json

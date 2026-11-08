@@ -26,7 +26,7 @@ The Extras menu also carries its own control hints and icon legend.
 The editor preview does not yet integrate supervised Codex/Claude sessions,
 the custom diff/review suite, source autosave, or complete managed releases.
 Ordinary shell terminals and Git hunk tools are available now. The earlier agent
-pilot runs separately from `/Users/matteostara/Code/ai-nvim` using
+pilot runs separately from `~/Code/ai-nvim` using
 `./spike --drudwyn`; keep its checkout and worktrees intact.
 
 For every feature change, update its write-up with what changed, how to use it,

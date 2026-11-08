@@ -6,7 +6,7 @@ and attention handling feel useful when Codex and Claude work on real code?
 ## Run
 
 ```sh
-/Users/matteostara/Code/ai-nvim/spike --drudwyn
+~/Code/ai-nvim/spike --drudwyn
 ```
 
 Use a wide terminal. The first session shows the session navigator source and a
@@ -33,9 +33,9 @@ asks you to submit the instruction yourself; it never duplicates the task.
 ## Prepared work
 
 Both worktrees originate from clean `tmux-drudwyn` main at `570a865`. The pilot
-uses `/Users/matteostara/Code/tmux-drudwyn`, not the older `tmux-agent-watch` clone.
+uses `~/Code/tmux-drudwyn`, not the older `tmux-agent-watch` clone.
 
-| Session | CLI | Worktree under `/Users/matteostara/Code/ai-nvim-worktrees/` | Branch | Assigned file |
+| Session | CLI | Worktree under `~/Code/ai-nvim-worktrees/` | Branch | Assigned file |
 | --- | --- | --- | --- | --- |
 | sessions | Codex | `drudwyn-sessions` | `ai-nvim/clear-filter-sessions` | `src/session_navigator.rs` |
 | workspaces | Claude | `drudwyn-workspaces` | `ai-nvim/clear-filter-workspaces` | `src/navigator.rs` |

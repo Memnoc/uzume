@@ -1,15 +1,15 @@
 ---
 status: accepted
 date: 2026-11-06
-proposed-by: Memnoc and Codex
-approved-by: Memnoc
+proposed-by: project maintainers
+approved-by: project maintainer
 ---
 
 # ADR-0001: Build an independent distribution with multiplexing inside Neovim
 
 ## Context
 
-My-LazyVim supplies the desired editing workflow, but upstream changes can disrupt it. A new distribution also needs flexible panes and concurrent agent sessions while retaining MNvim's minimal, understandable design.
+Uzume needs stable editing defaults, flexible panes, and concurrent agent sessions with a minimal, understandable implementation. Depending on another distribution would couple these workflows to its changing defaults and release schedule.
 
 ## Decision
 
@@ -18,7 +18,7 @@ Build an independent distribution using native Neovim windows and terminals for 
 ## Considered options
 
 - **Independent configuration and native Neovim multiplexing** — chosen for ownership and native integration without initially building a terminal renderer.
-- **Extend LazyVim** — rejected as the foundation because it retains dependency on another distribution's evolving defaults.
+- **Extend an existing distribution** — rejected as the foundation because it retains dependency on another distribution's evolving defaults.
 - **Require an external multiplexer** — deferred as an optional integration because the baseline should own multiplexing behavior.
 - **Build a surrounding terminal application** — deferred because it introduces rendering and process-management scope before native feasibility has been tested.
 

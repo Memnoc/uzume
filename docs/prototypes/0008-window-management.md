@@ -1,10 +1,10 @@
 # Project, window and pane management spike
 
 Date: 2026-11-08. Branch: `spike/editor-baseline`. Status: implemented and
-probed; awaiting Memnoc's hands-on evaluation.
+probed; awaiting the maintainer's hands-on evaluation.
 
 Question: does a project grouping native Neovim tab pages, each representing a
-window with its own editor/terminal panes, give Memnoc an understandable native
+window with its own editor/terminal panes, give the user an understandable native
 multiplexer? Test creation, switching, splits, moving/swapping/resizing, floating
 and fullscreen with restoration, hide/restore, and scoped close using ordinary
 files and shells before integrating agents.
@@ -100,7 +100,7 @@ checks passed.
 ## Verdict and next evaluation
 
 The native mapping supports the complete first interaction loop without a new
-renderer or dependency. This is ready for Memnoc to try against Drudwyn with
+renderer or dependency. This is ready for the maintainer to try against Drudwyn with
 ordinary files and shells before the agent workflow returns. Confirm the new
 window/pane distinction, Space w controls, placement after hide/restore, and
 mouse feel in the actual terminal. The mouse probes validate Neovim event
@@ -113,7 +113,7 @@ agent attention and process-tree supervision remain separate increments.
 
 ## Follow-up: separate window and pane menus
 
-Memnoc found the combined menu too long and requested clear directional names
+The maintainer found the combined menu too long and requested clear directional names
 and distinct window/pane prefixes. Space w now contains six window actions:
 pick (ww), new editor (wn), new shell (wN), next/previous (w]/w[), and close (wd).
 Pane actions moved to Space p. Focus (pg), Move (pM), and Resize (pR) are short

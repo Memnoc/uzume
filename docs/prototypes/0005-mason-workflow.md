@@ -5,8 +5,8 @@ Date: 2026-11-08. Status: installed for evaluation on `spike/editor-baseline`.
 ## Question and decision
 
 Can the independent Extras menu provide a browsable tool catalog and install
-missing language tools when a supported file is opened, without importing
-LazyVim or replacing working external tools?
+missing language tools when a supported file is opened, without depending on
+another distribution or replacing working external tools?
 
 Yes. Use pinned Mason as the installation backend, keep our catalog and native
 Neovim language integration, and request explicit tool versions from a pinned
@@ -50,7 +50,7 @@ mostly drawn from the already exercised external installation. Our workflow
 checks the registry hash and passes the selected version to Mason's install API.
 It does not upgrade an existing binary automatically.
 
-The default LazyVim installation and tool cache are not updated. Its existing
+The default editor installation and tool cache are not updated. Its existing
 binaries remain usable through earlier read-only references; new installs go
 under ai-nvim/mason. The normal nvim and nvims registration are unchanged.
 
@@ -112,7 +112,7 @@ without a tool to editing with an attached server.
 
 Primary reference: [Mason documentation](https://github.com/mason-org/mason.nvim/blob/2a6940af80375532e5e9e7c1f2fc6319a1b7a69d/doc/mason.txt).
 
-## Follow-up: managed core tools installed for Memnoc
+## Follow-up: managed core tools installed for the maintainer
 
 On 2026-11-08, at the user's request, installed all nine core packages into the
 registered ai-nvim data directory: rust-analyzer 2026-08-31, LuaLS 3.19.1,
@@ -125,5 +125,5 @@ Disposable Rust, Lua, C, TSX, HTML, CSS and JSON fixtures confirmed server
 attachment from ai-nvim's own `mason/bin` paths and formatting availability.
 Rust/Lua/TypeScript diagnostics, C definition lookup, native syntax and
 TypeScript completion checks passed. No project source files, pack preferences,
-or default LazyVim configuration were changed. Restart already running editors
+or default editor configuration were changed. Restart already running editors
 to ensure their existing language-server processes use the new managed copies.

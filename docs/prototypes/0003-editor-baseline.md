@@ -1,18 +1,17 @@
 # Editor baseline preview
 
 Date: 2026-11-07. Status: installed for hands-on evaluation.
-Branch: `spike/editor-baseline`. Checkout: `/Users/matteostara/Code/uzume` (renamed from `ai-nvim-editor` on 2026-11-08).
+Branch: `spike/editor-baseline`. Checkout: `~/Code/uzume` (renamed from `ai-nvim-editor` on 2026-11-08).
 
 ## Question and scope
 
-After trying the Drudwyn pilot, Memnoc found agents more accessible but the
+After trying the Drudwyn pilot, the maintainer found agents more accessible but the
 editor insufficiently familiar or capable. Build the editor foundation first:
-Rose Pine, the Snacks sidebar, floating navigation, familiar LazyVim key groups,
-and discoverable shortcuts. Memnoc explicitly asked to retain plain `nvim` for
-the daily LazyVim configuration and add this preview through the existing zsh
+Rose Pine, the Snacks sidebar, floating navigation, and discoverable leader key groups. The maintainer explicitly asked to retain plain `nvim` for
+the default Neovim configuration and add this preview through the existing zsh
 `nvims` function.
 
-This is an independent native Neovim configuration, not a LazyVim import. It
+This independent native Neovim configuration
 does not load the agent pilot. The worktree keeps the pilot's existing paths
 intact so it remains available for comparison.
 
@@ -50,7 +49,7 @@ No global `NVIM_APPNAME` or `nvim` alias was added.
 Open a new shell, run `nvims`, and choose **ai-nvim**. Direct launch:
 
 ```sh
-NVIM_APPNAME=ai-nvim nvim /Users/matteostara/Code/tmux-drudwyn/src/session_navigator.rs
+NVIM_APPNAME=ai-nvim nvim ~/Code/tmux-drudwyn/src/session_navigator.rs
 ```
 
 ## Verification
@@ -58,7 +57,7 @@ NVIM_APPNAME=ai-nvim nvim /Users/matteostara/Code/tmux-drudwyn/src/session_navig
 Development probes used an isolated configuration/data/state/cache and disposable
 Git project. No permanent test suite was added for this Northstar spike.
 
-- Startup loads Rose Pine with no initialization errors and no LazyVim runtime.
+- Startup loads Rose Pine with no initialization errors or dependency on another distribution.
 - In a real PTY on the installed Neovim 0.12 development build, keyboard actions
   opened/closed the explorer, created a file/directory, renamed a file through
   the Snacks dialog, and opened a file while keeping the sidebar visible.
@@ -70,7 +69,7 @@ Git project. No permanent test suite was added for this Northstar spike.
 - Installation/registration is idempotent in an isolated home. The existing
   `nvims` function was exercised with a fake picker/executable: default unsets
   an inherited app name; selecting ai-nvim sets it; path arguments survive.
-- Actual registration preserved hashes of all 19 inspected default LazyVim
+- Actual registration preserved hashes of all 19 inspected default editor
   config files. `.zshrc` differed only by the added candidate and passed zsh
   syntax validation. Plain Neovim's default config path remains `~/.config/nvim`.
 - The installed ai-nvim configuration starts without errors. The already
@@ -98,7 +97,7 @@ behavior, and startup/performance under load are not yet established. There are
 no new agent/session menus in this preview. Review snapshots and agent feedback
 delivery remain separate increments.
 
-Ask Memnoc to use a real project for reading: sidebar, search, buffers, windows,
+Ask a tester to use a real project for reading: sidebar, search, buffers, windows,
 and shell access. First settle whether this restores the familiar editor feel;
 then add and verify language tooling before bringing agent navigation back.
 

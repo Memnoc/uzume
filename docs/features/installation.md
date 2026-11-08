@@ -1,15 +1,15 @@
 # Installation, isolation and releases
 
 Run `./setup-editor --register` from the editor-preview checkout. Then use
-`nvims` → **ai-nvim**, or `NVIM_APPNAME=ai-nvim nvim`. The existing default
-LazyVim configuration remains available through plain `nvim` and the default
+`uzume`, or `uzume path/to/file`. The default
+Neovim configuration remains available through plain `nvim` and the default
 picker entry. The [launch guide](../../editor/README.md) lists prerequisites
 and removal instructions.
 
 ## How it works
 
 [setup-editor](../../setup-editor) links this checkout's `editor/` directory to
-`~/.config/ai-nvim`. It adds ai-nvim to the existing zsh `nvims` candidate list,
+`~/.config/ai-nvim`. It adds the `uzume` command and ai-nvim to the existing zsh `nvims` candidate list,
 backs up `.zshrc`, and refuses to replace unrelated configuration. An already
 running shell needs `source ~/.zshrc` after first registration.
 
@@ -21,8 +21,8 @@ tags and marks the bundle complete before making it available.
 
 [packages.lua](../../editor/lua/ainvim/packages.lua) loads the bundle selected by
 the lockfile hash, using native Neovim `packadd`. Optional packages load only
-when their Extras pack is enabled. There is no LazyVim or lazy.nvim runtime,
-no startup plugin download and no automatic update check. Supported filetypes
+when their Extras pack is enabled. There is no plugin-manager runtime,
+startup plugin download or automatic update check. Supported filetypes
 can trigger missing-tool downloads through Mason. Already installed bundles
 remain available when a new lockfile is installed.
 
@@ -41,7 +41,7 @@ remain available when a new lockfile is installed.
 The installer reads existing language tools from the supplied Mason cache or
 PATH. [tools.lua](../../editor/lua/ainvim/tools.lua) prefers ai-nvim-managed
 binaries, then recorded external paths, otherwise PATH. External paths remain
-read-only references, and ai-nvim does not modify LazyVim’s Mason cache.
+read-only references, and ai-nvim does not modify the supplied Mason cache.
 Updating those tools elsewhere can change this editor's behavior.
 
 Extras saves settings locally and does not transmit them. The editor has no
@@ -63,5 +63,5 @@ rollback, not an implemented release/rollback UI.
 The [baseline](../prototypes/0003-editor-baseline.md),
 [Extras](../prototypes/0004-extras-and-languages.md), and
 [Mason workflow](../prototypes/0005-mason-workflow.md) records document installed
-startup, isolated runtime behavior and checks that the daily LazyVim files were
+startup, isolated runtime behavior and checks that the default Neovim files were
 unchanged. Keep the editor worktree while the config symlink points into it.

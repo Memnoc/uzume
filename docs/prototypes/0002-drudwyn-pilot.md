@@ -5,14 +5,14 @@ Throwaway branch: `spike/drudwyn-pilot`.
 
 ## Question and authorization
 
-Can Memnoc maintain reading flow while two real CLI agents work in separate
+Can a user maintain reading flow while two real CLI agents work in separate
 native Neovim sessions? The fixture trial was too artificial to judge shortcuts
-and attention. Memnoc chose Drudwyn, approved the clear-filter task, and clarified
-that the newly cloned `/Users/matteostara/Code/tmux-drudwyn` should be used.
+and attention. The maintainer chose Drudwyn, approved the clear-filter task, and clarified
+that the newly cloned `~/Code/tmux-drudwyn` should be used.
 
 The new clone and the previously inspected `tmux-agent-watch` checkout both
 pointed at `570a865`; the new clone was clean. Two branches/worktrees were created
-from that commit under `/Users/matteostara/Code/ai-nvim-worktrees`: Codex handles
+from that commit under `~/Code/ai-nvim-worktrees`: Codex handles
 the session navigator and Claude handles the workspace navigator. Each task adds
 Ctrl-u filter clearing and its own narrow regression coverage. The assignments
 do not share implementation files. No Drudwyn feature implementation has been
@@ -80,12 +80,12 @@ heavy output remain unverified.
 
 ## Next observation
 
-Memnoc reports that the AI workflow feels more accessible than opening a
+The maintainer reports that the AI workflow feels more accessible than opening a
 separate terminal. However, the editor lacks the feel, visual appeal, and
-functionality of the current LazyVim configuration. The next priority is a solid
+functionality of the current default editor configuration. The next priority is a solid
 editor experience, then determining how the AI workflow best fits within it.
 
-For sessions/workspaces, Memnoc prefers Neovim/LazyVim-style floating or anchored
+For sessions/workspaces, the maintainer prefers Neovim-style floating or anchored
 menus that can expand and collapse through keyboard shortcuts. Their default
 placement and exact interaction are still open; the pilot's tab presentation
 is not a final navigation decision.

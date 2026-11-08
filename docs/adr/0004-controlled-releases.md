@@ -2,7 +2,7 @@
 status: accepted
 date: 2026-11-06
 proposed-by: Codex
-approved-by: Memnoc
+approved-by: project maintainer
 ---
 
 # ADR-0004: Manage Neovim and ship user-controlled tested releases

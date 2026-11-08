@@ -1,21 +1,21 @@
 # Design record
 
-Date: 2026-11-06. Owner: Memnoc. Project: Uzume (name selected 2026-11-08; formerly ai-nvim).
+Date: 2026-11-06. Project: Uzume (name selected 2026-11-08; formerly ai-nvim).
 
 This records the design interview, not a completed implementation specification. Agreed product behavior is separated from proposed experiments and unresolved mechanisms.
 
 ## Purpose and design principles
 
 - Code reading and review are primary product capabilities; manual programming remains fully supported.
-- Preserve My-LazyVim's keybindings and capabilities through equivalent behavior, with a complete inventory before migration. Fewer dependencies are useful only when they reduce total maintenance work.
+- Maintain a documented inventory of editing capabilities and stable keybindings. Fewer dependencies are useful only when they reduce total maintenance work.
 - Build an independent distribution from scratch. Use native Neovim facilities where appropriate and selected pinned plugins where they add substantial value.
 - Build our own multiplexing inside Neovim. External multiplexer integration is a possible later addition.
 - Rust is welcome when it serves a clear architectural need and maintainability; portfolio value alone does not determine language choice.
-- Interview one question at a time, and test incremental prototypes with Memnoc.
+- Interview one question at a time, and test incremental prototypes with the maintainer.
 
 ## Projects, windows, panes, and concurrent work
 
-Updated with Memnoc on 2026-11-08: the product hierarchy is **Project → Windows → Panes**. A project is rooted in a chosen local directory and owns its dedicated windows. A window is a switchable group of editor/terminal panes with its own retained layout. A pane is one editor or terminal surface. There is no separate user-facing session entity; the need for any additional grouping can be revisited after hands-on window-management use.
+Updated on 2026-11-08: the product hierarchy is **Project → Windows → Panes**. A project is rooted in a chosen local directory and owns its dedicated windows. A window is a switchable group of editor/terminal panes with its own retained layout. A pane is one editor or terminal surface. There is no separate user-facing session entity; the need for any additional grouping can be revisited after hands-on window-management use.
 
 The workflow is to create/open a project at a directory, create the windows and panes needed there, switch among them, and close the whole project workspace when finished. Switching projects or windows preserves their background processes. Closing a project ends its windows, panes, agents and owned spawned processes by default. Optional keep-running behavior remains deferred.
 
@@ -33,7 +33,7 @@ Four directly launched agents are the initial everyday performance workload, not
 - Moving, resizing, tiling, floating, zooming, and switching panes must be keyboard accessible.
 - Mouse dragging and resizing are supported; mouse support can be disabled. Keyboard use remains central.
 - Drudwyn's compact navigation, visible shortcuts, restrained borders, and agent-state cues are references. Preserve the current configuration's visual preferences unless a change is deliberately agreed.
-- Most navigation menus, including project/window quick switching, should float; selected persistent tools should be anchored. Menus expand/collapse through keyboard shortcuts. The file explorer is an essential anchored sidebar with the existing LazyVim/Snacks shortcuts, including `<leader>e` and explorer-local `a`. The hierarchy is project → windows → panes; exact menus and bindings remain to be designed. See the [editor baseline](editor-baseline.md).
+- Most navigation menus, including project/window quick switching, should float; selected persistent tools should be anchored. Menus expand/collapse through keyboard shortcuts. The file explorer is an essential anchored sidebar with the standard Snacks shortcuts, including `<leader>e` and explorer-local `a`. The hierarchy is project → windows → panes; exact menus and bindings remain to be designed. See the [editor baseline](editor-baseline.md).
 - Ghostty and WezTerm are primary reference terminals on macOS and Linux. Kitty is an additional compatibility target.
 - Smooth input and resizing matter in the first usable version. Animation polish follows the working product and remains configurable/off-switchable.
 - GPU-accelerated terminals are the intended environment. Hardware thresholds, terminal version requirements, and any hard compatibility gate require measurements before adoption.
@@ -81,22 +81,21 @@ The distro manages a pinned Neovim executable alongside existing installations. 
 
 ## Baseline inspection
 
-The local My-LazyVim checkout has 65 entries in its plugin lockfile. Its inspected active installation matches the repository's keymaps, options, bootstrap, and extras file, but differs in plugin pins. The inspected executable is Neovim `v0.12.0-dev-2155+g1e6c4ea896`. These are observations of the current machine, not chosen release versions.
+The initial prototype was inspected with Neovim `v0.12.0-dev-2155+g1e6c4ea896`. This is a development observation, not a chosen release version.
 
-The baseline includes Snacks navigation, completion, LSP, formatting/linting, debugging, tests, previews, multicursor editing, and terminal controls. Enabled language extras include C/C++, CMake, Rust, TypeScript, Tailwind, JSON, TOML, YAML, and Typst; custom Slint and Markdown/Mermaid functionality also needs accounting for. Preserve inherited LazyVim behavior as well as custom overrides. Notable custom bindings include `<C-/>` for the right-side terminal, `<leader>9` for a floating terminal, terminal `<C-h/j/k/l>` navigation, and horizontal resize bindings.
+The baseline includes Snacks navigation, completion, LSP, formatting/linting, debugging, tests, previews, multicursor editing, and terminal controls. Enabled language extras include C/C++, CMake, Rust, TypeScript, Tailwind, JSON, TOML, YAML, and Typst; custom Slint and Markdown/Mermaid functionality also needs accounting for. Notable custom bindings include `<C-/>` for the right-side terminal, `<leader>9` for a floating terminal, terminal `<C-h/j/k/l>` navigation, and horizontal resize bindings.
 
-MNvim's README and Treesitter implementation differ about the branch/pin in use. This illustrates why the migration inventory must inspect executable configuration and resolved dependencies, not README claims alone.
+Verify executable configuration and resolved dependencies against documented pins.
 
 ## Next steps and open design work
 
 The first Drudwyn pilot feedback changes the order: agents inside Neovim feel
 more accessible than a separate terminal, but the editor does not yet meet the
-user's LazyVim expectations for appearance or functionality. Establish a solid
-editor experience before expanding agent features. This preserves the independent
-distribution decision; it does not select LazyVim as the implementation base.
+expected appearance or functionality. Establish a solid
+editor experience before expanding agent features. The distribution remains independent.
 
-1. Complete the LazyVim capability, visual, and binding inventory, including inherited defaults. Use the actual configuration as the acceptance reference: Rose Pine, Snacks pickers/explorer, leader-menu discovery, code navigation, completion, diagnostics, formatting, and terminal behavior. Account for the remaining extras without silently dropping them.
-2. Agree and build the first editor-focused increment, choosing native equivalents or pinned plugins where they preserve behavior. Evaluate everyday reading and editing with Memnoc before integrating more AI UI.
+1. Complete the capability, visual, and binding inventory. The acceptance baseline includes: Rose Pine, Snacks pickers/explorer, leader-menu discovery, code navigation, completion, diagnostics, formatting, and terminal behavior. Account for the remaining extras without silently dropping them.
+2. Agree and build the first editor-focused increment, choosing native equivalents or pinned plugins where they preserve behavior. Evaluate everyday reading and editing with the maintainer before integrating more AI UI.
 3. **Current milestone: hands-on window/pane management trial before agent integration.** The prototype now covers project-owned windows, editor/terminal splits, moving/swapping/resizing, floating/fullscreen restoration, hide/restore and scoped close. Space ap selects projects, Space aw windows, Space w exposes window controls, and Space p pane controls (with Focus, Move and Resize submenus); Space as remains a compatibility alias. Evaluate ordinary files and shells in Drudwyn, including mouse behavior and busy output, before proceeding. See [window-management findings](prototypes/0008-window-management.md).
 4. After the window-management trial, settle task-worktree ownership and reintroduce the validated agent workflow into the editor. Verify terminal key routing, attention, process lifetime/cleanup, and resizing under concurrent output. Existing pilot code remains available for comparison.
 5. Prototype local review separately, including stable snapshots and revision feedback; choose storage boundaries and per-agent lifecycle/delivery mechanisms from evidence.

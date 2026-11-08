@@ -47,7 +47,7 @@ and Esc cancels. Invalid or empty paths create nothing. Reopening the same
 canonical directory switches to its existing project. The command equivalent is:
 
 ```vim
-:AiProject /Users/matteostara/Code/tmux-drudwyn
+:AiProject ~/Code/tmux-drudwyn
 ```
 
 `:AiSession` remains a compatibility alias. No Git worktree or directory is

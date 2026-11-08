@@ -1,6 +1,6 @@
 # First prototype proposal: native sessions and pane interaction
 
-Status: scope approved by Memnoc on 2026-11-06; throwaway prototype implemented on branch `spike/native-sessions`. Memnoc reports that the basic interactions work; realistic workflow evaluation remains open.
+Status: scope approved by the maintainer on 2026-11-06; throwaway prototype implemented on branch `spike/native-sessions`. The maintainer reports that the basic interactions work; realistic workflow evaluation remains open.
 
 ## Question
 
@@ -63,7 +63,7 @@ No persistent test suite was added: these are development probes and manual smok
 
 ## Further notes
 
-On 2026-11-07, Memnoc selected Drudwyn for the next real-project experiment, then clarified that the new `/Users/matteostara/Code/tmux-drudwyn` clone should be used. The fixture trial established that basic interactions work, but Memnoc could not assess attention and switching flow without meaningful project work. Exact shortcuts can be refined later; Space-leader controls and avoiding required function-row keys remain settled. Memnoc approved the clear-filter task; the [Drudwyn pilot](0002-drudwyn-pilot.md) prepares separate worktrees for the session and workspace navigators. This selection does not establish real-agent lifecycle integration or authorize arbitrary backlog implementation.
+On 2026-11-07, the maintainer selected Drudwyn for the next real-project experiment, then clarified that the new `~/Code/tmux-drudwyn` clone should be used. The fixture trial established that basic interactions work, but the maintainer could not assess attention and switching flow without meaningful project work. Exact shortcuts can be refined later; Space-leader controls and avoiding required function-row keys remain settled. The maintainer approved the clear-filter task; the [Drudwyn pilot](0002-drudwyn-pilot.md) prepares separate worktrees for the session and workspace navigators. This selection does not establish real-agent lifecycle integration or authorize arbitrary backlog implementation.
 
 User evaluation found the function row inconvenient and conflicting with macOS controls. The prototype now uses Space-leader sequences for all primary actions, with on-screen hints and documentation matching them. Terminal input returns to Normal mode with Esc twice before leader actions; literal spaces remain available to agents. Function-row and Ctrl-arrow mappings have been removed. This is prototype usability feedback, not a final production keymap specification.
 

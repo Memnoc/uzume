@@ -4,7 +4,7 @@ Date: 2026-11-07. Status: installed for user evaluation on `spike/editor-baselin
 
 ## Requested increment
 
-Memnoc reported the editor preview was working, requested LazyExtras-like
+The maintainer reported the editor preview was working, requested
 optional features, and selected Rust, Lua, C, TypeScript/React/HTML/CSS, plus
 Smear Cursor. The requested menu shortcut is **Space l**.
 
@@ -48,7 +48,7 @@ The installer discovers existing tool executables and records read-only paths
 in ai-nvim's data directory. All 13 advertised executables were found. This
 machine's rustup rust-analyzer shim cannot run, so the working Mason binary is
 chosen. HTML/CSS executables already exist inside the eslint-lsp package. No
-tools were downloaded and no LazyVim/Mason files were modified.
+tools were downloaded and no default configuration or Mason files were modified.
 
 These executables remain user-managed, not pinned by ai-nvim. Plugin/syntax pins
 do not guarantee that external tool behavior cannot change. Tool distribution,
@@ -78,7 +78,7 @@ Disposable development probes, not a permanent test suite:
   filesystem-watcher access; the full interaction/server probe used the installed
   Neovim 0.12 development build.
 - Installed startup confirms Space l, all five enabled packs, and active Smear.
-  Default LazyVim config hashes and `.zshrc` were unchanged by installation.
+  Default editor config hashes and `.zshrc` were unchanged by installation.
 - Lua formatting, installer syntax, and whitespace checks passed.
 
 Not yet verified: real React application workflows, TSX paired-tag renaming,
@@ -98,7 +98,7 @@ editor spike branch.
 
 ## Follow-up: discoverable controls and feature write-ups
 
-Memnoc requested ongoing write-ups explaining each feature and its implementation,
+The maintainer requested ongoing write-ups explaining each feature and its implementation,
 and controls visible directly in the Extras menu. The editor branch now keeps a
 feature index at `docs/features/README.md`, covering editor/navigation, languages,
 cursor animation, installation/isolation/pins, and the separate agent pilot.

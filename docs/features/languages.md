@@ -51,8 +51,8 @@ External tool paths and version boundaries are covered in
 ## Cursor animation
 
 The **Smear Cursor** pack loads the pinned `smear-cursor.nvim` plugin, configured
-in [init.lua](../../editor/init.lua). It follows the existing LazyVim cursor
-settings (`hide_target_hack`, automatic cursor color). Terminal input, Snacks
+in [init.lua](../../editor/init.lua). It uses
+`hide_target_hack` and automatic cursor color. Terminal input, Snacks
 picker/input windows and WhichKey menus are excluded. It does not configure
 other plugins' animations.
 

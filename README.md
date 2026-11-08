@@ -1,8 +1,10 @@
+<p align="center"><img src="docs/assets/uzume-logo.svg" width="160" alt="Uzume logo: the sun rising inside a cave arch"></p>
+
 # Uzume
 
-An independent Neovim distribution for reading code, reviewing agent changes, and programming by hand. Uzume aims to preserve the capabilities and keybindings of Memnoc's My-LazyVim configuration, with MNvim's preference for understandable, minimal configuration.
-
-The design combines native Neovim editing with our own project, window, and pane management, Codex and Claude Code terminals, and a substantial local diff and review experience. Plugins remain appropriate when they offer meaningful value at a reasonable maintenance cost.
+An independent, understandable and opinionated Neovim distribution for reading code, reviewing agent changes, and programming by hand.
+The design combines native Neovim editing with built-in project, window, and pane management, first-class support for Codex and Claude Code, and a substantial local diff and review experience.
+Plugins are used when they offer meaningful value at a reasonable maintenance cost.
 
 ## Why Uzume?
 
@@ -12,7 +14,7 @@ Uzume takes its name from **Ame-no-Uzume**, the Japanese goddess whose dance hel
 
 Design and prototype stage. This branch, `spike/editor-baseline`, provides the first independent editor preview. There is no production distribution yet; the full specification remains open.
 
-Run `uzume`, or `uzume path/to/file` to open a file directly. The existing `nvims` → **ai-nvim** entry also works. See the [editor guide](editor/README.md) for setup, familiar controls, and the current boundaries. Plain `nvim` keeps the existing LazyVim configuration.
+Run `uzume`, or `uzume path/to/file` to open a file directly. The existing `nvims` → **ai-nvim** entry also works. See the [editor guide](editor/README.md) for setup, familiar controls, and the current boundaries. Plain `nvim` keeps your default configuration.
 
 The project is now named **Uzume**. The preview retains its original `ai-nvim` installation name and `ainvim` Lua namespace so existing settings, tools, and saved state continue to work. Renaming those identifiers will need a migration.
 
@@ -21,11 +23,9 @@ language tools now install automatically through isolated, pinned Mason when you
 open supported files. The [tool workflow](docs/features/tool-installation.md)
 covers catalog views, manual installation, disabling automation and retries.
 
-The earlier agent pilot remains available in `/Users/matteostara/Code/ai-nvim` on `spike/drudwyn-pilot`. It is separate from this editor preview while we evaluate the editor first.
-
 - [Design record](docs/design.md): agreed behavior, deferred features, and open questions.
 - [Feature guide](docs/features/README.md): available features, shortcuts, implementation and limits.
-- [Domain glossary](CONTEXT.md): the meaning of sessions, panes, tasks, and reviews.
+- [Domain glossary](CONTEXT.md): the meaning of projects, windows, panes, tasks, and reviews.
 - [Architecture decisions](docs/adr/README.md): choices and their tradeoffs.
 - [First prototype](docs/prototypes/0001-native-sessions.md): scope, technical findings, and pending hands-on evaluation.
 
@@ -35,15 +35,8 @@ Every feature change includes an updated feature write-up: behavior, controls,
 implementation, dependencies and stored state, verification, and known limits.
 Keep the feature index current and distinguish implemented features from plans.
 
-Use Northstar and ask one design question at a time. Record decisions during the interview; use throwaway spikes to resolve interaction and technical uncertainty. Before the production specification, complete Northstar's compliance triage, then create the spec and incremental tickets. Implement with appropriate TDD and crosscheck, and use harden to verify the assembled workflows. Test small increments with Memnoc rather than building the whole distribution before feedback.
+Development proceeds in small, testable increments. Record design decisions, use focused prototypes to resolve uncertainty, and validate real editing workflows before expanding the feature set.
 
 The initial reference terminals are Ghostty and WezTerm on macOS and Linux. Kitty is an additional compatibility target. Animation polish follows a usable core.
 
-## References
-
-- [My-LazyVim](https://github.com/Memnoc/My-LazyVim): functionality and muscle-memory baseline.
-- [MNvim](https://github.com/Memnoc/MNvim): design spirit, not a source tree to copy wholesale.
-- [Drudwyn](https://github.com/Memnoc/tmux-drudwyn): session navigation, agent attention, worktrees, and TUI inspiration.
-- [TUIOS](https://github.com/Gaurav-Gosain/tuios): flexible terminal window management inspiration.
-
-Uzume was selected as the project name on 2026-11-08. Visual branding, Rust component boundaries, and the production dependency set remain open.
+The Uzume name and cave-and-sun logo are established. Rust component boundaries and the production dependency set remain open.

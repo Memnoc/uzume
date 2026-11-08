@@ -2,7 +2,7 @@
 status: accepted
 date: 2026-11-06
 proposed-by: Codex
-approved-by: Memnoc
+approved-by: project maintainer
 ---
 
 # ADR-0003: Review stable snapshots while agents keep working

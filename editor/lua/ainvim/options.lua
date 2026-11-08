@@ -49,7 +49,7 @@ opt.formatoptions = "jcroqlnt"
 opt.wildmode = "longest:full,full"
 vim.g.markdown_recommended_style = 0
 vim.g.snacks_animate = false
--- Match LazyVim's effective LSP display, which overrides its early options.
+-- Show native inline diagnostics alongside underlines and gutter signs.
 vim.diagnostic.config({
   underline = true,
   update_in_insert = false,

@@ -1,14 +1,14 @@
 # Uzume editor preview
 
-Northstar editor spike: can a small independent configuration restore Memnoc's
-LazyVim navigation and visual feel before adding agent sessions?
+The editor preview provides native project, window, and pane management alongside
+code navigation, language tools, and discoverable keyboard controls.
 
 This first increment supplies Rose Pine, a Snacks sidebar and floating pickers,
 WhichKey's Helix leader menus, buffer/status lines, Git signs and hunk actions,
 Flash navigation, paired delimiters, and the familiar shell terminal shortcuts.
 The base and optional plugins are pinned to exact commits and loaded with
-Neovim's native package support. There is no dependency on LazyVim or a
-plugin-manager runtime. **Space l** (or `:Extras`) manages the language packs and
+Neovim's native package support. Packages load without a plugin-manager runtime.
+**Space l** (or `:Extras`) manages the language packs and
 Smear Cursor; see [Extras](EXTRAS.md) for controls and tool requirements.
 The [feature guide](../docs/features/README.md) explains every current feature
 group, its implementation, shortcuts, stored state and known limits.
@@ -18,17 +18,17 @@ group, its implementation, shortcuts, stored state and known limits.
 Uzume currently uses the original `ai-nvim` installation name to preserve the preview's existing settings and state.
 
 After registration, open a new terminal and run `uzume`. It forwards all arguments to Neovim, so `uzume .` and `uzume path/to/file` work too. In an existing shell, run `source ~/.zshrc` once to load the command. You can also run `nvims`, then choose **ai-nvim**.
-The **default** entry and plain `nvim` retain the existing LazyVim configuration.
+The **default** entry and plain `nvim` retain the default Neovim configuration.
 To launch directly:
 
 ```sh
-uzume /Users/matteostara/Code/tmux-drudwyn/src/session_navigator.rs
+uzume path/to/project/src/main.rs
 ```
 
-The active checkout is `/Users/matteostara/Code/uzume`. Configuration lives in its
-`editor/` directory, linked as `~/.config/ai-nvim`.
+Configuration lives in this checkout's `editor/` directory, linked as
+`~/.config/ai-nvim`.
 Neovim uses its own `ai-nvim` data, cache, and state directories. It never loads
-your daily LazyVim configuration or shares its plugin installation. The initial
+your default Neovim configuration or shares its plugin installation. The initial
 setup copies committed plugin contents from the local cache when available;
 otherwise it downloads the declared repository and extracts the pinned commit.
 
@@ -87,7 +87,7 @@ Formatting runs on explicit saves by default; **Space uf** toggles it globally,
 ```
 
 Requires Neovim 0.11+, Python 3.12+, Git, `rg`, and `fd`. A Nerd Font provides the
-icons, as in the current LazyVim setup. The shell picker also needs `fzf`.
+icons throughout the interface. The shell picker also needs `fzf`.
 This local preview's captured parser binaries are for macOS ARM64. Installation
 also requires the exact parser/query cache identified in the lockfile; portable
 parser builds are not implemented yet. The setup script discovers existing tools
@@ -95,7 +95,7 @@ without modifying them. At runtime,
 Mason installs missing tools for supported files into ai-nvim’s own directory;
 see [Tool installation](../docs/features/tool-installation.md).
 
-The installer adds the `ai-nvim` entry to Memnoc's existing `nvims` list and a
+The installer adds the `ai-nvim` entry to the existing `nvims` list and a
 `uzume` shell function that launches the same configuration. It backs up `.zshrc`
 and refuses to replace an unrelated config. Registration is idempotent.
 No global `NVIM_APPNAME` is exported and the `nvim` command/aliases are unchanged.

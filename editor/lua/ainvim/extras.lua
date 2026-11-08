@@ -34,7 +34,7 @@ M.catalog = {
   {
     id = "smear",
     name = "Smear Cursor",
-    description = "The cursor animation from your LazyVim setup. Space ua toggles it for this run; Extras controls whether it loads on restart.",
+    description = "Smooth cursor animation. Space ua toggles it for this run; Extras controls whether it loads on restart.",
     tools = {},
   },
 }

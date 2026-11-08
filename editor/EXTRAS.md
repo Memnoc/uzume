@@ -36,7 +36,7 @@ copy for the open menu. Enter edits only the draft. Ctrl-s validates all catalog
 choices and atomically renames a temporary JSON file into place; Esc drops the
 draft. [packages.lua](lua/ainvim/packages.lua) and
 [languages.lua](lua/ainvim/languages.lua) use startup choices to load features.
-There is no dependency on LazyVim or lazy.nvim, and no general third-party
+There is no plugin-manager runtime and no general third-party
 Extras marketplace or custom-pack editor yet. Mason supplies the tool installation
 backend; our catalog and native LSP configuration remain independent.
 
@@ -91,7 +91,7 @@ The installer records usable existing executables in
 PATH; this machine's rustup rust-analyzer shim is broken, while its Mason binary
 works. HTML/CSS servers are present inside the existing eslint-lsp package even
 though Mason exposes only some binaries in its top-level bin directory. These
-are read-only references: the installer does not update or write into LazyVim's
+are read-only references: the installer does not update or write into the supplied
 Mason installation. PATH is a runtime fallback if a recorded executable vanishes.
 Managed binaries in ai-nvim’s own `mason/bin` now take precedence. Opening a
 supported file automatically installs missing required tools, then refreshes

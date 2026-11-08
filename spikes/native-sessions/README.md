@@ -18,7 +18,7 @@ From the repository root on branch `spike/native-sessions`:
 Or from any directory:
 
 ```sh
-/Users/matteostara/Code/ai-nvim/spike
+~/Code/ai-nvim/spike
 ```
 
 Requires Neovim 0.11+ and Python 3 on PATH. The tested executable is this machine's Neovim 0.12 development build; the production distro's pinned Neovim installer is not part of the spike. Start with a reasonably wide terminal, around 120 columns by 36 rows, so the editor and two terminals are readable.
@@ -35,7 +35,7 @@ The launcher creates fresh temporary config/data/state/cache paths and two dispo
 6. Press **Space then s** to switch sessions. Hidden agents continue running. Press **Space then x** to explicitly terminate a session, then confirm; the other session continues.
 7. Press `Space q` from Normal mode to quit. All fixtures and workers are stopped and scratch files removed.
 
-All primary controls use Space as the leader: press Space and then the indicated key(s), rather than holding them together. Function-row and Ctrl-arrow bindings have been removed following macOS usability feedback. These are prototype controls, not a finalized replacement for the existing LazyVim bindings.
+All primary controls use Space as the leader: press Space and then the indicated key(s), rather than holding them together. Function-row and Ctrl-arrow bindings have been removed following macOS usability feedback. These are prototype controls, not a finalized replacement for the existing default editor bindings.
 
 ## Controls
 

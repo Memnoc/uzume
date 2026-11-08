@@ -1,8 +1,8 @@
 ---
 status: accepted
 date: 2026-11-06
-proposed-by: Memnoc and Codex
-approved-by: Memnoc
+proposed-by: project maintainers
+approved-by: project maintainer
 ---
 
 # ADR-0005: Keep authentication in official agent CLIs and autosave locally

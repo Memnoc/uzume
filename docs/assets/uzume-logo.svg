@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="t">
+  <title id="t">Uzume: the sun returning from the cave mouth</title>
+  <style>
+    /* Rosé Pine Dawn: iris, love */
+    .ink { stroke: #907aa9; }
+    .sun { fill: #b4637a; }
+    /* Rosé Pine: iris, love */
+    @media (prefers-color-scheme: dark) {
+      .ink { stroke: #c4a7e7; }
+      .sun { fill: #eb6f92; }
+    }
+  </style>
+  <defs>
+    <clipPath id="above-ground"><rect width="256" height="196"/></clipPath>
+  </defs>
+  <!-- the sun, half risen out of the cave -->
+  <circle class="sun" cx="128" cy="184" r="42" clip-path="url(#above-ground)"/>
+  <!-- the cave mouth / Uzume's overturned tub; inverted, a U -->
+  <path class="ink" d="M58 208 V128 A70 70 0 0 1 198 128 V208" fill="none" stroke-width="26"/>
+  <!-- the ground line, also a cursor-line baseline -->
+  <path class="ink" d="M86 208 H170" fill="none" stroke-width="10" stroke-linecap="round"/>
+</svg>

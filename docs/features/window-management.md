@@ -134,6 +134,6 @@ No dependency, terminal renderer or external multiplexer was added. The existing
 Lua editor is the appropriate place to test these interactions; there is no new
 Rust subsystem in this increment. The [probe record](../prototypes/0008-window-management.md)
 records actual workflow and compatibility checks. Heavy-output performance,
-terminal-specific mouse ergonomics and Memnoc's hands-on layout evaluation remain
+terminal-specific mouse ergonomics and hands-on layout evaluation remain
 open. Agent attention, review, worktree automation and animation polish follow
 this window-management trial.
