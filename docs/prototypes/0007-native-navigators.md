@@ -83,3 +83,23 @@ row identity, switching, filtering and closing match the user's expected flow.
 Then connect the existing agent pilot, checking genuine attention signals and
 process-tree cleanup before claiming managed multi-agent sessions. Autosave,
 floating/tiling layout management, and full restoration remain later increments.
+
+## Follow-up: creation from the navigators
+
+Memnoc requested a way to spawn windows and sessions from these menus. Both now
+show **n window** and **N session** in the footer. `n` creates a right-hand native
+shell split in the selected entry's session, including hidden sessions, and
+focuses terminal input. With no filtered selection it uses the current session.
+During a close confirmation `n` remains cancel. `N` opens an inline directory
+prompt, prefilled from the selected project; Ctrl-u clears, Enter creates a new
+empty editor tab, and Esc cancels. It accepts existing directories only and
+does not create worktrees.
+
+The disposable `.probe/navigation/create.py` drives both menus with real keyboard
+input and a real `/bin/sh` process. It verified prompt cancellation, invalid and
+empty paths, correct directory and ownership when creating in a hidden session,
+terminal input, close/termination, the no-selection fallback, and all footer
+controls at 80×24. Shell startup failure removes the split and leaves the
+navigator usable. Launch uses an argument list derived from Neovim's shell
+option, avoiding an extra shell-command wrapper. Existing source files remain
+unchanged. No new plugin, external multiplexer or persisted preference was added.
