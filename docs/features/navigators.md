@@ -49,9 +49,20 @@ commands available. These are provisional shortcuts for the usability trial.
 Press **N** in either navigator to create a session. The inline directory prompt
 starts at the selected entry's project root; **Ctrl-u** clears it, **Enter**
 creates the session, and **Esc** cancels. Choose an existing directory; invalid
-or empty input creates nothing. The new session starts with an empty editor,
-ready for **Space e** or **Space Space**. Directory creation and Git worktree
-creation are separate operations.
+or empty input creates nothing. The new session starts with a **Session home**
+showing its name, project directory and controls, alongside the file explorer.
+Focus stays on the home view. This is an unlisted, non-editable view rather than
+an unnamed source file: no filename or file save is required. **Space Space**
+opens a project file; **Ctrl-h** moves into the explorer, where `a` creates a file.
+**Space e** toggles the explorer. Directory creation and Git worktree creation
+are separate operations.
+
+For a genuine new file, **Space fn** opens an editable buffer and **Ctrl-s** asks
+for its filename on first save. Cancel keeps the draft intact. `:w filename`
+remains the native command alternative; plain `:w` still requires a named file.
+The session home explains this distinction, and Ctrl-s there shows guidance
+instead of trying to write a file. Shared buffer tabs remain distinct from
+sessions; use **Space as** to switch the whole window group.
 
 Press **n** in either navigator to add a shell window to the selected entry's
 session—even when that session is hidden. It opens as a right-hand native split,
@@ -106,6 +117,8 @@ In a fresh ai-nvim dashboard or one empty unnamed window, run:
 ```
 
 Restore reopens saved files/tabs and does **not** start terminals or agents.
+Sessions saved on their home, with no remaining file windows on restore, receive
+the session home and explorer again.
 Existing editing layouts are refused. Neovim's `mksession` supplies the layout,
 with terminal, option, global-variable and hidden-buffer capture excluded. If
 an argument list contains a terminal reference, save refuses it instead of
@@ -114,7 +127,7 @@ session scripts inside JSON; do not substitute downloaded/untrusted snapshots.
 Source files still require `:w` or Ctrl-s.
 
 This is a persistence probe, not the planned full autosave system. Terminal
-panes and auxiliary plugin panels are omitted on restore; native layout sizing
+panes and other auxiliary plugin panels are omitted on restore; native layout sizing
 can change when those panes disappear. Labels for multiple views of the same
 file share one saved label. There is no snapshot history, cross-instance merge,
 automatic restore, or session autosave yet. Delete the snapshot to forget the
@@ -124,7 +137,7 @@ saved layout. Existing Neovim undo/recovery remains separate.
 
 [navigator.lua](../../editor/lua/ainvim/navigator.lua) renders native floating
 windows and handles navigation, input, filtering, confirmations and resize.
-[sessions.lua](../../editor/lua/ainvim/sessions.lua) owns tab/window discovery,
+[sessions.lua](../../editor/lua/ainvim/sessions.lua) owns the native session home, tab/window discovery,
 creation, names, switching, terminal cleanup and local snapshots. New shell
 windows use native `jobstart` with a terminal and explicit working directory;
 they follow the same ownership/close behavior as other session terminals. No plugin or external

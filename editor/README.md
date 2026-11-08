@@ -51,6 +51,8 @@ otherwise it downloads the declared repository and extracts the pinned commit.
 7. **Space aw** opens the Workspace Navigator; **Space as** opens the Session
    Navigator. In either menu, **n** creates a shell window and **N** prompts for
    a project/worktree directory to create a session; j/k and Enter switch entries.
+   A new session shows its name/path and the explorer, not an unnamed file.
+   **Space fn** starts a real new file; **Ctrl-s** asks for its name on first save.
    The menus show rename, confirmed close, local
    layout save and filter controls. See [Native navigators](../docs/features/navigators.md)
    for the full workflow and restore limits.

@@ -103,3 +103,49 @@ controls at 80×24. Shell startup failure removes the split and leaves the
 navigator usable. Launch uses an argument list derived from Neovim's shell
 option, avoiding an extra shell-command wrapper. Existing source files remain
 unchanged. No new plugin, external multiplexer or persisted preference was added.
+
+## Follow-up: session home and first-save recovery
+
+Memnoc found the new session indistinguishable from an unnamed file and reported
+being unable to save it. The disposable command
+`python3 .probe/navigation/unnamed-save.py` reproduced the exact sequence—N,
+Enter, Ctrl-s—with `E32: No file name`. The error came from using a normal blank
+file as the session landing view and mapping Ctrl-s directly to `:write`.
+Creating the tab succeeded; the resulting UI did not communicate the session
+boundary or give unnamed-file saving a usable path.
+
+New sessions now show a native, unlisted, non-editable Session home with their
+name, project directory, and existing leader controls. The project explorer
+opens alongside it without stealing focus. Opening a real file replaces the
+home, restores the normal editor options, and uses the existing Snacks picker
+flow. The temporary empty buffer created by tabnew is removed only if unmodified,
+unnamed and no longer displayed. Existing drafts are retained. Saved home-only
+sessions restore to this view again; a small optional home flag supplements the
+existing local snapshot metadata.
+
+Ctrl-s now writes named files normally and offers a Snacks filename prompt for
+genuine unnamed files. It captures the originating buffer and directory, supports
+completion, explicit Ctrl-u clearing and Escape cancellation, and refuses an
+existing target or missing parent directory before attempting a write. Special
+views show guidance rather than attempting file writes. Native `:w filename`
+remains available; plain `:w` still has Neovim's normal named-file requirement.
+No automatically generated source filename or forced overwrite was introduced.
+
+The broader `.probe/navigation/session-home.py` checked real keyboard input:
+home labels and explorer root, retaining an unsaved original buffer, opening a
+file from home, named-file saving, first-save from Insert mode, cancellation,
+filenames containing spaces, refusing overwrite, switching with drafts, and
+home-only save/restore. All passed. It also exposed two prompt integration
+details: stopping Insert before opening the input interferes with its mode,
+and expression-based Enter can read text before queued typing finishes. The
+save prompt uses non-expression confirmation/cancellation and explicit clearing;
+fast typed text plus Enter is part of the successful probe.
+
+The original reproduction now opens the home and Ctrl-s produces guidance with
+no E32. Prevention is to test the user-visible next action after creation, not
+merely the existence of another native tab. Buffer tabs are still shared; this
+fix clarifies the landing experience rather than claiming complete session-local
+buffer isolation. Disposable probes remain under the ignored `.probe/navigation/`
+directory; no debug logging is present in runtime code.
+Neovim 0.11.6 also passed session-home creation and save guidance; Lua formatting
+and whitespace checks passed.

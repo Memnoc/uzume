@@ -71,7 +71,7 @@ terminal's original directory. `rg` and `fd` provide external search tools.
 | Space 9 | Toggle floating shell |
 | Space ft / fT | Floating shell at project root / cwd |
 | Esc or jk in terminal input | Return to terminal Normal mode |
-| Ctrl-s / :w | Save source file |
+| Ctrl-s / :w | Save source file; Ctrl-s prompts for a filename on first save |
 | Space qq | Quit, confirming unsaved changes |
 
 The [native navigators](navigators.md) provide Drudwyn-style session/window
@@ -79,6 +79,12 @@ selection, creation, naming, confirmed closing and manual local layout save.
 Inside either menu, **n** opens a new shell window in the selected session and
 **N** prompts for an existing directory to create a session. Sessions are native
 tabs; `:AiSession /existing/project/or/worktree` is also available.
+New sessions show a labelled, non-editable home view and the project explorer.
+They do not create a source file to save. To write a new file, use **Space fn**
+and **Ctrl-s**: the filename prompt supports completion, cancellation preserves
+the draft, and existing files are not silently overwritten. Named files save
+normally. Native `:w filename` also works; `:w` alone still needs a named buffer.
+The first-save behavior is implemented in [save.lua](../../editor/lua/ainvim/save.lua).
 
 The shells use Snacks terminals and Neovim terminal buffers. Separate terminal
 identities prevent the right and floating shortcuts from opening the same pane.

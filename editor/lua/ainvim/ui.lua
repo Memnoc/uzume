@@ -15,7 +15,10 @@ Snacks.setup({
     style = "minimal",
     level = vim.log.levels.INFO,
     filter = function(notification)
-      return notification.title == "Extras" or notification.level == "warn" or notification.level == "error"
+      return notification.title == "Extras"
+        or notification.title == "Editor"
+        or notification.level == "warn"
+        or notification.level == "error"
     end,
   },
   indent = { enabled = true, animate = { enabled = false } },
@@ -126,8 +129,25 @@ require("lualine").setup({
   sections = {
     lualine_a = { "mode" },
     lualine_b = { "branch" },
-    lualine_c = { "diagnostics", { "filename", path = 1 } },
-    lualine_x = { "diff", "filetype" },
+    lualine_c = {
+      "diagnostics",
+      {
+        "filename",
+        path = 1,
+        fmt = function(name)
+          return vim.bo.filetype == "ainvim_session" and ("Session: " .. (vim.t.ainvim_name or "")) or name
+        end,
+      },
+    },
+    lualine_x = {
+      "diff",
+      {
+        "filetype",
+        fmt = function(name)
+          return name == "ainvim_session" and "Session home" or name
+        end,
+      },
+    },
     lualine_y = { "progress" },
     lualine_z = { "location" },
   },
