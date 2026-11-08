@@ -5,8 +5,8 @@
 <h1 align="center">Uzume</h1>
 
 <p align="center">
-  <strong>An independent, understandable and opinionated Neovim distribution.</strong><br>
-  For reading code, reviewing agent changes, and programming by hand.
+  <strong>An independent, understandable and opinionated Neovim distribution</strong><br>
+  for reading code, reviewing agent changes, and programming by hand.
 </p>
 
 <p align="center">
