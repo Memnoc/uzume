@@ -1,8 +1,30 @@
-<p align="center"><img src="docs/assets/uzume-logo.svg" width="160" alt="Uzume logo: the sun rising inside a cave arch"></p>
+<p align="center">
+  <img src="docs/assets/uzume-logo.svg" width="160" alt="Uzume logo: the sun rising inside a cave arch">
+</p>
 
-# Uzume
+<h1 align="center">Uzume</h1>
 
-An independent, understandable and opinionated Neovim distribution for reading code, reviewing agent changes, and programming by hand.
+<p align="center">
+  <strong>An independent, understandable and opinionated Neovim distribution.</strong><br>
+  For reading code, reviewing agent changes, and programming by hand.
+</p>
+
+<p align="center">
+  <a href="#project-status"><img src="https://img.shields.io/badge/status-prototype-eb6f92" alt="Status: prototype"></a>
+  <a href="editor/README.md#installation-and-pins"><img src="https://img.shields.io/badge/Neovim-0.11%2B-c4a7e7" alt="Requires Neovim 0.11 or newer"></a>
+  <a href="docs/features/installation.md#current-limits-and-verification"><img src="https://img.shields.io/badge/preview-macOS_ARM64-9ccfd8" alt="Current preview: macOS ARM64"></a>
+</p>
+
+<p align="center">
+  <a href="editor/README.md#installation-and-pins"><strong>Install</strong></a> ·
+  <a href="docs/features/README.md">Features</a> ·
+  <a href="editor/README.md#first-walkthrough">Shortcuts</a> ·
+  <a href="editor/EXTRAS.md">Extras</a> ·
+  <a href="docs/design.md">Design</a>
+</p>
+
+---
+
 The design combines native Neovim editing with built-in project, window, and pane management, first-class support for Codex and Claude Code, and a substantial local diff and review experience.
 Plugins are used when they offer meaningful value at a reasonable maintenance cost.
 
