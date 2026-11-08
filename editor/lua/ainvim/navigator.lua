@@ -181,13 +181,13 @@ local function draw()
     put(2, 1, summary, "Muted")
   end
   rule(3)
-  local footer = "j/k move  Enter "
+  local footer = "n window  N session  j/k move  Enter "
     .. (s.kind == "sessions" and "switch" or "jump")
     .. "  r rename  x kill  s save  / filter  Esc close"
   if s.input then
     footer = "Type " .. (s.input_label or "text") .. "  Ctrl-u clear  Enter apply  Esc cancel"
   end
-  local footer_rows = width < 95 and 2 or 1
+  local footer_rows = vim.fn.strdisplaywidth(footer) > width and 2 or 1
   local footer_top = height - footer_rows - 2
   rule(footer_top, "Muted")
   if footer_rows == 1 or s.input then
@@ -196,10 +196,10 @@ local function draw()
     put(
       footer_top + 1,
       0,
-      "j/k move  Enter " .. (s.kind == "sessions" and "switch" or "jump") .. "  r rename  x kill",
+      "n window  N session  j/k move  Enter " .. (s.kind == "sessions" and "switch" or "jump"),
       "Muted"
     )
-    put(footer_top + 2, 0, "s save  / filter  Esc close", "Muted")
+    put(footer_top + 2, 0, "r rename  x kill  s save  / filter  Esc close", "Muted")
   end
   local function render_rows(list, top, bottom, group_name)
     if group_name then
@@ -426,11 +426,40 @@ function M.open(kind)
       end
     end)
   end
+  local function create(fn)
+    M.close()
+    local ok, err = pcall(fn)
+    if not ok then
+      M.open(kind)
+      M.current.notice = tostring(err)
+      draw()
+    end
+  end
   map("n", function()
     if s.confirm then
       s.confirm = nil
       draw()
+      return
     end
+    local item = selected(s) or { tab = api.nvim_get_current_tabpage() }
+    create(function()
+      sessions.new_window(item)
+    end)
+  end)
+  map("N", function()
+    if s.confirm then
+      return
+    end
+    local item = selected(s)
+    input("Directory", item and item.root or vim.fn.getcwd(), nil, function(path)
+      if vim.trim(path) == "" then
+        s.notice = "Choose an existing project or worktree directory"
+        return
+      end
+      create(function()
+        sessions.create(path)
+      end)
+    end)
   end)
   map("<CR>", function()
     if s.confirm then

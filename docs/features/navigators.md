@@ -23,6 +23,8 @@ Restart ai-nvim to load this increment, then use:
 | --- | --- |
 | Space aw / `:AiWorkspaces` | Toggle the workspace/window navigator |
 | Space as / `:AiSessions` | Toggle the session navigator |
+| n | Create and focus a right-hand shell window in the selected session |
+| N (Shift-n) | Prompt for a directory and create a new editor session |
 | j/k or arrows | Move through entries; wraps at the ends |
 | Enter | Jump to the window, or switch to the session's last editor/terminal window |
 | / | Type a live, case-insensitive substring filter |
@@ -44,7 +46,23 @@ the shortcut strip. The preview was checked at 150×45 and 80×24 cells.
 The Space a group keeps the existing Space w window commands and Space s search
 commands available. These are provisional shortcuts for the usability trial.
 
-Create another session with an existing local project/worktree path:
+Press **N** in either navigator to create a session. The inline directory prompt
+starts at the selected entry's project root; **Ctrl-u** clears it, **Enter**
+creates the session, and **Esc** cancels. Choose an existing directory; invalid
+or empty input creates nothing. The new session starts with an empty editor,
+ready for **Space e** or **Space Space**. Directory creation and Git worktree
+creation are separate operations.
+
+Press **n** in either navigator to add a shell window to the selected entry's
+session—even when that session is hidden. It opens as a right-hand native split,
+starts the configured Neovim shell at that session's root and focuses terminal
+input. Existing editor buffers are retained. If filtering leaves no selection,
+the current session is used. **Esc** leaves terminal input so the leader menus
+are available again. During a kill confirmation, **n** still cancels; it does
+not spawn a window. Shell startup failure removes the new split and reports the
+error in the navigator.
+
+The command form also accepts an existing local project/worktree path:
 
 ```vim
 :AiSession /Users/matteostara/Code/tmux-drudwyn
@@ -107,7 +125,9 @@ saved layout. Existing Neovim undo/recovery remains separate.
 [navigator.lua](../../editor/lua/ainvim/navigator.lua) renders native floating
 windows and handles navigation, input, filtering, confirmations and resize.
 [sessions.lua](../../editor/lua/ainvim/sessions.lua) owns tab/window discovery,
-names, switching, terminal cleanup and local snapshots. No plugin or external
+creation, names, switching, terminal cleanup and local snapshots. New shell
+windows use native `jobstart` with a terminal and explicit working directory;
+they follow the same ownership/close behavior as other session terminals. No plugin or external
 multiplexer was added. A one-second refresh keeps an open list current without
 changing focus; Smear is disabled inside the overlay.
 

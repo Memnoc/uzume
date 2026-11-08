@@ -88,6 +88,31 @@ function M.jump(item)
     end
   end
 end
+function M.new_window(item)
+  assert(api.nvim_tabpage_is_valid(item.tab), "Session has closed")
+  local root = tabvar(item.tab, "ainvim_root") or vim.fn.getcwd(-1, api.nvim_tabpage_get_number(item.tab))
+  assert(vim.fn.isdirectory(root) == 1, "Session directory no longer exists")
+  local origin = api.nvim_get_current_win()
+  api.nvim_set_current_tabpage(item.tab)
+  local anchor = item.win
+  if not anchor or not api.nvim_win_is_valid(anchor) or api.nvim_win_get_config(anchor).relative ~= "" then
+    anchor = tiled_windows(item.tab)[1]
+  end
+  api.nvim_set_current_win(anchor)
+  vim.cmd("botright vnew")
+  local win, buf = api.nvim_get_current_win(), api.nvim_get_current_buf()
+  local ok, job = pcall(vim.fn.jobstart, vim.fn.split(vim.o.shell), { term = true, cwd = root })
+  if not ok or job <= 0 then
+    api.nvim_win_close(win, true)
+    api.nvim_buf_delete(buf, { force = true })
+    if api.nvim_win_is_valid(origin) then
+      api.nvim_set_current_win(origin)
+    end
+    error("Could not start shell: " .. tostring(job))
+  end
+  vim.cmd.startinsert()
+  return win
+end
 function M.rename(item, name)
   name = vim.trim(name)
   assert(name ~= "", "A name cannot be empty")

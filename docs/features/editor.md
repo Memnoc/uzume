@@ -75,8 +75,10 @@ terminal's original directory. `rg` and `fd` provide external search tools.
 | Space qq | Quit, confirming unsaved changes |
 
 The [native navigators](navigators.md) provide Drudwyn-style session/window
-selection, naming, confirmed closing and manual local layout save. Sessions are
-native tabs; use `:AiSession /existing/project/or/worktree` to create another.
+selection, creation, naming, confirmed closing and manual local layout save.
+Inside either menu, **n** opens a new shell window in the selected session and
+**N** prompts for an existing directory to create a session. Sessions are native
+tabs; `:AiSession /existing/project/or/worktree` is also available.
 
 The shells use Snacks terminals and Neovim terminal buffers. Separate terminal
 identities prevent the right and floating shortcuts from opening the same pane.

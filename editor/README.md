@@ -49,8 +49,9 @@ otherwise it downloads the declared repository and extracts the pinned commit.
    through changes. **Space uM** toggles the mouse. **Space qq** quits with normal
    unsaved-buffer confirmation. Save files with `:w` or **Ctrl-s**.
 7. **Space aw** opens the Workspace Navigator; **Space as** opens the Session
-   Navigator. Use `:AiSession /existing/project/or/worktree` for another session,
-   then j/k and Enter to switch. The menus show rename, confirmed close, local
+   Navigator. In either menu, **n** creates a shell window and **N** prompts for
+   a project/worktree directory to create a session; j/k and Enter switch entries.
+   The menus show rename, confirmed close, local
    layout save and filter controls. See [Native navigators](../docs/features/navigators.md)
    for the full workflow and restore limits.
 
