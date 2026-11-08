@@ -80,7 +80,7 @@ function M.apply(values)
   local renamed, err = vim.uv.fs_rename(temp, path)
   assert(renamed, err)
   M.desired = vim.deepcopy(enabled)
-  vim.notify("Extras saved. Restart ai-nvim to apply changes.", vim.log.levels.WARN)
+  vim.notify("Extras saved. Restart Uzume to apply changes.", vim.log.levels.WARN)
 end
 
 function M.show()
@@ -151,10 +151,10 @@ function M.show()
         "## Controls",
         "Type: filter · Ctrl-n/p or arrows: move · Ctrl-v: change view",
         "Enter: toggle · Ctrl-s: save choices · Esc: discard draft",
-        "Ctrl-r: install/retry this pack's required tools in ai-nvim storage",
+        "Ctrl-r: install/retry this pack's required tools in Uzume storage",
         "Ctrl-g: Mason package browser, optional tools and installation logs",
         "Pack activation changes require restart. New tools attach without restart.",
-        "External tools are usable but not managed by ai-nvim. Installed view shows managed packs.",
+        "External tools are usable but not managed by Uzume. Installed view shows managed packs.",
         "Installation starts immediately; Escape does not cancel downloads.",
       })
       if view == 1 or view == 2 and not managed or view == 3 and managed or view == 4 and draft[entry.id] then

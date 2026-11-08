@@ -1,4 +1,4 @@
-# ai-nvim
+# Uzume
 
 An independent Neovim distribution combining familiar editing, project-owned windows and panes, concurrent agents, and code review.
 
@@ -70,7 +70,7 @@ A tested combination of the distro, a distro-managed Neovim version, and selecte
 | tmux session | Project | Our top-level grouping is explicitly rooted in a project directory; no additional generic session entity is required. |
 | tmux window / pane | Window / Pane | A window holds a pane layout; a pane is one editor or terminal surface. Native Neovim API terminology is not the product hierarchy. |
 | Agent lifecycle state | Attention Item | Only actionable needs belong in the attention queue; ordinary background work stays quiet. |
-| Kill session | Close Project | ai-nvim owns process cleanup and retains local review state; worktree removal is a separate action. Closing a single window has narrower scope. |
+| Kill session | Close Project | Uzume owns process cleanup and retains local review state; worktree removal is a separate action. Closing a single window has narrower scope. |
 
 ### Codex and Claude Code
 
@@ -78,4 +78,4 @@ A tested combination of the distro, a distro-managed Neovim version, and selecte
 | --- | --- | --- |
 | Interactive CLI process | Agent Instance | Existing terminal interfaces and official authentication flows remain in use. |
 | Spawned subagent | Worker | Discovery and actionable state depend on what each CLI reliably exposes; coverage is not assumed. |
-| CLI conversation | Agent Instance | A saved ai-nvim project workspace does not itself restore or authenticate an agent conversation. Resume behavior requires verification. |
+| CLI conversation | Agent Instance | A saved Uzume project workspace does not itself restore or authenticate an agent conversation. Resume behavior requires verification. |

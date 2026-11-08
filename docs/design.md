@@ -1,6 +1,6 @@
 # Design record
 
-Date: 2026-11-06. Owner: Memnoc. Working name: ai-nvim.
+Date: 2026-11-06. Owner: Memnoc. Project: Uzume (name selected 2026-11-08; formerly ai-nvim).
 
 This records the design interview, not a completed implementation specification. Agreed product behavior is separated from proposed experiments and unresolved mechanisms.
 

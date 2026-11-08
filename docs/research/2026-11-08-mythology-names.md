@@ -1,6 +1,6 @@
 # Greek and Japanese mythology names
 
-Date: 2026-11-08. Status: exploratory; no name selected or legally cleared.
+Date: 2026-11-08. Decision: Memnoc selected **Uzume** after this screen. The name has not been legally cleared. The findings below record the comparison that informed the choice.
 
 This round follows the user's preference for evocative names and narrows the
 search to Greek and Japanese mythology. Acronyms are not required. The project

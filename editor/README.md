@@ -1,4 +1,4 @@
-# Editor preview
+# Uzume editor preview
 
 Northstar editor spike: can a small independent configuration restore Memnoc's
 LazyVim navigation and visual feel before adding agent sessions?
@@ -14,6 +14,8 @@ The [feature guide](../docs/features/README.md) explains every current feature
 group, its implementation, shortcuts, stored state and known limits.
 
 ## Launch
+
+Uzume currently uses the original `ai-nvim` installation name to preserve the preview's existing settings and state.
 
 After registration, open a new terminal and run `nvims`, then choose **ai-nvim**.
 The **default** entry and plain `nvim` retain the existing LazyVim configuration.

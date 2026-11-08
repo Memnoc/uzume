@@ -1,14 +1,20 @@
-# ai-nvim
+# Uzume
 
-Working name for an independent Neovim distribution for reading code, reviewing agent changes, and programming by hand. Preserve the capabilities and keybindings of Memnoc's My-LazyVim configuration, with MNvim's preference for understandable, minimal configuration.
+An independent Neovim distribution for reading code, reviewing agent changes, and programming by hand. Uzume aims to preserve the capabilities and keybindings of Memnoc's My-LazyVim configuration, with MNvim's preference for understandable, minimal configuration.
 
-The design combines native Neovim editing with our own pane and session management, Codex and Claude Code terminals, and a substantial local diff and review experience. Plugins remain appropriate when they offer meaningful value at a reasonable maintenance cost.
+The design combines native Neovim editing with our own project, window, and pane management, Codex and Claude Code terminals, and a substantial local diff and review experience. Plugins remain appropriate when they offer meaningful value at a reasonable maintenance cost.
+
+## Why Uzume?
+
+Uzume takes its name from **Ame-no-Uzume**, the Japanese goddess whose dance helped draw the sun goddess Amaterasu out of her cave. Her story connects creativity, laughter, and the return of light—an inspiration for a personal editor that helps bring clarity to complex work. See [Kokugakuin University's Encyclopedia of Shinto](https://d-museum.kokugakuin.ac.jp/eos/detail/?id=9422) for the myth behind the name.
 
 ## Project status
 
 Design and prototype stage. This branch, `spike/editor-baseline`, provides the first independent editor preview. There is no production distribution yet; the full specification remains open.
 
 Run `nvims` and choose **ai-nvim**, or use `NVIM_APPNAME=ai-nvim nvim`. See the [editor guide](editor/README.md) for setup, familiar controls, and the current boundaries. Plain `nvim` keeps the existing LazyVim configuration.
+
+The project is now named **Uzume**. The preview retains its original `ai-nvim` installation name and `ainvim` Lua namespace so existing settings, tools, and saved state continue to work. Renaming those identifiers will need a migration.
 
 **Space l** opens [Extras](editor/EXTRAS.md): Rust, Lua, C/C++, TypeScript/React/HTML/CSS, and Smear Cursor. Save choices with Ctrl-s and restart to apply pack-loading changes. Missing
 language tools now install automatically through isolated, pinned Mason when you
@@ -40,4 +46,4 @@ The initial reference terminals are Ghostty and WezTerm on macOS and Linux. Kitt
 - [Drudwyn](https://github.com/Memnoc/tmux-drudwyn): session navigation, agent attention, worktrees, and TUI inspiration.
 - [TUIOS](https://github.com/Gaurav-Gosain/tuios): flexible terminal window management inspiration.
 
-Branding, Rust component boundaries, plugin selection, and exact version pins are not settled.
+Uzume was selected as the project name on 2026-11-08. Visual branding, Rust component boundaries, and the production dependency set remain open.
