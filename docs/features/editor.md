@@ -97,6 +97,19 @@ Snacks supplies Git pickers; gitsigns supplies gutter markers and hunk actions.
 This is not yet the planned side-by-side agent-review suite. Diagnostic data
 comes from the language servers described in [Languages](languages.md).
 
+Errors and warnings appear inline beside code, with underlines and severity
+icons in the gutter. This uses Neovim's native diagnostics, matching LazyVim's
+effective LSP display: four spaces before the message, a dot prefix, and source
+labels when multiple diagnostic sources are present. Updates wait until you
+leave Insert mode. Long inline text may be clipped by the window width; use
+**Space cd** for the full diagnostic float, **]d / [d** to navigate, or
+**Space sD** for the buffer's diagnostic picker. **Space ud** toggles diagnostics.
+Gray inferred types, such as `Args` and `Option<String>`, are inlay hints rather
+than error messages; this display fix does not enable them.
+
+The [diagnostic display investigation](../prototypes/0006-diagnostic-display.md)
+records the real Rust reproduction and why the earlier baseline hid messages.
+
 [options.lua](../../editor/lua/ainvim/options.lua) and
 [autocmds.lua](../../editor/lua/ainvim/autocmds.lua) enable local undo/recovery,
 restore file position, highlight yanks and check external file changes on focus,

@@ -49,6 +49,21 @@ opt.formatoptions = "jcroqlnt"
 opt.wildmode = "longest:full,full"
 vim.g.markdown_recommended_style = 0
 vim.g.snacks_animate = false
-vim.diagnostic.config({ virtual_text = false, severity_sort = true, float = { border = "rounded" } })
+-- Match LazyVim's effective LSP display, which overrides its early options.
+vim.diagnostic.config({
+  underline = true,
+  update_in_insert = false,
+  virtual_text = { spacing = 4, source = "if_many", prefix = "●" },
+  severity_sort = true,
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = " ",
+      [vim.diagnostic.severity.WARN] = " ",
+      [vim.diagnostic.severity.HINT] = " ",
+      [vim.diagnostic.severity.INFO] = " ",
+    },
+  },
+  float = { border = "rounded" },
+})
 vim.cmd("filetype plugin indent on")
 vim.cmd("syntax enable")
