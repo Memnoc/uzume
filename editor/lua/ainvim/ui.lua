@@ -1,4 +1,14 @@
-require("rose-pine").setup({ variant = "main" })
+require("rose-pine").setup({
+  variant = "main",
+  -- A gentle mauve tint for neutral text, scoped to Rose Pine's main variant.
+  palette = {
+    main = {
+      text = "#e0d4eb",
+      subtle = "#a99ab8",
+      muted = "#8b7c98",
+    },
+  },
+})
 vim.cmd.colorscheme("rose-pine")
 
 Snacks.setup({

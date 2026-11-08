@@ -16,6 +16,19 @@ indent guides, status-column UI, input prompts and warning/error notifications.
 Indent-guide animation is disabled. WhichKey's Helix-style menu appears after
 pressing Space and pausing; no function-row key is required.
 
+Uzume gives Rose Pine's main variant a gentle mauve text palette: ordinary text
+uses `#e0d4eb`, comments and secondary text `#a99ab8`, and muted text `#8b7c98`.
+The base, surface, and overlay backgrounds and the syntax/diagnostic accent
+palette remain upstream defaults. These are theme-local palette settings in
+[ui.lua](../../editor/lua/ainvim/ui.lua), not global highlight overrides or a
+`ColorScheme` hook. **Space uC** can switch to another installed colorscheme;
+its own colors take over. Rose Pine Moon and Dawn keep their original palettes.
+Switching back to Rose Pine main restores the mauve tint. To use its unmodified
+palette, remove the `palette.main` overrides from the setup table.
+Startup checks compared the main editor backgrounds and syntax, diagnostic, and
+diff highlights against stock Rose Pine, then verified switching to Habamax,
+Moon, and Dawn and back without the mauve settings leaking into those themes.
+
 The home screen centers a small ASCII cave-and-sun emblem above the Uzume
 wordmark, matching the repository logo. The shared artwork lives in
 [branding.lua](../../editor/lua/ainvim/branding.lua) and also appears after the
