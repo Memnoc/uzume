@@ -13,13 +13,17 @@ This records the design interview, not a completed implementation specification.
 - Rust is welcome when it serves a clear architectural need and maintainability; portfolio value alone does not determine language choice.
 - Interview one question at a time, and test incremental prototypes with Memnoc.
 
-## Sessions and concurrent work
+## Projects, windows, panes, and concurrent work
 
-A session belongs to one project checkout or Git worktree. Switching sessions hides the previous session's panes while keeping its agents running. Terminating a session stops its agents and owned spawned processes by default. Optional keep-running behavior is deferred.
+Updated with Memnoc on 2026-11-08: the product hierarchy is **Project → Windows → Panes**. A project is rooted in a chosen local directory and owns its dedicated windows. A window is a switchable group of editor/terminal panes with its own retained layout. A pane is one editor or terminal surface. There is no separate user-facing session entity; the need for any additional grouping can be revisited after hands-on window-management use.
 
-Independent features use separate worktrees, branches, and sessions. Branches alone do not isolate simultaneous edits in one directory. Joining an existing task uses that session's checkout; sharing it among agents represents deliberate collaboration. Worktree creation, switching, and cleanup should be easy to discover.
+The workflow is to create/open a project at a directory, create the windows and panes needed there, switch among them, and close the whole project workspace when finished. Switching projects or windows preserves their background processes. Closing a project ends its windows, panes, agents and owned spawned processes by default. Optional keep-running behavior remains deferred.
 
-Closing a session preserves its checkout files and review state. Worktree cleanup is a separate, explicit action. Drudwyn's refusal to remove primary, dirty, or unintegrated worktrees is a useful reference to refine before implementation; exact cleanup and integration rules are not yet specified.
+Independent features still require separate worktrees and branches; branches alone do not isolate simultaneous edits in one directory. Joining a task's checkout represents deliberate collaboration. **Open detail:** decide how task worktrees are assigned to a project's windows before reintroducing concurrent agents; do not silently require a separate top-level project for every worktree or silently allow shared-checkout edits. Worktree creation, switching, and cleanup should be easy to discover.
+
+Closing/removing the project workspace is distinct from deleting its directory or worktrees. Checkout files and locally saved layout/review state are retained. Worktree cleanup is a separate, explicit action. Drudwyn's refusal to remove primary, dirty, or unintegrated worktrees is a useful reference to refine before implementation; exact cleanup and integration rules remain open.
+
+The current preview has not implemented this hierarchy: it labels native tab pages as sessions and individual editor/terminal splits as windows. That conflation, along with shared buffer tabs, caused confusion. Native tab/window/buffer APIs remain implementation tools, not definitions of the product entities. Record this as the next design increment rather than presenting a menu rename as a completed structural change.
 
 Four directly launched agents are the initial everyday performance workload, not a product limit. Spawned workers also contribute to load. Higher stress workloads will be chosen from observed usage.
 
@@ -29,7 +33,7 @@ Four directly launched agents are the initial everyday performance workload, not
 - Moving, resizing, tiling, floating, zooming, and switching panes must be keyboard accessible.
 - Mouse dragging and resizing are supported; mouse support can be disabled. Keyboard use remains central.
 - Drudwyn's compact navigation, visible shortcuts, restrained borders, and agent-state cues are references. Preserve the current configuration's visual preferences unless a change is deliberately agreed.
-- Most navigation menus, including session/workspace quick switching, should float; selected persistent tools should be anchored. Menus expand/collapse through keyboard shortcuts. The file explorer is an essential anchored sidebar with the existing LazyVim/Snacks shortcuts, including `<leader>e` and explorer-local `a`. Exact session-menu hierarchy remains open. See the [editor baseline](editor-baseline.md).
+- Most navigation menus, including project/window quick switching, should float; selected persistent tools should be anchored. Menus expand/collapse through keyboard shortcuts. The file explorer is an essential anchored sidebar with the existing LazyVim/Snacks shortcuts, including `<leader>e` and explorer-local `a`. The hierarchy is project → windows → panes; exact menus and bindings remain to be designed. See the [editor baseline](editor-baseline.md).
 - Ghostty and WezTerm are primary reference terminals on macOS and Linux. Kitty is an additional compatibility target.
 - Smooth input and resizing matter in the first usable version. Animation polish follows the working product and remains configurable/off-switchable.
 - GPU-accelerated terminals are the intended environment. Hardware thresholds, terminal version requirements, and any hard compatibility gate require measurements before adoption.
@@ -61,7 +65,7 @@ Usability evaluation should cover the whole cycle: read, navigate surrounding co
 
 ## Local persistence and authentication
 
-Session layout, open-file references, review progress, and unsent comments autosave locally during use; clean exit or a manual save shortcut is not required. Reopening restores that workspace state. Restarting agents is explicit.
+Project window/pane layouts, open-file references, review progress, and unsent comments autosave locally during use; clean exit or a manual save shortcut is not required. Reopening restores that workspace state. Restarting agents is explicit.
 
 Source-file saves remain explicit as the initial design direction, with local recovery for unsaved edits. Source autosave, if added, is a separate setting because it can trigger formatters/watchers and alter the files agents read. Autosave never authorizes uploading data or handing drafts to an agent.
 
@@ -93,8 +97,8 @@ distribution decision; it does not select LazyVim as the implementation base.
 
 1. Complete the LazyVim capability, visual, and binding inventory, including inherited defaults. Use the actual configuration as the acceptance reference: Rose Pine, Snacks pickers/explorer, leader-menu discovery, code navigation, completion, diagnostics, formatting, and terminal behavior. Account for the remaining extras without silently dropping them.
 2. Agree and build the first editor-focused increment, choosing native equivalents or pinned plugins where they preserve behavior. Evaluate everyday reading and editing with Memnoc before integrating more AI UI.
-3. Evaluate the native session/workspace navigator increment against Drudwyn. Memnoc's supplied screenshots select floating flat lists with visible shortcuts and separate workspace/agent sections. Space aw/as are provisional bindings preserving the existing window/search groups. The first implementation uses native tabs/windows, has no tmux dependency, and offers manual local layout save; full autosave and supervised agent integration remain pending. See [navigator findings](prototypes/0007-native-navigators.md).
-4. Reintroduce the validated agent workflow into the editor, then verify terminal key routing, attention, process lifetime/cleanup, and resizing under concurrent output. Existing pilot code remains available for comparison.
+3. **Next milestone: design and trial window/pane management before agent integration.** Use the project → windows → panes hierarchy. Cover creating editor/terminal panes, horizontal/vertical splits, moving/swapping/resizing panes, tiled/floating/fullscreen transitions with layout restoration, hiding versus closing, and closing the whole project workspace. Keep keyboard discovery and optional mouse controls coherent. Test ordinary files and shells in Drudwyn first, one design question at a time. The existing navigator styling and provisional Space aw/as bindings remain a reference; see [navigator findings](prototypes/0007-native-navigators.md).
+4. After the window-management trial, settle task-worktree ownership and reintroduce the validated agent workflow into the editor. Verify terminal key routing, attention, process lifetime/cleanup, and resizing under concurrent output. Existing pilot code remains available for comparison.
 5. Prototype local review separately, including stable snapshots and revision feedback; choose storage boundaries and per-agent lifecycle/delivery mechanisms from evidence.
 6. Complete Northstar's compliance triage before writing the production spec. Record the relevant source-code persistence and explicit external-handoff boundaries without expanding the product into an authentication or policy platform.
 7. Set up canonical repository guidance and the ticket tracker, then produce the spec and incremental implementation tickets.
