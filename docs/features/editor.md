@@ -50,14 +50,14 @@ color). Both adapt to the active colorscheme. The icon occupies 11 columns and
 30 rows use a compact name beneath it instead of
 the five-line ASCII wordmark. File, search, explorer, and quit shortcuts remain
 below the startup artwork.
-Two short vertical motifs decorate the home screen's outer margins beside the
-header when its window is at least 90 columns wide and 28 rows tall. Solid
-strokes fade into dashed strokes and dots, with a blank row between each glyph.
+Four dots anchor the home screen's corners when its window is at least 90
+columns wide and 28 rows tall. Seven-cell horizontal lines and two-cell vertical
+lines extend inward from each dot, leaving the sides open.
 They follow the theme's `NonText`
 highlight (muted mauve in Uzume), resize with the dashboard, and disappear in
 compact windows. They are virtual text in the dashboard buffer, add no panes or
 focus targets, and avoid any content extending into the margins.
-PTY checks covered the fading motifs, resize/hide/restore, colorscheme switching,
+PTY checks covered the dotted corners, resize/hide/restore, colorscheme switching,
 opening a file without decorations, and returning to the last-project home.
 Disposable PTY checks verified the rendered header and shortcuts at 120×36 and
 80×24, the new-file action, and the dashboard shown after closing the last project.

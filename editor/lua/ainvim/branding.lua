@@ -17,6 +17,13 @@ local function decorate(dashboard)
   end
 
   local count = api.nvim_buf_line_count(buf)
+  if count < height then
+    local modifiable = vim.bo[buf].modifiable
+    vim.bo[buf].modifiable = true
+    api.nvim_buf_set_lines(buf, count, -1, false, vim.fn["repeat"]({ "" }, height - count))
+    vim.bo[buf].modifiable = modifiable
+    count = height
+  end
   local function mark(row, col, text)
     if row >= count then
       return
@@ -35,12 +42,14 @@ local function decorate(dashboard)
       hl_mode = "combine",
     })
   end
-  local top = dashboard.row or 0
-  for index, glyph in ipairs({ "·", "┆", "│", "│", "┆", "·" }) do
-    local row = top + (index - 1) * 2
-    mark(row, 3, glyph)
-    mark(row, width - 4, glyph)
+  mark(1, 3, "•───────")
+  mark(1, width - 11, "───────•")
+  for _, row in ipairs({ 2, 3, height - 4, height - 3 }) do
+    mark(row, 3, "│")
+    mark(row, width - 4, "│")
   end
+  mark(height - 2, 3, "•───────")
+  mark(height - 2, width - 11, "───────•")
 end
 
 -- Half-block rendering of docs/assets/uzume-logo.svg: arch, sun, then arch.
