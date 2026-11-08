@@ -70,7 +70,7 @@ def lua(expr):
 def do(code): return lua('(function() ' + code + '; return true end)()')
 def js(expr): return json.loads(lua('vim.json.encode(' + expr + ')'))
 def keys(text):
-    lua("vim.api.nvim_input(" + json.dumps(text) + ")")
+    lua("vim.api.nvim_input(" + json.dumps(text, ensure_ascii=False) + ")")
     time.sleep(.2)
 def wait(fn):
     for _ in range(120):
@@ -94,6 +94,25 @@ def emit(entry, event, **extra):
 try:
     wait(lambda: lua('vim.fn.exists(":UzumeAgent")') == '2')
     do('require("smear_cursor").enabled=false; require("ainvim.sessions").adopt()')
+    # Search and naming fields must allow deleting the first character too.
+    for opener, filetype in (
+        ('Snacks.picker.files({cwd=vim.fn.getcwd()})', 'snacks_picker_input'),
+        ('Snacks.input({prompt="Name"},function() end)', 'snacks_input'),
+    ):
+        do(opener)
+        wait(lambda: lua('vim.bo.filetype') == filetype)
+        wait(lambda: lua('vim.api.nvim_get_mode().mode') == 'i')
+        for text in ('abc', 'é', '界'):
+            keys(text)
+            for _ in text: keys('<BS>')
+            assert js('vim.api.nvim_get_current_line()') == '', (filetype, text, lua('vim.api.nvim_get_current_line()'))
+        keys('<Esc>')
+        keys('<Esc>')
+        do('for _,p in ipairs(Snacks.picker.get()) do p:close() end; vim.cmd.stopinsert()')
+    if '--inputs-only' in sys.argv:
+        print('PASS: search and naming fields delete all ASCII and multibyte characters')
+        sys.exit(0)
+    assert lua('vim.bo.buftype') == ''
     origin = js('vim.api.nvim_get_current_tabpage()')
     for count, kind in enumerate(('codex', 'claude', 'codex', 'claude'), 1):
         if count <= 2:
@@ -135,6 +154,24 @@ try:
         assert (Path(record['cwd']) / 'example.txt').read_text() == 'base\n'
         assert len(js('require("ainvim.sessions").windows(' + str(entry['tab']) + ')')) == 2
     assert (project / 'example.txt').read_text() == 'uncommitted source\n'
+    # Explicit file handoff targets this task only and pastes without Enter.
+    current_task = js('vim.t.uzume_task')
+    current = next(x for x in entries if x['task']['id'] == current_task['id'])
+    do('vim.cmd.stopinsert()')
+    do('vim.api.nvim_set_current_win(vim.fn.win_findbuf(vim.fn.bufnr(vim.t.ainvim_root .. "/example.txt"))[1])')
+    keys(' af')
+    received = Path(current['directory']) / 'input.bin'
+    wait(lambda: received.exists() and b'File open in the editor:' in received.read_bytes())
+    payload = received.read_bytes()
+    assert b'"example.txt"' in payload and b'base' not in payload
+    assert b'\r' not in payload and b'\n' not in payload
+    assert all(not (Path(x['directory']) / 'input.bin').exists() for x in entries if x != current)
+    assert lua('vim.b.uzume_agent_id') == current_task['id']
+    label = lua('vim.b.uzume_agent_label')
+    assert label.startswith(('Codex', 'Claude'))
+    rendered = lua('vim.api.nvim_eval_statusline(vim.o.tabline,{use_tabline=true}).str')
+    assert 'python3' not in rendered and ('Codex' in rendered or 'Claude' in rendered)
+
     do('vim.cmd.stopinsert(); vim.api.nvim_set_current_tabpage(' + str(origin) + ')')
     emit(a, 'PermissionRequest')
     wait(lambda: js('require("uzume.agents").window_status(' + str(a['tab']) + ').state') == 'waiting')
@@ -183,7 +220,7 @@ try:
     # Modified source preflight must reject closing the entire project atomically.
     do('vim.api.nvim_set_current_tabpage(' + str(origin) + '); vim.api.nvim_buf_set_lines(0,0,1,false,{"unsaved"})')
     result = js('(function() local ok = pcall(require("ainvim.projects").close,{kind="project",project=' + json.dumps(str(project)) + '}); return ok end)()')
-    assert result is False and all(living(x['pid']) for x in records)
+    assert result is False and all(living(x['pid']) for x in records), {'closed':result,'alive':[(x['pid'],living(x['pid'])) for x in records], 'buffer':js('{name=vim.api.nvim_buf_get_name(0),type=vim.bo.buftype,modified=vim.bo.modified}'), 'project':js('require("ainvim.projects").list()')}
     do('vim.bo.modified=false; require("ainvim.projects").close({kind="project",project=' + json.dumps(str(project)) + '})')
     wait(lambda: all(not living(x['pid']) and not living(x['child']) for x in records))
     assert all(Path(x['task']['cwd']).is_dir() for x in entries)

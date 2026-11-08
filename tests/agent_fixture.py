@@ -3,6 +3,8 @@
 import json
 import os
 from pathlib import Path
+import select
+import tty
 import signal
 import subprocess
 import sys
@@ -14,5 +16,10 @@ child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(600)'])
 def interrupt(*_):
     (root / 'interrupted').write_text('yes')
 signal.signal(signal.SIGINT, interrupt)
+tty.setraw(sys.stdin.fileno())
 while True:
-    time.sleep(.05)
+    if select.select([sys.stdin], [], [], .05)[0]:
+        data = os.read(sys.stdin.fileno(), 4096)
+        if not data: break
+        with (root / 'input.bin').open('ab') as output:
+            output.write(data)

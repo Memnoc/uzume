@@ -77,7 +77,8 @@ are still separate work.
 **Space ac** creates a Codex task; **Space aC** creates a Claude task. Each gets a
 dedicated branch/worktree and an editor/agent window under the project. Choose
 a file from the list on the left; Enter opens it beside the agent. Use
-**Esc Esc** for editor controls, **Space aa** for attention and **Space ar** to
+**Esc Esc** for editor controls, **Space af** to add the open file to the agent
+prompt (review and press Enter yourself), **Space aa** for attention and **Space ar** to
 restart a stopped task CLI. See [AI tasks](../docs/features/agents.md).
 
 Unlike the original fixture spike, edits to opened files and normal editor

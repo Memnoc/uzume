@@ -190,3 +190,18 @@ shells. The [language record](../prototypes/0004-extras-and-languages.md) covers
 code features. Not every inherited plugin action has been exercised; broader
 editing coverage and Linux/terminal coverage remain future work. Integrated
 agent tasks are described in the [agent workflow](agents.md).
+
+### Search and naming input compatibility
+
+The installed Neovim nightly prevents native empty-prompt buffers from deleting
+their first character. This reproduces without plugins; stable Neovim 0.11.6
+with the same editor configuration deletes it normally. The compatibility layer
+in [input.lua](../../editor/lua/uzume/input.lua) handles Backspace/Ctrl-h at that
+boundary for Snacks search and naming fields, including multibyte characters.
+Other positions use native Backspace, and ordinary source buffers keep their
+existing mappings. Remove this workaround when the supported Neovim baseline
+passes the regression without it.
+
+`python3 tests/agents.py --inputs-only` checks complete deletion in both search
+and naming fields. The full suite also checks explicit file-reference delivery
+and user-facing agent labels.

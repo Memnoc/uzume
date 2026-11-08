@@ -15,6 +15,7 @@ project. Codex and Claude Code are the initial adapters; tmux is not required.
 | Space ac | Name and create a Codex task |
 | Space aC | Name and create a Claude Code task |
 | Space aa | Pick an agent; actionable states appear first |
+| Space af (from a file) | Add its worktree-relative path to this task’s agent prompt |
 | Space ar | Start a fresh CLI in the selected stopped task's existing worktree |
 | Space ww / Space aw | Window navigator, including agent states |
 | Space ap | Project navigator |
@@ -30,6 +31,25 @@ in agent buffers. Ordinary shell mappings remain separate. Pane movement,
 resizing, floating, fullscreen and hide/restore use the existing Space p controls.
 An agent pane stays in its task window; transferring it into another checkout's
 window is currently refused.
+
+## File context and terminal labels
+
+Opening a file does not tell the CLI which file you chose. From the editor pane,
+press **Space af** to add an exact, quoted path relative to this task's worktree
+and focus its agent. It inserts a draft reference at the CLI input cursor using
+bracketed paste; **it does not press Enter**. Add your question and submit when
+ready. Existing prompt text is retained. Use this at the CLI's message prompt;
+known working, permission/input-waiting and starting states refuse the handoff.
+If hook status is unknown, inspect the terminal before using the action.
+
+The file must be saved and inside the task's checkout. Unsaved changes are not
+silently written or sent, and source text is not copied into the prompt. The CLI
+reads the referenced file after you submit. This is a file-reference handoff,
+not automatic context synchronization or queued review delivery.
+
+Agent buffer tabs and the filename section of the statusline show **Codex · task**
+or **Claude · task**. The earlier `python3` label was the terminal supervisor's
+process name; that buffer is the agent terminal, not an extra editor file.
 
 ## Checkouts and lifetime
 
@@ -121,6 +141,6 @@ and forced editor exit. Both installed CLIs also reached initial interactive
 setup under empty authentication homes. Linux, terminal performance, and
 authenticated real task/hook flows still need hands-on validation.
 
-Context sending, queued review feedback, a dedicated interrupt-and-send action,
+Selection/content sending, queued review feedback, a dedicated interrupt-and-send action,
 resume selection, worktree deletion and the full diff/review suite remain future
 increments. Use the CLI's own input/interrupt controls for this trial.

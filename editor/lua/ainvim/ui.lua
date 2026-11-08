@@ -140,6 +140,9 @@ require("bufferline").setup({
       Snacks.bufdelete(buf)
     end,
     diagnostics = "nvim_lsp",
+    name_formatter = function(buffer)
+      return vim.b[buffer.bufnr].uzume_agent_label or buffer.name
+    end,
     always_show_bufferline = false,
     offsets = { { filetype = "snacks_layout_box" } },
   },
@@ -172,6 +175,9 @@ require("lualine").setup({
         "filename",
         path = 1,
         fmt = function(name)
+          if vim.b.uzume_agent_label then
+            return vim.b.uzume_agent_label
+          end
           return vim.bo.filetype == "ainvim_session" and "Project home" or name
         end,
       },

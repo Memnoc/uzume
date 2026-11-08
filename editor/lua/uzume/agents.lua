@@ -156,6 +156,7 @@ local function launch(task, tab, project_name, kind)
   item.job = job
   M.instances[task.id] = item
   vim.b[buf].uzume_agent_id = task.id
+  vim.b[buf].uzume_agent_label = (kind == "codex" and "Codex" or "Claude") .. " · " .. task.label
   vim.b[buf].ainvim_owner = tab
   vim.bo[buf].bufhidden = "hide"
   vim.w.ainvim_name = kind .. " · " .. task.label
@@ -238,6 +239,30 @@ function M.prompt(kind)
   end)
 end
 
+function M.add_file()
+  local task = assert(vim.t.uzume_task, "Open a file in an AI task window first")
+  local item = assert(M.instances[task.id], "Start this task's agent with Space ar first")
+  assert(alive(item), "Agent has stopped; Space ar starts a fresh CLI")
+  assert(
+    item.status.state ~= "working" and item.status.state ~= "waiting" and item.status.state ~= "starting",
+    "Finish or interrupt the agent's current interaction before adding a file"
+  )
+  local buf = api.nvim_get_current_buf()
+  assert(vim.bo[buf].buftype == "", "Focus the file you want to add to the agent prompt")
+  assert(not vim.bo[buf].modified, "Save this file first; the agent reads its contents from disk")
+  local file = vim.uv.fs_realpath(api.nvim_buf_get_name(buf))
+  local root = vim.uv.fs_realpath(task.cwd)
+  assert(file and root and vim.startswith(file, root .. "/"), "Choose a file inside this task's worktree")
+  local relative = file:sub(#root + 2)
+  assert(not relative:find("[%c]"), "File paths containing control characters cannot be added to a terminal prompt")
+  local reference = " File open in the editor: " .. vim.json.encode(relative) .. ". "
+  M.focus(item)
+  assert(api.nvim_get_current_buf() == item.buf, "Restore the agent pane before adding a file")
+  -- Bracketed paste inserts a draft reference. Never send Enter or source text.
+  vim.api.nvim_chan_send(item.job, "\027[200~" .. reference .. "\027[201~")
+  vim.cmd.startinsert()
+end
+
 function M.restart()
   local task = assert(vim.t.uzume_task, "Select an existing AI task window first")
   local previous = M.instances[task.id]
@@ -305,6 +330,7 @@ function M.setup()
     M.prompt("claude")
   end, "New Claude Task")
   map("a", M.pick, "Agents / Attention")
+  map("f", M.add_file, "Add File to Agent Prompt")
   map("r", M.restart, "Restart Task CLI (Fresh Conversation)")
   api.nvim_create_user_command("UzumeAgent", function(args)
     require("ainvim.panes").run(function()
