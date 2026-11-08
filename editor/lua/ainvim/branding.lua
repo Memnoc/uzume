@@ -1,18 +1,14 @@
 local M = {}
 
 -- Half-block rendering of docs/assets/uzume-logo.svg: arch, sun, then arch.
--- Each row is 20 terminal cells wide; the middle segment uses the sun color.
+-- Each row is 11 terminal cells wide; the middle segment uses the sun color.
 local logo = {
-  { "     ▄▄██████▄▄     " },
-  { "  ▄████▀▀▀▀▀▀████▄  " },
-  { " ████▀        ▀████ " },
-  { "███▀            ▀███" },
-  { "███              ███" },
-  { "███     ", "▄▄▄▄", "     ███" },
-  { "███   ", "████████", "   ███" },
-  { "███  ", "██████████", "  ███" },
-  { "███  ", "▀▀▀▀▀▀▀▀▀▀", "  ███" },
-  { "▀▀▀ ▀▀▀▀▀▀▀▀▀▀▀▀ ▀▀▀" },
+  { "  ▄█████▄  " },
+  { "▄█▀     ▀█▄" },
+  { "██       ██" },
+  { "██ ", "▄███▄", " ██" },
+  { "██ ", "█████", " ██" },
+  { "   ▀▀▀▀▀   " },
 }
 
 local wordmark = {

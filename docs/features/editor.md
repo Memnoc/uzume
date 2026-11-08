@@ -45,8 +45,9 @@ last project is closed. Unicode half-block characters reproduce the solid arch,
 rounded sun, and baseline using normal text rendering, with no image renderer,
 conversion utility, or graphics-protocol dependency. The arch follows
 `SnacksDashboardHeader`; the sun follows `DiagnosticError` (Rose Pine's love
-color). Both adapt to the active colorscheme. The icon occupies 20 columns and
-10 rows; windows shorter than 30 rows use a compact name beneath it instead of
+color). Both adapt to the active colorscheme. The icon occupies 11 columns and
+6 rows (about 45% smaller than the initial rendering). Windows shorter than
+30 rows use a compact name beneath it instead of
 the five-line ASCII wordmark. File, search, explorer, and quit shortcuts remain
 below the startup artwork.
 Disposable PTY checks verified the rendered header and shortcuts at 120×36 and
