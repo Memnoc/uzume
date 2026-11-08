@@ -83,7 +83,7 @@ Snacks.setup({
 require("which-key").setup({
   preset = "helix",
   spec = {
-    { "<leader>a", group = "agents/workspaces" },
+    { "<leader>a", group = "projects/windows" },
     { "<leader>b", group = "buffer" },
     { "<leader>c", group = "code" },
     { "<leader>f", group = "file/find" },
@@ -92,14 +92,7 @@ require("which-key").setup({
     { "<leader>q", group = "quit" },
     { "<leader>s", group = "search" },
     { "<leader>u", group = "ui" },
-    {
-      "<leader>w",
-      group = "windows",
-      proxy = "<c-w>",
-      expand = function()
-        return require("which-key.extras").expand.win()
-      end,
-    },
+    { "<leader>w", group = "windows/panes" },
     { "<leader>x", group = "diagnostics/quickfix" },
     { "<leader><tab>", group = "tabs" },
     { "[", group = "prev" },
@@ -128,14 +121,27 @@ require("lualine").setup({
   },
   sections = {
     lualine_a = { "mode" },
-    lualine_b = { "branch" },
+    lualine_b = {
+      function()
+        if vim.t.ainvim_unassigned then
+          return "No project"
+        end
+        if not vim.t.ainvim_root then
+          return ""
+        end
+        return (vim.t.ainvim_project_name or vim.fs.basename(vim.t.ainvim_root))
+          .. " / "
+          .. (vim.t.ainvim_name or "Editor")
+      end,
+      "branch",
+    },
     lualine_c = {
       "diagnostics",
       {
         "filename",
         path = 1,
         fmt = function(name)
-          return vim.bo.filetype == "ainvim_session" and ("Session: " .. (vim.t.ainvim_name or "")) or name
+          return vim.bo.filetype == "ainvim_session" and "Project home" or name
         end,
       },
     },
@@ -144,7 +150,7 @@ require("lualine").setup({
       {
         "filetype",
         fmt = function(name)
-          return name == "ainvim_session" and "Session home" or name
+          return name == "ainvim_session" and "Project home" or name
         end,
       },
     },

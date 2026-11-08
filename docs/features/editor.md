@@ -63,10 +63,10 @@ terminal's original directory. `rg` and `fd` provide external search tools.
 | Space bd / bo | Close buffer while keeping layout / close other buffers |
 | Space bp / bj | Pin buffer / select buffer by label |
 | Space - / Space \| | Split below / right |
-| Ctrl-h/j/k/l | Move between windows |
-| Ctrl-w + / - / > / < | Native window resizing |
-| Space wd | Close window |
-| Space aw / Space as | Workspace/window navigator / session navigator |
+| Ctrl-h/j/k/l | Move between panes |
+| Ctrl-w + / - / > / < | Native tiled pane resizing |
+| Space wd / wD | Confirm close pane / whole window |
+| Space aw / Space ap | Window navigator / project navigator (Space as is an alias) |
 | Ctrl-/ | Toggle right-side shell |
 | Space 9 | Toggle floating shell |
 | Space ft / fT | Floating shell at project root / cwd |
@@ -74,12 +74,14 @@ terminal's original directory. `rg` and `fd` provide external search tools.
 | Ctrl-s / :w | Save source file; Ctrl-s prompts for a filename on first save |
 | Space qq | Quit, confirming unsaved changes |
 
-The [native navigators](navigators.md) provide Drudwyn-style session/window
+The [native navigators](navigators.md) provide Drudwyn-style project/window
 selection, creation, naming, confirmed closing and manual local layout save.
-Inside either menu, **n** opens a new shell window in the selected session and
-**N** prompts for an existing directory to create a session. Sessions are native
-tabs; `:AiSession /existing/project/or/worktree` is also available.
-New sessions show a labelled, non-editable home view and the project explorer.
+Inside either menu, **n** opens a shell window, **e** an editor window, and
+**N** prompts for an existing project directory. Projects group native tabs;
+each tab is a window with its own pane layout. `:AiProject /existing/directory`
+is also available. **Space w** exposes the [window/pane controls](window-management.md),
+including split, move, resize, float/fullscreen and hide/restore.
+New editor windows show a labelled, non-editable home view and the project explorer.
 They do not create a source file to save. To write a new file, use **Space fn**
 and **Ctrl-s**: the filename prompt supports completion, cancellation preserves
 the draft, and existing files are not silently overwritten. Named files save

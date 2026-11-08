@@ -1,4 +1,5 @@
--- EDITOR SPIKE: native tab sessions and windows, no external multiplexer.
+-- EDITOR SPIKE: low-level native tab/window lifecycle and snapshot compatibility.
+-- Product projects/windows/panes are exposed by projects.lua and panes.lua.
 local M = {}
 local api = vim.api
 local snapshot = vim.fn.stdpath("state") .. "/navigator/snapshot.json"
@@ -38,7 +39,7 @@ function M.windows(tab)
           or (
             terminal and (vim.b[buf].term_title or "terminal")
             or (vim.bo[buf].filetype == "snacks_dashboard" and "Dashboard")
-            or (vim.bo[buf].filetype == "ainvim_session" and "Session home")
+            or (vim.bo[buf].filetype == "ainvim_session" and "Project home")
             or (file ~= "" and vim.fs.basename(file) or "[New file]")
           ),
         agent = vim.b[buf].ainvim_agent,
@@ -64,11 +65,20 @@ function M.list()
 end
 function M.adopt()
   local tab = api.nvim_get_current_tabpage()
+  if vim.t[tab].ainvim_unassigned then
+    if vim.bo.buftype == "" and api.nvim_buf_get_name(0) ~= "" then
+      vim.t[tab].ainvim_unassigned = nil
+    else
+      return
+    end
+  end
   if not tabvar(tab, "ainvim_root") then
     local root = require("ainvim.project").root()
     api.nvim_tabpage_set_var(tab, "ainvim_root", root)
     vim.cmd.tcd(vim.fn.fnameescape(root))
   end
+  vim.t[tab].ainvim_project_name = vim.t[tab].ainvim_project_name or vim.fs.basename(vim.t[tab].ainvim_root)
+  vim.t[tab].ainvim_name = vim.t[tab].ainvim_name or "Editor"
 end
 function M.home()
   local tab, win, previous = api.nvim_get_current_tabpage(), api.nvim_get_current_win(), api.nvim_get_current_buf()
@@ -80,27 +90,26 @@ function M.home()
   vim.b[buf].snacks_main = true
   api.nvim_buf_set_lines(buf, 0, -1, false, {
     "",
-    "  Session: " .. name,
-    "  Project: " .. root,
+    "  Project: " .. (vim.t[tab].ainvim_project_name or vim.fs.basename(root)),
+    "  Directory: " .. root,
     "",
-    "  This session groups your editor and terminal windows.",
+    "  Window: " .. name,
     "  This is a home view, not a file to save.",
     "",
     "  Space e       Toggle file explorer (a adds a file)",
     "  Space Space   Find a file in this project",
-    "  Space aw      Windows (n creates a shell window)",
-    "  Space as      Switch or manage sessions",
+    "  Space aw      Windows (n shell, e editor)",
+    "  Space ap      Switch or manage projects",
+    "  Space w       Split, move, resize, float or close panes",
     "  Space fn      Start a new file; Ctrl-s asks for its name",
     "",
   })
   vim.bo[buf].modifiable = false
-  api.nvim_buf_set_extmark(
-    buf,
-    api.nvim_create_namespace("ainvim.session_home"),
-    1,
-    2,
-    { end_row = 1, end_col = #("  Session: " .. name), hl_group = "Title" }
-  )
+  api.nvim_buf_set_extmark(buf, api.nvim_create_namespace("ainvim.session_home"), 1, 2, {
+    end_row = 1,
+    end_col = #("  Project: " .. (vim.t[tab].ainvim_project_name or vim.fs.basename(root))),
+    hl_group = "Title",
+  })
   api.nvim_win_set_buf(win, buf)
   local options =
     { number = vim.wo[win].number, relativenumber = vim.wo[win].relativenumber, cursorline = vim.wo[win].cursorline }
@@ -129,22 +138,45 @@ function M.home()
   then
     api.nvim_buf_delete(previous, {})
   end
-  Snacks.explorer({ cwd = root, enter = false })
+  if #Snacks.picker.get({ source = "explorer" }) == 0 then
+    Snacks.explorer({ cwd = root, enter = false })
+  end
   api.nvim_set_current_win(win)
   return buf
 end
-function M.create(path)
+function M.refresh_home(tab)
+  for _, pane in ipairs(M.windows(tab)) do
+    if vim.bo[pane.buf].filetype == "ainvim_session" then
+      vim.bo[pane.buf].modifiable = true
+      api.nvim_buf_set_lines(pane.buf, 1, 2, false, { "  Project: " .. (vim.t[tab].ainvim_project_name or "") })
+      api.nvim_buf_set_lines(pane.buf, 4, 5, false, { "  Window: " .. (vim.t[tab].ainvim_name or "") })
+      vim.bo[pane.buf].modifiable = false
+    end
+  end
+end
+function M.create(path, opts)
+  opts = opts or {}
   path = vim.fs.normalize(vim.fn.fnamemodify(vim.fn.expand(path), ":p"))
   assert(vim.fn.isdirectory(path) == 1, "Choose an existing project or worktree directory")
   vim.cmd.tabnew()
   vim.cmd.tcd(vim.fn.fnameescape(path))
   api.nvim_tabpage_set_var(0, "ainvim_root", path)
-  api.nvim_tabpage_set_var(0, "ainvim_name", vim.fs.basename(path))
-  M.home()
+  api.nvim_tabpage_set_var(0, "ainvim_name", opts.name or "Editor")
+  vim.t.ainvim_project_name = opts.project_name or vim.fs.basename(path)
+  if opts.shell then
+    local ok, job = pcall(vim.fn.jobstart, vim.fn.split(vim.o.shell), { term = true, cwd = path })
+    if not ok or job <= 0 then
+      vim.cmd.tabclose()
+      error("Could not start shell: " .. tostring(job))
+    end
+    vim.cmd.startinsert()
+  else
+    M.home()
+  end
   return api.nvim_get_current_tabpage()
 end
 function M.jump(item)
-  assert(api.nvim_tabpage_is_valid(item.tab), "Session has closed")
+  assert(api.nvim_tabpage_is_valid(item.tab), "Window has closed")
   api.nvim_set_current_tabpage(item.tab)
   if item.win then
     assert(api.nvim_win_is_valid(item.win), "Window has closed")
@@ -156,31 +188,6 @@ function M.jump(item)
     end
   end
 end
-function M.new_window(item)
-  assert(api.nvim_tabpage_is_valid(item.tab), "Session has closed")
-  local root = tabvar(item.tab, "ainvim_root") or vim.fn.getcwd(-1, api.nvim_tabpage_get_number(item.tab))
-  assert(vim.fn.isdirectory(root) == 1, "Session directory no longer exists")
-  local origin = api.nvim_get_current_win()
-  api.nvim_set_current_tabpage(item.tab)
-  local anchor = item.win
-  if not anchor or not api.nvim_win_is_valid(anchor) or api.nvim_win_get_config(anchor).relative ~= "" then
-    anchor = tiled_windows(item.tab)[1]
-  end
-  api.nvim_set_current_win(anchor)
-  vim.cmd("botright vnew")
-  local win, buf = api.nvim_get_current_win(), api.nvim_get_current_buf()
-  local ok, job = pcall(vim.fn.jobstart, vim.fn.split(vim.o.shell), { term = true, cwd = root })
-  if not ok or job <= 0 then
-    api.nvim_win_close(win, true)
-    api.nvim_buf_delete(buf, { force = true })
-    if api.nvim_win_is_valid(origin) then
-      api.nvim_set_current_win(origin)
-    end
-    error("Could not start shell: " .. tostring(job))
-  end
-  vim.cmd.startinsert()
-  return win
-end
 function M.rename(item, name)
   name = vim.trim(name)
   assert(name ~= "", "A name cannot be empty")
@@ -189,28 +196,7 @@ function M.rename(item, name)
     vim.w[item.win].ainvim_name = name
   else
     api.nvim_tabpage_set_var(item.tab, "ainvim_name", name)
-    for _, win in ipairs(M.windows(item.tab)) do
-      if vim.bo[win.buf].filetype == "ainvim_session" then
-        vim.bo[win.buf].modifiable = true
-        api.nvim_buf_set_lines(win.buf, 1, 2, false, { "  Session: " .. name })
-        vim.bo[win.buf].modifiable = false
-      end
-    end
   end
-end
-local function owned_terminals(tab)
-  local result = {}
-  for _, buf in ipairs(api.nvim_list_bufs()) do
-    if vim.bo[buf].buftype == "terminal" and vim.b[buf].ainvim_owner == tab then
-      result[buf] = true
-    end
-  end
-  for _, item in ipairs(M.windows(tab)) do
-    if item.terminal then
-      result[item.buf] = true
-    end
-  end
-  return result
 end
 local function stop_terminal(buf)
   local job = vim.b[buf].terminal_job_id
@@ -218,53 +204,11 @@ local function stop_terminal(buf)
     pcall(vim.fn.jobstop, job)
   end
 end
-function M.close(item)
-  assert(api.nvim_tabpage_is_valid(item.tab), "Session has closed")
-  local windows = item.win and { item } or M.windows(item.tab)
-  local terminals = item.win and {} or owned_terminals(item.tab)
-  for _, win in ipairs(windows) do
-    assert(api.nvim_win_is_valid(win.win), "Window has closed")
-    assert(api.nvim_win_get_buf(win.win) == win.buf, "Window contents changed; choose the target again")
-    assert(not vim.bo[win.buf].modified or win.terminal, "Save modified files before closing this target")
-    if win.terminal then
-      terminals[win.buf] = true
-    end
-  end
-  for buf in pairs(terminals) do
-    for _, win in ipairs(vim.fn.win_findbuf(buf)) do
-      assert(
-        api.nvim_win_get_tabpage(win) == item.tab and (not item.win or win == item.win),
-        "Terminal is displayed elsewhere; close its other view first"
-      )
-    end
-  end
-  -- Check all guards before closing a pane or stopping any job.
-  if item.win then
-    if
-      #tiled_windows(item.tab) == 1
-      and #api.nvim_list_tabpages() == 1
-      and api.nvim_win_get_config(item.win).relative == ""
-    then
-      api.nvim_win_call(item.win, function()
-        vim.cmd.enew()
-      end)
-    else
-      api.nvim_win_close(item.win, false)
-    end
-  else
-    if #api.nvim_list_tabpages() == 1 then
-      M.create(item.root)
-    end
-    vim.cmd.tabclose(tostring(api.nvim_tabpage_get_number(item.tab)))
-  end
-  for buf in pairs(terminals) do
-    stop_terminal(buf)
-  end
-end
-
 -- Native mksession preserves editor layout/cursors; terminal/options/globals are
 -- excluded so restoring never launches a shell, agent, or captured option code.
 function M.save()
+  require("ainvim.panes").prepare_save()
+  assert(#require("ainvim.projects").list() > 0, "Open a project before saving its layout")
   if M.restoring then
     return
   end
@@ -291,7 +235,13 @@ function M.save()
         titles[api.nvim_buf_get_name(item.buf)] = vim.w[item.win].ainvim_name
       end
     end
-    metadata[#metadata + 1] = { name = session.name, root = session.root, titles = titles, home = home }
+    metadata[#metadata + 1] = {
+      name = session.name,
+      root = session.root,
+      titles = titles,
+      home = home,
+      project_name = vim.t[session.tab].ainvim_project_name,
+    }
   end
   local layout = vim.fn.readfile(temporary)
   vim.fn.delete(temporary)
@@ -335,7 +285,8 @@ function M.restore()
     for index, tab in ipairs(api.nvim_list_tabpages()) do
       local session = saved.sessions[index]
       if session then
-        api.nvim_tabpage_set_var(tab, "ainvim_name", session.name)
+        api.nvim_tabpage_set_var(tab, "ainvim_name", session.project_name and session.name or "Editor")
+        vim.t[tab].ainvim_project_name = session.project_name or session.name
         api.nvim_tabpage_set_var(tab, "ainvim_root", session.root)
         for _, win in ipairs(M.windows(tab)) do
           vim.w[win.win].ainvim_name = session.titles[api.nvim_buf_get_name(win.buf)]
@@ -392,11 +343,11 @@ function M.setup()
     end,
   })
   api.nvim_create_user_command("AiSession", function(args)
-    local ok, err = pcall(M.create, args.args ~= "" and args.args or vim.fn.getcwd())
+    local ok, err = pcall(require("ainvim.projects").open, args.args ~= "" and args.args or vim.fn.getcwd())
     if not ok then
       vim.notify(tostring(err), vim.log.levels.ERROR)
     end
-  end, { nargs = "?", complete = "dir", desc = "Open a native session for an existing project/worktree" })
+  end, { nargs = "?", complete = "dir", desc = "Compatibility alias for AiProject" })
   api.nvim_create_user_command("AiSessionRestore", function()
     local ok, err = pcall(M.restore)
     if not ok then

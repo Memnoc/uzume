@@ -8,7 +8,8 @@ records preserve what was actually checked at each increment.
 | Feature | What to read |
 | --- | --- |
 | Appearance, dashboard, explorer, search, buffers, windows, mouse, shells | [Editor and navigation](editor.md) |
-| Drudwyn-style session/window menus, switching, closing, local layout save | [Native navigators](navigators.md) |
+| Project/window menus, switching, naming, closing, local layout save | [Native navigators](navigators.md) |
+| Splits, moving, resizing, floating/fullscreen, hide/restore and mouse controls | [Window management](window-management.md) |
 | Git changes, diagnostics, undo and recovery | [Editor and navigation](editor.md#reading-changes-and-recovery) |
 | Optional packs, menu icons, saving choices | [Extras](../../editor/EXTRAS.md) |
 | Available/installed catalog, Mason, file-triggered tools, retry controls | [Tool installation](tool-installation.md) |

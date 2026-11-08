@@ -48,14 +48,20 @@ otherwise it downloads the declared repository and extracts the pinned commit.
 6. **Space gs** opens Git status, **Space gd** shows hunks, and **]h/[h** moves
    through changes. **Space uM** toggles the mouse. **Space qq** quits with normal
    unsaved-buffer confirmation. Save files with `:w` or **Ctrl-s**.
-7. **Space aw** opens the Workspace Navigator; **Space as** opens the Session
-   Navigator. In either menu, **n** creates a shell window and **N** prompts for
-   a project/worktree directory to create a session; j/k and Enter switch entries.
-   A new session shows its name/path and the explorer, not an unnamed file.
+7. **Space aw** opens windows; **Space ap** opens projects (**Space as** is an
+   alias). In either menu, **n** creates a shell window, **e** an editor window,
+   and **N** prompts for a project directory. Each window keeps its own panes.
+   A new editor window shows its project/name/path and the explorer, not an unnamed file.
    **Space fn** starts a real new file; **Ctrl-s** asks for its name on first save.
    The menus show rename, confirmed close, local
    layout save and filter controls. See [Native navigators](../docs/features/navigators.md)
    for the full workflow and restore limits.
+8. Try **Space wv** for a right-hand editor split, **Space wt** for a shell below,
+   **Space wf** to float/dock a pane, and **Space wm** to fullscreen/restore it.
+   **Space wH/J/K/L** moves panes; **Space w>/< and w+/-** resize them. **Space wz**
+   hides, **Space wr** restores, and **Space wp** picks a pane. **Space wd** closes
+   a pane; **Space wD** closes its whole window, with confirmation and job cleanup.
+   Press **Space w** and pause for the full menu. See [Window management](../docs/features/window-management.md).
 
 Rust, Lua, C/C++, and TypeScript/React/HTML/CSS packs now supply language servers,
 completion, diagnostics and formatting. Native Treesitter handles the captured

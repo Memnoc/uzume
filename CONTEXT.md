@@ -55,6 +55,14 @@ A tested combination of the distro, a distro-managed Neovim version, and selecte
 
 ## Mappings
 
+### Native Neovim preview
+
+| Theirs | Ours | Notes |
+| --- | --- | --- |
+| Tabs sharing a project directory | Project | The preview groups by canonical directory; this is not another native Neovim session object. |
+| Tab page | Window | Retains its pane layout while another window is active. |
+| Editor/terminal window | Pane | Native UI terminology differs from our product hierarchy; auxiliary picker windows are not managed panes. |
+
 ### Drudwyn
 
 | Theirs | Ours | Notes |

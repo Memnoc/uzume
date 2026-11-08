@@ -1,7 +1,8 @@
 -- EDITOR SPIKE: reproduce the supplied Drudwyn navigator surfaces with native floats.
 local M = {}
 local api = vim.api
-local sessions = require("ainvim.sessions")
+local projects = require("ainvim.projects")
+local native = require("ainvim.sessions")
 local ns = api.nvim_create_namespace("ainvim.navigator")
 local groups = {
   Normal = { fg = "#e0def4", bg = "#191724" },
@@ -34,9 +35,9 @@ end
 local function geometry(kind)
   kind = kind or (M.current and M.current.kind)
   local width =
-    math.max(20, math.min(vim.o.columns - 4, math.floor(vim.o.columns * (kind == "sessions" and 0.85 or 0.9))))
+    math.max(20, math.min(vim.o.columns - 4, math.floor(vim.o.columns * (kind == "projects" and 0.85 or 0.9))))
   local height =
-    math.max(16, math.min(vim.o.lines - 4, math.floor((vim.o.lines - 2) * (kind == "sessions" and 0.75 or 0.82))))
+    math.max(16, math.min(vim.o.lines - 4, math.floor((vim.o.lines - 2) * (kind == "projects" and 0.75 or 0.82))))
   return {
     relative = "editor",
     row = math.floor((vim.o.lines - height - 2) / 2),
@@ -62,25 +63,27 @@ local function age(since)
   return seconds .. "s"
 end
 local function snapshot(kind)
-  local all, entries = sessions.list(), {}
-  for _, session in ipairs(all) do
-    if kind == "sessions" then
+  local all, entries = projects.list(), {}
+  for _, project in ipairs(all) do
+    if kind == "projects" then
       entries[#entries + 1] = {
-        id = "s" .. session.tab,
-        tab = session.tab,
-        name = session.name,
-        root = session.root,
-        count = #session.windows,
-        current = session.current,
+        id = "p" .. project.id,
+        kind = "project",
+        project = project.id,
+        tab = project.tab,
+        name = project.name,
+        root = project.root,
+        count = #project.windows,
+        current = project.current,
       }
     else
-      for index, win in ipairs(session.windows) do
-        local entry = vim.tbl_extend(
-          "force",
-          win,
-          { id = "w" .. win.win, index = index, session = session.name, root = session.root }
-        )
-        entries[#entries + 1] = entry
+      for index, window in ipairs(project.windows) do
+        entries[#entries + 1] = vim.tbl_extend("force", window, {
+          kind = "window",
+          index = index,
+          session = project.name,
+          count = #window.panes + #require("ainvim.panes").hidden(window.tab),
+        })
       end
     end
   end
@@ -162,7 +165,7 @@ local function draw()
   local function rule(row, group)
     put(row, 0, string.rep("─", width), group or "Border")
   end
-  local title = s.kind == "sessions" and "SESSION NAVIGATOR" or "WORKSPACE NAVIGATOR"
+  local title = s.kind == "projects" and "PROJECT NAVIGATOR" or "WINDOW NAVIGATOR"
   local agents, attention = 0, 0
   for _, item in ipairs(entries) do
     if type(item.agent) == "table" then
@@ -172,7 +175,7 @@ local function draw()
       end
     end
   end
-  local summary = s.kind == "sessions" and (#all .. " sessions · 1 current")
+  local summary = s.kind == "projects" and (#all .. " projects")
     or (#entries .. " windows · " .. agents .. " agents · " .. attention .. " need you")
   put(1, 1, title, "Selected")
   if width >= 70 then
@@ -181,9 +184,9 @@ local function draw()
     put(2, 1, summary, "Muted")
   end
   rule(3)
-  local footer = "n window  N session  j/k move  Enter "
-    .. (s.kind == "sessions" and "switch" or "jump")
-    .. "  r rename  x kill  s save  / filter  Esc close"
+  local footer = "n shell  e editor  N project  j/k move  Enter "
+    .. (s.kind == "projects" and "switch" or "jump")
+    .. "  r rename  x close  s save  / filter  Esc close"
   if s.input then
     footer = "Type " .. (s.input_label or "text") .. "  Ctrl-u clear  Enter apply  Esc cancel"
   end
@@ -196,10 +199,10 @@ local function draw()
     put(
       footer_top + 1,
       0,
-      "n window  N session  j/k move  Enter " .. (s.kind == "sessions" and "switch" or "jump"),
+      "n shell  e editor  N project  j/k move  Enter " .. (s.kind == "projects" and "switch" or "jump"),
       "Muted"
     )
-    put(footer_top + 2, 0, "r rename  x kill  s save  / filter  Esc close", "Muted")
+    put(footer_top + 2, 0, "r rename  x close  s save  / filter  Esc close", "Muted")
   end
   local function render_rows(list, top, bottom, group_name)
     if group_name then
@@ -224,7 +227,7 @@ local function draw()
       local main = (chosen or type(item.agent) == "table") and "Selected" or "Normal"
       local muted = chosen and "Selected" or "Muted"
       put(row, 0, chosen and "▶" or " ", main)
-      if s.kind == "sessions" then
+      if s.kind == "projects" then
         put(row, 3, item.current and "●" or " ", chosen and "Selected" or "Active")
         put(row, 5, item.name, main, math.floor(width * 0.44) - 6)
         put(row, math.floor(width * 0.44), item.count .. (item.count == 1 and " window" or " windows"), muted, 12)
@@ -239,7 +242,7 @@ local function draw()
           put(row, math.floor(width * 0.36) + 11, (agent.state or "unknown"):upper(), main, 13)
           put(row, math.floor(width * 0.36) + 25, age(agent.since), "Muted")
         else
-          put(row, math.floor(width * 0.36), item.session, muted)
+          put(row, math.floor(width * 0.36), item.session .. " · " .. item.count .. " panes", muted)
         end
       end
     end
@@ -247,7 +250,7 @@ local function draw()
       put(bottom, 1, string.format("%d–%d / %d", offset + 1, math.min(#list, offset + capacity), #list), "Muted")
     end
   end
-  if s.kind == "sessions" then
+  if s.kind == "projects" then
     render_rows(items, 5, footer_top - 2)
   else
     local work, workers = {}, {}
@@ -257,12 +260,12 @@ local function draw()
     -- Navigation order follows the two visible groups, as in the screenshots.
     s.items = vim.list_extend(vim.deepcopy(work), workers)
     local middle = math.max(8, math.floor(height * 0.52))
-    render_rows(work, 4, middle - 1, "WORKSPACES")
+    render_rows(work, 4, middle - 1, "WINDOWS")
     rule(middle)
     render_rows(workers, middle + 1, footer_top - 2, "AGENTS")
   end
   if s.confirm then
-    put(footer_top - 1, 1, "Kill " .. clean(s.confirm.name) .. "?  y confirm · n/Esc cancel", "Selected")
+    put(footer_top - 1, 1, "Close " .. clean(s.confirm.name) .. "?  y confirm · n/Esc cancel", "Selected")
   elseif s.notice then
     put(footer_top - 1, 1, s.notice, "Muted")
   elseif s.query ~= "" then
@@ -368,6 +371,7 @@ local function action(fn)
   end
 end
 function M.open(kind)
+  kind = ({ sessions = "projects", workspaces = "windows" })[kind] or kind
   if M.current then
     local previous = M.current.kind
     M.close()
@@ -375,7 +379,7 @@ function M.open(kind)
       return
     end
   end
-  sessions.adopt()
+  native.adopt()
   colors()
   local s = { kind = kind, origin = api.nvim_get_current_win(), query = "" }
   local background = api.nvim_create_buf(false, true)
@@ -399,7 +403,7 @@ function M.open(kind)
   M.current = s
   local _, entries = snapshot(kind)
   for _, item in ipairs(entries) do
-    if kind == "sessions" and item.current or item.win == s.origin then
+    if item.current then
       s.selected = item.id
     end
   end
@@ -443,7 +447,16 @@ function M.open(kind)
     end
     local item = selected(s) or { tab = api.nvim_get_current_tabpage() }
     create(function()
-      sessions.new_window(item)
+      projects.new_window(item, true)
+    end)
+  end)
+  map("e", function()
+    if s.confirm then
+      return
+    end
+    local item = selected(s)
+    create(function()
+      projects.new_window(item, false)
     end)
   end)
   map("N", function()
@@ -451,13 +464,13 @@ function M.open(kind)
       return
     end
     local item = selected(s)
-    input("Directory", item and item.root or vim.fn.getcwd(), nil, function(path)
+    input("Project directory", item and item.root or vim.fn.getcwd(), nil, function(path)
       if vim.trim(path) == "" then
         s.notice = "Choose an existing project or worktree directory"
         return
       end
       create(function()
-        sessions.create(path)
+        projects.open(path)
       end)
     end)
   end)
@@ -468,7 +481,7 @@ function M.open(kind)
     local item = selected(s)
     if item then
       M.close()
-      local ok, err = pcall(sessions.jump, item)
+      local ok, err = pcall(projects.jump, item)
       if not ok then
         vim.notify(err, vim.log.levels.WARN)
       end
@@ -493,7 +506,7 @@ function M.open(kind)
     if item and not s.confirm then
       input("Rename", item.name, nil, function(name)
         action(function()
-          sessions.rename(item, name)
+          projects.rename(item, name)
         end)
       end)
     end
@@ -512,7 +525,7 @@ function M.open(kind)
     s.confirm = nil
     -- Close the overlay before window/tab mutation so it cannot become a leftover tab window.
     M.close()
-    local ok, err = pcall(sessions.close, target)
+    local ok, err = pcall(projects.close, target)
     M.open(kind)
     M.current.notice = ok and "Closed; files retained" or tostring(err)
     draw()
@@ -520,8 +533,8 @@ function M.open(kind)
   map("s", function()
     if not s.confirm then
       action(function()
-        sessions.save()
-        s.notice = "Saved locally · :AiSessionRestore from a fresh editor"
+        native.save()
+        s.notice = "Saved locally · :AiLayoutRestore from a fresh editor"
         draw()
       end)
     end
@@ -565,13 +578,27 @@ function M.open(kind)
   draw()
 end
 function M.setup()
-  sessions.setup()
+  native.setup()
+  projects.setup()
+  require("ainvim.panes").setup()
   api.nvim_create_user_command("AiSessions", function()
-    M.open("sessions")
-  end, { desc = "Session navigator" })
+    M.open("projects")
+  end, { desc = "Project navigator (compatibility alias)" })
   api.nvim_create_user_command("AiWorkspaces", function()
-    M.open("workspaces")
-  end, { desc = "Workspace/window navigator" })
+    M.open("windows")
+  end, { desc = "Window navigator (compatibility alias)" })
+  api.nvim_create_user_command("AiProjects", function()
+    M.open("projects")
+  end, { desc = "Project navigator" })
+  api.nvim_create_user_command("AiWindows", function()
+    M.open("windows")
+  end, { desc = "Window navigator" })
+  api.nvim_create_user_command("AiLayoutRestore", function()
+    local ok, err = pcall(native.restore)
+    if not ok then
+      vim.notify(tostring(err), vim.log.levels.WARN)
+    end
+  end, { desc = "Restore the saved project/window file layout" })
   api.nvim_create_autocmd("ColorScheme", { callback = colors })
   api.nvim_create_autocmd("VimResized", { callback = draw })
 end
