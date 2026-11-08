@@ -10,7 +10,10 @@ Design and prototype stage. This branch, `spike/editor-baseline`, provides the f
 
 Run `nvims` and choose **ai-nvim**, or use `NVIM_APPNAME=ai-nvim nvim`. See the [editor guide](editor/README.md) for setup, familiar controls, and the current boundaries. Plain `nvim` keeps the existing LazyVim configuration.
 
-**Space l** opens [Extras](editor/EXTRAS.md): Rust, Lua, C/C++, TypeScript/React/HTML/CSS, and Smear Cursor. Save choices with Ctrl-s and restart to apply them.
+**Space l** opens [Extras](editor/EXTRAS.md): Rust, Lua, C/C++, TypeScript/React/HTML/CSS, and Smear Cursor. Save choices with Ctrl-s and restart to apply pack-loading changes. Missing
+language tools now install automatically through isolated, pinned Mason when you
+open supported files. The [tool workflow](docs/features/tool-installation.md)
+covers catalog views, manual installation, disabling automation and retries.
 
 The earlier agent pilot remains available in `/Users/matteostara/Code/ai-nvim` on `spike/drudwyn-pilot`. It is separate from this editor preview while we evaluate the editor first.
 

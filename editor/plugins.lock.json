@@ -100,6 +100,11 @@
       "url": "https://github.com/sphamba/smear-cursor.nvim.git",
       "commit": "f6cb57c342268177f719acc3968b9d8de3ecc969",
       "extra": "smear"
+    },
+    {
+      "name": "mason.nvim",
+      "url": "https://github.com/mason-org/mason.nvim.git",
+      "commit": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d"
     }
   ],
   "syntax": {

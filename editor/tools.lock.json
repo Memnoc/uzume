@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "registry": {
+    "source": "github:mason-org/mason-registry@2026-11-06-sneaky-satin",
+    "sha256": "80b63e16b5651297a3ea5cfa29e01434e0eb0b308365662e4f70974f4228fe33"
+  },
+  "packages": {
+    "rust-analyzer": "2026-08-31",
+    "lua-language-server": "3.19.1",
+    "stylua": "v2.5.2",
+    "clangd": "22.1.6",
+    "vtsls": "0.3.0",
+    "html-lsp": "4.10.0",
+    "css-lsp": "4.10.0",
+    "json-lsp": "4.10.0",
+    "eslint-lsp": "4.10.0",
+    "prettier": "3.9.6",
+    "tailwindcss-language-server": "0.16.0",
+    "emmet-ls": "0.4.2"
+  }
+}

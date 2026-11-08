@@ -10,7 +10,14 @@ Snacks.setup({
     sources = { explorer = { layout = { preset = "sidebar", preview = false } } },
   },
   input = { enabled = true },
-  notifier = { enabled = true, style = "minimal", level = vim.log.levels.WARN },
+  notifier = {
+    enabled = true,
+    style = "minimal",
+    level = vim.log.levels.INFO,
+    filter = function(notification)
+      return notification.title == "Extras" or notification.level == "warn" or notification.level == "error"
+    end,
+  },
   indent = { enabled = true, animate = { enabled = false } },
   statuscolumn = { enabled = true },
   dashboard = {

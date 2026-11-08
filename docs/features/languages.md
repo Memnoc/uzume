@@ -40,7 +40,10 @@ coordinates formatting; Neovim handles LSP requests and diagnostics.
 Formatting runs on explicit saves by default. Prettier prefers the project's
 local executable, then the discovered fallback. C formatting comes from clangd,
 so a separate clang-format executable is not required. Missing servers are
-skipped and shown in Extras; executable presence does not prove project health.
+installed in the background for supported files when automatic installation is
+enabled; successful installs refresh language availability. Failures appear in
+Extras and require explicit retry. Existing executable presence does not prove
+project health. See [Tool installation](tool-installation.md).
 External tool paths and version boundaries are covered in
 [Installation and releases](installation.md).
 

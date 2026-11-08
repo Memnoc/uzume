@@ -1,16 +1,23 @@
 local M = {}
 local extras = require("ainvim.extras")
 local tools = require("ainvim.tools")
+M.servers = {}
 
 local function server(name, executable, args, config)
-  local path = tools.find(executable)
-  if not path then
-    return
-  end -- Missing tools are visible in :Extras.
-  config = config or {}
-  config.cmd = vim.list_extend({ path }, args or {})
-  vim.lsp.config(name, config)
-  vim.lsp.enable(name)
+  M.servers[name] = { executable = executable, args = args or {}, config = config or {} }
+end
+
+function M.refresh()
+  for name, spec in pairs(M.servers) do
+    local path = tools.find(spec.executable)
+    if path and spec.path ~= path then
+      local config = vim.deepcopy(spec.config)
+      config.cmd = vim.list_extend({ path }, spec.args)
+      vim.lsp.config(name, config)
+      vim.lsp.enable(name)
+      spec.path = path
+    end
+  end
 end
 
 function M.setup()
@@ -134,13 +141,19 @@ function M.setup()
   require("conform").setup({
     formatters_by_ft = formatters,
     formatters = {
-      rustfmt = { command = tools.find("rustfmt") or "rustfmt" },
-      stylua = { command = tools.find("stylua") or "stylua" },
+      rustfmt = {
+        command = function()
+          return tools.find("rustfmt") or "rustfmt"
+        end,
+      },
+      stylua = {
+        command = function()
+          return tools.find("stylua") or "stylua"
+        end,
+      },
       prettier = {
         command = function(_, ctx)
-          local directory = vim.fs.dirname(ctx.filename)
-          local bin = vim.fs.find("node_modules/.bin/prettier", { path = directory, upward = true })[1]
-          return bin or tools.find("prettier") or "prettier"
+          return tools.prettier(ctx.filename) or "prettier"
         end,
       },
     },
@@ -217,6 +230,7 @@ function M.setup()
       vim.keymap.set("x", "<leader>ca", vim.lsp.buf.code_action, { buffer = event.buf, desc = "Code Action" })
     end,
   })
+  M.refresh()
 end
 
 return M

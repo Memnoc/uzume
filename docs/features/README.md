@@ -10,6 +10,7 @@ records preserve what was actually checked at each increment.
 | Appearance, dashboard, explorer, search, buffers, windows, mouse, shells | [Editor and navigation](editor.md) |
 | Git changes, diagnostics, undo and recovery | [Editor and navigation](editor.md#reading-changes-and-recovery) |
 | Optional packs, menu icons, saving choices | [Extras](../../editor/EXTRAS.md) |
+| Available/installed catalog, Mason, file-triggered tools, retry controls | [Tool installation](tool-installation.md) |
 | Rust, Lua, C/C++, TypeScript/React, HTML/CSS, completion and formatting | [Languages](languages.md) |
 | Cursor animation and its controls | [Cursor animation](languages.md#cursor-animation) |
 | Separate config, nvims, dependencies, pins and upgrades | [Installation and releases](installation.md) |

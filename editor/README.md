@@ -72,17 +72,20 @@ Requires Neovim 0.11+, Python 3.12+, Git, `rg`, and `fd`. A Nerd Font provides t
 icons, as in the current LazyVim setup. The shell picker also needs `fzf`.
 This local preview's captured parser binaries are for macOS ARM64. Installation
 also requires the exact parser/query cache identified in the lockfile; portable
-parser builds are not implemented yet. Language executables are discovered as
-read-only external tools, not installed or updated by this script.
+parser builds are not implemented yet. The setup script discovers existing tools
+without modifying them. At runtime,
+Mason installs missing tools for supported files into ai-nvim’s own directory;
+see [Tool installation](../docs/features/tool-installation.md).
 
 The installer adds only the `ai-nvim` entry to Memnoc's existing `nvims` list,
 backs up `.zshrc`, and refuses to replace an unrelated config. It is idempotent.
 No global `NVIM_APPNAME` is exported and the `nvim` command/aliases are unchanged.
 
-`plugins.lock.json` determines a separate immutable package bundle. Startup
-does not install, update, or check for updates. Changing pins requires an explicit
-installer run; old bundles remain available. This is not yet the distribution's
-Neovim installer, upgrade UI, or complete release/rollback mechanism.
+`plugins.lock.json` determines a separate immutable package bundle. Plugin
+startup does not download or update packages. Opening a supported file
+can trigger background language-tool installation; **Space uI** toggles that
+behavior. Changing plugin pins requires an explicit installer run; old bundles
+remain available. This is not yet the distribution’s Neovim installer, upgrade UI, or complete release/rollback mechanism.
 
 Keep this worktree while its configuration link is installed. To remove the
 preview, remove only that link and the `ai-nvim` candidate in `nvims`; remove its

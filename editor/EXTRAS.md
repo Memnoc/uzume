@@ -6,7 +6,9 @@ Escape discards changes that were not saved. The menu marks changes that require
 a restart and shows required/optional tool availability in its preview.
 
 The menu border keeps the controls visible: **Ctrl-n/p** moves, **Enter** toggles,
-**Ctrl-s** saves, and one **Esc** cancels. Type to filter; arrow keys also move.
+**Ctrl-s** saves, and one **Esc** cancels. **Ctrl-v** cycles catalog views,
+**Ctrl-r** installs/retries the selected pack, and **Ctrl-g** opens Mason.
+Type to filter; arrow keys also move.
 The preview appears beside the list in wide terminals and below it in narrower
 ones. The icon legend stays at the top even when details are out of view.
 
@@ -16,11 +18,14 @@ ones. The icon legend stays at the top even when details are out of view.
 | ○ | Selected to be disabled |
 | * unsaved | Different from the last saved choice; Ctrl-s commits it |
 | ↻ restart | Different from the currently running configuration |
-| missing tools | A required executable was not found; details list it |
+| available / external | Required tools are missing / usable outside ai-nvim storage |
+| installing / installed / failed | Managed installation state; details show versions and errors |
 
 Icons have different shapes as well as colors. The preview spells out both
 **Selected** and **Running now** so a draft toggle is not mistaken for an
-immediate change. Cancelling does not undo preferences saved earlier.
+immediate change. Cancelling does not undo preferences saved earlier or stop an installation
+already requested. Pack loading changes need a restart; installing a missing
+tool for an active pack does not.
 
 ## How it is built
 
@@ -32,7 +37,8 @@ choices and atomically renames a temporary JSON file into place; Esc drops the
 draft. [packages.lua](lua/ainvim/packages.lua) and
 [languages.lua](lua/ainvim/languages.lua) use startup choices to load features.
 There is no dependency on LazyVim or lazy.nvim, and no general third-party
-Extras marketplace or custom-pack editor yet.
+Extras marketplace or custom-pack editor yet. Mason supplies the tool installation
+backend; our catalog and native LSP configuration remain independent.
 
 ## Available packs
 
@@ -48,7 +54,8 @@ The requested packs are enabled initially:
 
 Disabling a pack stops loading its optional plugins and language servers on the
 next launch. The small local catalog's dependencies are installed together at
-setup and pinned; toggling a pack does not fetch packages or update the editor.
+setup and pinned. Saving a newly enabled pack installs its missing required
+tools through Mason; toggling the draft alone does not start a download.
 Preferences live in `~/.local/share/ai-nvim/extras.json`, outside the source
 checkout, and are written atomically. No editor restart is forced.
 
@@ -85,8 +92,10 @@ works. HTML/CSS servers are present inside the existing eslint-lsp package even
 though Mason exposes only some binaries in its top-level bin directory. These
 are read-only references: the installer does not update or write into LazyVim's
 Mason installation. PATH is a runtime fallback if a recorded executable vanishes.
-Missing tools are shown in Extras; servers without a usable executable are not
-started. Executable detection is not a guarantee of server/project health.
+Managed binaries in ai-nvim’s own `mason/bin` now take precedence. Opening a
+supported file automatically installs missing required tools, then refreshes
+LSP/formatter availability. **Space uI** toggles this behavior persistently.
+Executable detection is not a guarantee of server/project health.
 
 Plugin commits and copied parser/query hashes are in `plugins.lock.json`. Syntax
 resources are copied into ai-nvim's own package bundle and loaded through native
@@ -94,10 +103,12 @@ Neovim Treesitter; the nvim-treesitter plugin is not a runtime dependency. This
 snapshot is for this macOS ARM64 machine. CSS/SCSS/LESS use native Vim syntax;
 their language-server features and Prettier are configured independently.
 
-External language tools remain user-managed and are not release-pinned yet.
-Updating their existing installation may change their behavior. Portable parser
-builds and independently managed/pinned tool distributions remain release work;
-the current mechanism is a local, working editor experiment.
+External language tools remain user-managed; updating them elsewhere may change
+their behavior. New managed tools use Mason with the registry and top-level
+versions in `tools.lock.json`. Existing installations are not automatically
+upgraded. Portable parser builds, transitive dependency locking and complete
+release migrations remain work. See [Tool installation](../docs/features/tool-installation.md)
+for the complete workflow, prerequisites, catalog views and retry policy.
 
 Smear mirrors the existing color/target settings, excludes picker/input/menu
 buffers, and does not animate terminal input. It is independent of other Snacks
