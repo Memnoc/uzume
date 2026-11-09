@@ -137,6 +137,39 @@ try:
         visible = js('(function() local r={} for _,buf in ipairs(vim.api.nvim_list_bufs()) do if require("uzume.workspace_buffers").contains(buf) and vim.api.nvim_buf_get_name(buf):match("example.txt$") then r[#r+1]=buf end end return r end)()')
         assert len(visible) == 1, visible
         assert js('vim.api.nvim_buf_is_valid(vim.fn.bufnr(' + json.dumps(str(project/'example.txt')) + '))')
+        if count == 1:
+            # Selecting the existing agent must focus its pane, never mirror it
+            # over the file. Exercise the real keyboard, mouse and picker routes.
+            agent = item(1)
+            terminal = next(p for p in views if p['terminal'])
+            for route in ('cycle', 'tab-click', 'buffer-command', 'buffer-picker'):
+                do('vim.cmd.stopinsert(); vim.api.nvim_set_current_win(' + str(editor['win']) + ')')
+                if route == 'cycle':
+                    keys('L')
+                elif route == 'tab-click':
+                    column = js('(function() local s=vim.api.nvim_eval_statusline(vim.o.tabline,{use_tabline=true,maxwidth=vim.o.columns}).str; local i=assert(s:find("Codex",1,true)); return vim.fn.strdisplaywidth(s:sub(1,i-1)) end)()')
+                    do('vim.api.nvim_input_mouse("left","press","",0,0,' + str(column) + '); vim.api.nvim_input_mouse("left","release","",0,0,' + str(column) + ')')
+                elif route == 'buffer-command':
+                    do('vim.cmd.buffer(' + str(agent['buf']) + ')')
+                else:
+                    keys(' ,')
+                    wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+                    wait(lambda: lua('vim.api.nvim_get_mode().mode') == 'i')
+                    keys('python')
+                    wait(lambda: js('#Snacks.picker.get({source="buffers"})[1]:items()') == 1)
+                    keys('<CR>')
+                wait(lambda: js('vim.api.nvim_get_current_win()') == terminal['win'])
+                assert js('vim.fn.win_findbuf(' + str(agent['buf']) + ')') == [terminal['win']], route
+                assert js('vim.api.nvim_win_get_buf(' + str(editor['win']) + ')') == editor['buf'], route
+                assert js('#require("uzume.agents").list()') == 1, route
+            # Swapping also briefly duplicates a buffer while assigning panes;
+            # routing must wait for the operation rather than undo that layout.
+            do('require("ainvim.panes").swap()')
+            wait(lambda: js('vim.api.nvim_win_get_buf(' + str(editor['win']) + ')') == agent['buf'])
+            assert js('vim.api.nvim_win_get_buf(' + str(terminal['win']) + ')') == editor['buf']
+            do('require("ainvim.panes").swap()')
+            wait(lambda: js('vim.api.nvim_win_get_buf(' + str(editor['win']) + ')') == editor['buf'])
+            assert js('vim.fn.win_findbuf(' + str(agent['buf']) + ')') == [terminal['win']]
 
     do('require("uzume.agents").focus(require("uzume.agents").list()[4]); vim.cmd.startinsert()')
     wait(lambda: lua('vim.api.nvim_get_mode().mode') == 't')
@@ -212,6 +245,10 @@ try:
     # Hide/restore/float retain the exact same running job; focus restores hidden panes.
     do('require("uzume.agents").focus(require("uzume.agents").instances[' + json.dumps(a['task']['id']) + ']); require("ainvim.panes").hide()')
     do('require("uzume.agents").focus(require("uzume.agents").instances[' + json.dumps(a['task']['id']) + ']); require("ainvim.panes").float(); require("ainvim.panes").zoom(); require("ainvim.panes").zoom(); require("ainvim.panes").dock()')
+    panes = js('require("ainvim.sessions").windows(0)')
+    assert len(panes) == 2 and sum(p['buf'] == a['buf'] for p in panes) == 1
+    assert js('vim.api.nvim_get_current_buf()') == a['buf']
+    assert lua('vim.api.nvim_buf_get_name(' + str(next(p['buf'] for p in panes if not p['terminal'])) + ')') == a['task']['cwd'] + '/example.txt'
     record_a = json.loads((Path(a['directory']) / 'fixture.json').read_text())
     record_b = json.loads((Path(b['directory']) / 'fixture.json').read_text())
     assert living(record_a['pid']) and living(record_b['pid'])

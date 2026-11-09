@@ -39,6 +39,11 @@ The original checkout's buffer remains available in its original workspace; it
 is hidden from the task's tab strip rather than closed or unloaded. A reference
 file explicitly opened in the task workspace remains visible there.
 
+Selecting an already visible agent buffer—by cycling buffers, clicking its tab,
+using the buffer picker or `:buffer`—focuses its existing pane and keeps the
+editor's file in place. It does not display the same terminal in both panes.
+Floating, docking and swapping panes still move that single terminal normally.
+
 ## Marking, references and delivery
 
 Marks form a per-agent list, not another session. Marking is idempotent and works
@@ -94,6 +99,8 @@ remain separate work.
 - `uzume.context` owns marks, role classification, atomic context manifests and
   context controls. Errors shown by agent actions omit internal Lua locations.
 - `uzume.workspace_buffers` scopes the tab strip without deleting buffers.
+- `uzume.agent_views` routes duplicate terminal selections to their existing
+  pane after layout operations settle, restoring the displaced editor buffer.
 - `uzume.worktrees` uses asynchronous argument-array Git calls.
 - `editor/agent/supervisor.py` supervises the official CLI and observed children.
   `hook.py` supplies marked paths and lifecycle metadata, never logs incoming
@@ -108,7 +115,8 @@ a retention interface is still pending.
 
 `python3 tests/agents.py` runs the actual editor with mock CLIs and disposable
 repositories. It covers both launch modes without submitted prompts, workspace
-buffer filtering, file marking/deduplication, multi-select/removal, external
+buffer filtering, agent selection through keyboard/mouse/picker without mirrored
+terminals, pane swapping/docking, file marking/deduplication, multi-select/removal, external
 reference roles, hook output and metadata privacy, input deletion, concurrent
 agents, pane cleanup, restart and layout restore. `--inputs-only` runs the input
 regression; `--crash` tests forced editor exit.

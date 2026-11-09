@@ -294,6 +294,7 @@ local function poll()
 end
 
 function M.setup()
+  require("uzume.agent_views").setup()
   local group = api.nvim_create_augroup("uzume_agents", { clear = true })
   local timer = assert(vim.uv.new_timer())
   timer:start(500, 500, vim.schedule_wrap(poll))
