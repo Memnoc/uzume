@@ -74,12 +74,14 @@ Smear Cursor is enabled and can be toggled with **Space ua**. Debugging/test
 adapters, remaining language previews/custom extras and the custom review suite
 are still separate work.
 
-**Space ac** creates a Codex task; **Space aC** creates a Claude task. Each gets a
+**Space ac** starts a Codex task; **Space aC** starts a Claude task. Describe what
+the agent should do; Enter passes that instruction on launch. Each gets a
 dedicated branch/worktree and an editor/agent window under the project. Choose
 a file from the list on the left; Enter opens it beside the agent. Use
 **Esc Esc** for editor controls, **Space af** to add the open file to the agent
 prompt (review and press Enter yourself), **Space aa** for attention and **Space ar** to
-restart a stopped task CLI. See [AI tasks](../docs/features/agents.md).
+restart a stopped task CLI without replaying the original instruction. Normal
+CLI exit collapses its pane while retaining your editor and worktree. See [AI tasks](../docs/features/agents.md).
 
 Unlike the original fixture spike, edits to opened files and normal editor
 recovery/history persist. Source-file saving remains explicit. Root detection

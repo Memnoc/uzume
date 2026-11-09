@@ -18,6 +18,8 @@ def interrupt(*_):
 signal.signal(signal.SIGINT, interrupt)
 tty.setraw(sys.stdin.fileno())
 while True:
+    if (root / 'exit').exists():
+        raise SystemExit(int((root / 'exit').read_text()))
     if select.select([sys.stdin], [], [], .05)[0]:
         data = os.read(sys.stdin.fileno(), 4096)
         if not data: break

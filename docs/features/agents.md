@@ -12,8 +12,8 @@ project. Codex and Claude Code are the initial adapters; tmux is not required.
 
 | Shortcut | Action |
 | --- | --- |
-| Space ac | Name and create a Codex task |
-| Space aC | Name and create a Claude Code task |
+| Space ac | Describe and start a Codex task |
+| Space aC | Describe and start a Claude Code task |
 | Space aa | Pick an agent; actionable states appear first |
 | Space af (from a file) | Add its worktree-relative path to this task’s agent prompt |
 | Space ar | Start a fresh CLI in the selected stopped task's existing worktree |
@@ -24,9 +24,14 @@ project. Codex and Claude Code are the initial adapters; tmux is not required.
 | Ctrl-C in an agent | Deliver the CLI's interrupt key |
 | Space pd / Space wd | Close pane / whole task window, with confirmation |
 
-`:UzumeAgent codex task name` and `:UzumeAgent claude task name` also create tasks.
-The name labels a window and branch; it is **not submitted as a prompt**. Enter
-instructions directly in the CLI. Single Escape, `jk`, and Ctrl-w pass through
+`:UzumeAgent codex <instruction>` and `:UzumeAgent claude <instruction>` also
+create tasks. The task field is the **initial instruction**: pressing Enter
+creates the worktree and passes the full text as the CLI's initial prompt.
+Authentication and trust prompts may still need your response before work begins.
+Window and branch labels use a shortened version for readability; shortening does
+not change the instruction. Arguments are passed directly, not through a shell.
+The file chooser remains available beside the running agent; selecting a file
+alone does not add context to that initial instruction. Single Escape, `jk`, and Ctrl-w pass through
 in agent buffers. Ordinary shell mappings remain separate. Pane movement,
 resizing, floating, fullscreen and hide/restore use the existing Space p controls.
 An agent pane stays in its task window; transferring it into another checkout's
@@ -63,9 +68,17 @@ manual; Uzume does not run project setup scripts.
 Switching windows or hiding panes keeps agents running. Closing a managed pane,
 window or project stops its CLI and observed descendants. Project close checks
 for modified visible/managed hidden source buffers before stopping anything.
+When the CLI exits normally, its terminal pane and buffer tab disappear and the
+remaining editor pane expands. Floating/hidden agent panes and their placeholders
+are removed too. Background exits do not switch focus. If the terminal was the
+last tiled pane, Neovim retains an empty editor pane. A failed launch/exit keeps
+its terminal output visible for diagnosis. A turn ending while the CLI remains
+running does not close its pane.
+
 Normal editor exit also stops supervised agents. Closing never deletes the
 worktree or branch. Task restart starts a **fresh conversation**, not an automatic
-resume; saved CLI conversations remain under the CLI's own control.
+resume, and does not replay the original instruction; saved CLI conversations
+remain under the CLI's own control.
 
 A saved layout retains project identity, task name, branch and checkout path.
 Restoring it launches no agents. Select a restored task window and press Space ar
@@ -112,6 +125,10 @@ resolve inside the preview's existing `ai-nvim` data/state directories. Runtime
 directories are private and metadata files are owner-readable/writable. Records
 contain paths, process identity, lifecycle state and fixed explanations. They
 are retained locally; a retention/cleanup interface is not yet implemented.
+The full initial instruction is placed in the private launch file for handoff;
+the supervisor removes it from that file after reading it. Only the shortened
+task label remains in workspace metadata. Normal CLI prompt history remains
+under the CLI's control. Restart and layout restore do not resend the instruction.
 
 The CLI owns browser/SSO authentication, permissions and its own data handling.
 Uzume preserves the user's authentication homes, adds hooks only for the launch,
@@ -128,7 +145,9 @@ Hook availability remains subject to enterprise policy. See the official
 local mock CLIs and disposable Git repositories. It covers independent checkouts,
 project grouping, unchanged dirty source checkout, attention without focus changes,
 worker event filtering, metadata privacy, hide/float/restore, scoped cleanup,
-modified-file close guards, restart, and snapshot restore without starting agents.
+modified-file close guards, initial instruction delivery (including long text
+and option-like text), collapse on CLI exit, restart without prompt replay, and
+snapshot restore without starting agents.
 Run with `--crash` to exercise forced editor termination instead of normal exit.
 The test uses installed pinned packages but isolates writable data, state and
 cache. It makes no model requests.

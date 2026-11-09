@@ -108,13 +108,15 @@ local function dependencies(kind)
   return executable, python
 end
 
-local function launch(task, tab, project_name, kind)
+local function launch(task, tab, project_name, kind, prompt)
   local executable, python = dependencies(kind)
   local run = task.id .. "-" .. tostring(vim.uv.hrtime())
   local directory = vim.fn.stdpath("state") .. "/agents/" .. run
   vim.fn.mkdir(directory, "p", 448)
   local fd = assert(vim.uv.fs_open(directory .. "/launch.json", "w", 384))
-  assert(vim.uv.fs_write(fd, vim.json.encode({ kind = kind, executable = executable, cwd = task.cwd }), 0))
+  assert(
+    vim.uv.fs_write(fd, vim.json.encode({ kind = kind, executable = executable, cwd = task.cwd, prompt = prompt }), 0)
+  )
   vim.uv.fs_close(fd)
   vim.cmd("botright vnew")
   local buf = api.nvim_get_current_buf()
@@ -148,6 +150,8 @@ local function launch(task, tab, project_name, kind)
         end
         if item.status.state == "failed" and api.nvim_tabpage_is_valid(tab) then
           notify(item.task.label .. ": agent exited with an error; inspect its terminal", vim.log.levels.WARN)
+        elseif item.status.state == "stopped" and vim.v.exiting == vim.NIL then
+          require("ainvim.panes").remove_exited_terminal(buf)
         end
       end)
     end,
@@ -172,7 +176,9 @@ end
 function M.start(kind, label, done)
   dependencies(kind)
   label = vim.trim(label or "")
-  assert(label ~= "" and not label:find("[%c]"), "Give the task a short name")
+  assert(label ~= "" and not label:find("[%c]"), "Describe the task on one line")
+  local instruction = label
+  label = vim.fn.strcharpart(instruction, 0, 60) .. (vim.fn.strchars(instruction) > 60 and "…" or "")
   local project = assert(require("ainvim.projects").current(), "Open a project first: Space ap")
   local origin = api.nvim_get_current_win()
   require("uzume.worktrees").create(project.root, label, function(task, err)
@@ -206,7 +212,7 @@ function M.start(kind, label, done)
         empty = true,
       })
       local editor = require("uzume.task_editor").create(task)
-      local item = launch(task, tab, project.name, kind)
+      local item = launch(task, tab, project.name, kind, instruction)
       if previous == origin then
         require("uzume.task_editor").pick(editor, task)
       end
@@ -230,13 +236,16 @@ end
 function M.prompt(kind)
   -- Resolve project before the floating input temporarily changes the cwd context.
   require("ainvim.sessions").adopt()
-  Snacks.input({ prompt = "Task name (new worktree from project HEAD): " }, function(label)
-    if label and vim.trim(label) ~= "" then
-      require("ainvim.panes").run(function()
-        M.start(kind, label)
-      end)
+  Snacks.input(
+    { prompt = "Task for " .. (kind == "codex" and "Codex" or "Claude") .. " · Enter starts agent: " },
+    function(label)
+      if label and vim.trim(label) ~= "" then
+        require("ainvim.panes").run(function()
+          M.start(kind, label)
+        end)
+      end
     end
-  end)
+  )
 end
 
 function M.add_file()

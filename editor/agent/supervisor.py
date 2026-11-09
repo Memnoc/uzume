@@ -33,18 +33,23 @@ def command_for(config, root):
         command = [config["executable"], "--no-daemon"]
         for event, groups in hooks("codex").items():
             command.extend(["-c", "hooks." + event + "=" + toml(groups)])
-        return command
-    if config["kind"] != "claude":
+    elif config["kind"] == "claude":
+        settings = root / "claude-settings.json"
+        atomic(settings, {"hooks": hooks("claude")})
+        command = [config["executable"], "--settings", str(settings)]
+    else:
         raise ValueError("Unsupported agent")
-    settings = root / "claude-settings.json"
-    atomic(settings, {"hooks": hooks("claude")})
-    return [config["executable"], "--settings", str(settings)]
+    if config.get("prompt"):
+        command.extend(["--", config["prompt"]])
+    return command
 
 
 def main():
     os.umask(0o077)
     root = Path(sys.argv[1])
     config = json.loads((root / "launch.json").read_text())
+    # The initial instruction is a one-shot handoff, not restart metadata.
+    atomic(root / "launch.json", {key: value for key, value in config.items() if key != "prompt"})
     events = root / "events"
     events.mkdir(mode=0o700, exist_ok=True)
     env = dict(os.environ)

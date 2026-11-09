@@ -114,6 +114,7 @@ try:
         sys.exit(0)
     assert lua('vim.bo.buftype') == ''
     origin = js('vim.api.nvim_get_current_tabpage()')
+    long_instruction = '--explain \"quoted paths\" and $(not-a-command) without losing the rest of this long task instruction'
     for count, kind in enumerate(('codex', 'claude', 'codex', 'claude'), 1):
         if count <= 2:
             do('vim.cmd.stopinsert()')
@@ -123,7 +124,8 @@ try:
             keys('same name')
             keys('<CR>')
         else:
-            do('require("uzume.agents").start(' + json.dumps(kind) + ',"same name")')
+            instruction = long_instruction if count == 4 else 'same name'
+            do('require("uzume.agents").start(' + json.dumps(kind) + ',' + json.dumps(instruction) + ')')
         wait(lambda: js('#require("uzume.agents").list()') == count)
         wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
         wait(lambda: js('#Snacks.picker.get({source="files"})[1]:items()') > 0)
@@ -151,6 +153,8 @@ try:
         wait(lambda: (Path(entry['directory']) / 'fixture.json').exists())
         record = json.loads((Path(entry['directory']) / 'fixture.json').read_text())
         assert record['cwd'] == entry['task']['cwd']
+        assert record['args'][-2:] == ['--', long_instruction if entry['task']['label'].startswith('--explain') else 'same name'], record['args']
+        assert 'prompt' not in json.loads((Path(entry['directory']) / 'launch.json').read_text())
         assert (Path(record['cwd']) / 'example.txt').read_text() == 'base\n'
         assert len(js('require("ainvim.sessions").windows(' + str(entry['tab']) + ')')) == 2
     assert (project / 'example.txt').read_text() == 'uncommitted source\n'
@@ -210,6 +214,30 @@ try:
     do('require("uzume.agents").restart(); vim.cmd.stopinsert()')
     b = js('require("uzume.agents").instances[' + json.dumps(b['task']['id']) + ']')
     wait(lambda: (Path(b['directory']) / 'fixture.json').exists())
+    # Normal CLI exit collapses tiled, floating and hidden panes without focus theft.
+    for entry, style in zip(js('require("uzume.agents").list()'), ('tiled', 'float', 'hidden')):
+        wait(lambda: (Path(entry['directory']) / 'fixture.json').exists())
+        record = json.loads((Path(entry['directory']) / 'fixture.json').read_text())
+        if entry['task']['id'] == b['task']['id']:
+            assert '--' not in record['args'], 'Restart replayed the initial task'
+        do('require("uzume.agents").focus(require("uzume.agents").instances[' + json.dumps(entry['task']['id']) + ']); vim.cmd.stopinsert()')
+        if style != 'tiled': do('require("ainvim.panes").' + ('float' if style == 'float' else 'hide') + '()')
+        if style == 'tiled':
+            focused = js('(function() for _,p in ipairs(require("ainvim.sessions").windows(0)) do if not p.terminal then return p.win end end end)()')
+            do('vim.cmd.startinsert()')
+        else:
+            do('vim.api.nvim_set_current_tabpage(' + str(origin) + ')')
+            focused = js('vim.api.nvim_get_current_win()')
+        (Path(entry['directory']) / 'exit').write_text('0')
+        wait(lambda: not js('vim.api.nvim_buf_is_valid(' + str(entry['buf']) + ')'))
+        assert js('vim.api.nvim_get_current_win()') == focused
+        assert len(js('require("ainvim.sessions").windows(' + str(entry['tab']) + ')')) == 1
+        assert js('#require("ainvim.panes").hidden(' + str(entry['tab']) + ')') == 0
+        assert Path(entry['task']['cwd']).is_dir()
+        wait(lambda: not living(record['child']))
+        do('vim.api.nvim_set_current_tabpage(' + str(entry['tab']) + '); require("uzume.agents").restart(); vim.cmd.stopinsert()')
+        refreshed = js('require("uzume.agents").instances[' + json.dumps(entry['task']['id']) + ']')
+        wait(lambda: (Path(refreshed['directory']) / 'fixture.json').exists())
     do('require("ainvim.sessions").save()')
     saved = json.loads((root / 'state/ai-nvim/navigator/snapshot.json').read_text())
     tasks = [x for x in saved['sessions'] if x.get('task')]

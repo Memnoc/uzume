@@ -301,6 +301,54 @@ function M.close(win)
   end
 end
 
+-- Process exit is not a user navigation action: clean up without switching tabs.
+function M.remove_exited_terminal(buf)
+  if not api.nvim_buf_is_valid(buf) then
+    return
+  end
+  assert(vim.bo[buf].buftype == "terminal", "Expected an exited terminal")
+  local slots = {}
+  for win, state in pairs(M.floats) do
+    if api.nvim_win_is_valid(win) and api.nvim_win_get_buf(win) == buf then
+      slots[#slots + 1] = state.slot
+      M.floats[win] = nil
+    end
+  end
+  for tab, hidden in pairs(M.hidden_by_tab) do
+    M.hidden_by_tab[tab] = vim.tbl_filter(function(pane)
+      if pane.buf == buf then
+        if pane.slot then
+          slots[#slots + 1] = pane.slot
+        end
+        return false
+      end
+      return true
+    end, hidden)
+  end
+  local function remove(win)
+    if not api.nvim_win_is_valid(win) then
+      return
+    end
+    local tab = api.nvim_win_get_tabpage(win)
+    if api.nvim_win_get_config(win).relative == "" and #tiled(tab) == 1 then
+      -- Neovim needs a tiled editor window even if the agent was its last pane.
+      api.nvim_win_set_buf(win, api.nvim_create_buf(true, false))
+      vim.w[win].ainvim_name = nil
+    else
+      api.nvim_win_close(win, true)
+    end
+  end
+  for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+    remove(win)
+  end
+  for _, win in ipairs(slots) do
+    if api.nvim_win_is_valid(win) and vim.bo[api.nvim_win_get_buf(win)].filetype == "ainvim_slot" then
+      remove(win)
+    end
+  end
+  api.nvim_buf_delete(buf, { force = true })
+end
+
 function M.pick()
   local tab = api.nvim_get_current_tabpage()
   local items = native.windows(tab)
