@@ -50,7 +50,8 @@ Snacks.setup({
     style = "minimal",
     level = vim.log.levels.INFO,
     filter = function(notification)
-      return notification.title == "Extras"
+      return notification.title == "Agent context"
+        or notification.title == "Extras"
         or notification.title == "Editor"
         or notification.level == "warn"
         or notification.level == "error"
@@ -138,6 +139,9 @@ require("bufferline").setup({
     end,
     right_mouse_command = function(buf)
       Snacks.bufdelete(buf)
+    end,
+    custom_filter = function(buf)
+      return require("uzume.workspace_buffers").contains(buf)
     end,
     diagnostics = "nvim_lsp",
     name_formatter = function(buffer)

@@ -27,6 +27,7 @@ def git(*args):
     return subprocess.check_output(['git', '-C', str(project), *args], text=True).strip()
 git('init', '-q')
 (project / 'example.txt').write_text('base\n')
+(project / 'z-extra.txt').write_text('extra\n')
 git('add', '.')
 git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'base')
 (project / 'example.txt').write_text('uncommitted source\n')
@@ -114,29 +115,28 @@ try:
         sys.exit(0)
     assert lua('vim.bo.buftype') == ''
     origin = js('vim.api.nvim_get_current_tabpage()')
-    long_instruction = '--explain \"quoted paths\" and $(not-a-command) without losing the rest of this long task instruction'
     for count, kind in enumerate(('codex', 'claude', 'codex', 'claude'), 1):
-        if count <= 2:
-            do('vim.cmd.stopinsert()')
-            keys(' ac' if kind == 'codex' else ' aC')
-            wait(lambda: lua('vim.bo.filetype') == 'snacks_input')
-            wait(lambda: lua('vim.api.nvim_get_mode().mode') == 'i')
-            keys('same name')
-            keys('<CR>')
-        else:
-            instruction = long_instruction if count == 4 else 'same name'
-            do('require("uzume.agents").start(' + json.dumps(kind) + ',' + json.dumps(instruction) + ')')
+        do('vim.cmd.stopinsert(); vim.api.nvim_set_current_tabpage(' + str(origin) + ')')
+        keys({1:' ac', 2:' aC', 3:' ae', 4:' aE'}[count])
         wait(lambda: js('#require("uzume.agents").list()') == count)
-        wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
-        wait(lambda: js('#Snacks.picker.get({source="files"})[1]:items()') > 0)
-        assert lua('Snacks.picker.get({source="files"})[1]:cwd()') == lua('vim.t.ainvim_root')
-        picker = js('(function() local p=Snacks.picker.get({source="files"})[1]; return {main=p.main, root=vim.api.nvim_win_get_config(p.layout.root.win)} end)()')
-        assert picker['root']['relative'] == 'win' and picker['root']['win'] == picker['main']
-        keys('<CR>')
-        wait(lambda: lua('vim.bo.filetype') != 'snacks_picker_input')
-        assert js('vim.api.nvim_get_current_win()') == picker['main']
-        assert lua('vim.api.nvim_buf_get_name(0)') == lua('vim.t.ainvim_root') + '/example.txt'
-        assert js('vim.wo.number') is True
+        if count <= 2:
+            wait(lambda: lua('vim.api.nvim_get_mode().mode') == 't')
+            assert lua('vim.bo.filetype') != 'snacks_input'
+            task = js('vim.t.uzume_task')
+            assert len(task['context']['files']) == 1
+            assert task['context']['files'][0]['path'] == task['cwd'] + '/example.txt'
+            views = js('require("ainvim.sessions").windows(0)')
+            editor = next(x for x in views if not x['terminal'])
+            assert lua('vim.api.nvim_buf_get_name(' + str(editor['buf']) + ')') == task['cwd'] + '/example.txt'
+        else:
+            wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+            wait(lambda: js('#Snacks.picker.get({source="files"})[1]:items()') > 0)
+            assert js('#vim.t.uzume_task.context.files') == 0
+            keys('<CR>')
+            wait(lambda: lua('vim.bo.filetype') != 'snacks_picker_input')
+        visible = js('(function() local r={} for _,buf in ipairs(vim.api.nvim_list_bufs()) do if require("uzume.workspace_buffers").contains(buf) and vim.api.nvim_buf_get_name(buf):match("example.txt$") then r[#r+1]=buf end end return r end)()')
+        assert len(visible) == 1, visible
+        assert js('vim.api.nvim_buf_is_valid(vim.fn.bufnr(' + json.dumps(str(project/'example.txt')) + '))')
 
     do('require("uzume.agents").focus(require("uzume.agents").list()[4]); vim.cmd.startinsert()')
     wait(lambda: lua('vim.api.nvim_get_mode().mode') == 't')
@@ -153,29 +153,48 @@ try:
         wait(lambda: (Path(entry['directory']) / 'fixture.json').exists())
         record = json.loads((Path(entry['directory']) / 'fixture.json').read_text())
         assert record['cwd'] == entry['task']['cwd']
-        assert record['args'][-2:] == ['--', long_instruction if entry['task']['label'].startswith('--explain') else 'same name'], record['args']
+        assert '--' not in record['args'], 'Launch submitted a prompt'
         assert 'prompt' not in json.loads((Path(entry['directory']) / 'launch.json').read_text())
         assert (Path(record['cwd']) / 'example.txt').read_text() == 'base\n'
         assert len(js('require("ainvim.sessions").windows(' + str(entry['tab']) + ')')) == 2
     assert (project / 'example.txt').read_text() == 'uncommitted source\n'
-    # Explicit file handoff targets this task only and pastes without Enter.
+    # Marking is local, idempotent and allowed while the agent is working.
     current_task = js('vim.t.uzume_task')
     current = next(x for x in entries if x['task']['id'] == current_task['id'])
-    do('vim.cmd.stopinsert()')
-    do('vim.api.nvim_set_current_win(vim.fn.win_findbuf(vim.fn.bufnr(vim.t.ainvim_root .. "/example.txt"))[1])')
+    do('vim.cmd.stopinsert(); vim.api.nvim_set_current_win(vim.fn.win_findbuf(vim.fn.bufnr(vim.t.ainvim_root .. "/example.txt"))[1])')
+    keys(' af'); keys(' af')
+    current = js('require("uzume.agents").instances[' + json.dumps(current_task['id']) + ']')
+    assert len(current['task']['context']['files']) == 1
+    reference = root / 'reference from another project.txt'
+    reference.write_text('PRIVATE_REFERENCE_CONTENT')
+    do('vim.cmd.edit(' + json.dumps(str(reference)) + ')')
     keys(' af')
-    received = Path(current['directory']) / 'input.bin'
-    wait(lambda: received.exists() and b'File open in the editor:' in received.read_bytes())
-    payload = received.read_bytes()
-    assert b'"example.txt"' in payload and b'base' not in payload
-    assert b'\r' not in payload and b'\n' not in payload
-    assert all(not (Path(x['directory']) / 'input.bin').exists() for x in entries if x != current)
-    assert lua('vim.b.uzume_agent_id') == current_task['id']
-    label = lua('vim.b.uzume_agent_label')
+    do('vim.cmd.edit(vim.t.ainvim_root .. "/example.txt")')
+    current = js('require("uzume.agents").instances[' + json.dumps(current_task['id']) + ']')
+    assert current['task']['context']['files'][1]['role'] == 'reference'
+    assert not (Path(current['directory']) / 'input.bin').exists(), 'Marking typed into the CLI'
+    result = subprocess.run(['python3', str(REPO/'editor/agent/hook.py'), 'UserPromptSubmit'],
+        input=json.dumps({'hook_event_name':'UserPromptSubmit','prompt':'PRIVATE_SENTINEL'}), capture_output=True, text=True,
+        env=dict(env, UZUME_EVENTS=current['directory']+'/events'), check=True)
+    context = json.loads(result.stdout)['hookSpecificOutput']['additionalContext']
+    assert str(reference) in context and current['task']['cwd']+'/example.txt' in context
+    assert 'PRIVATE_REFERENCE_CONTENT' not in context and 'PRIVATE_SENTINEL' not in context
+    wait(lambda: js('require("uzume.agents").instances[' + json.dumps(current_task['id']) + '].status.context_revision') == 2)
+    assert reference.read_text() == 'PRIVATE_REFERENCE_CONTENT'
+    keys(' aF')
+    wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+    wait(lambda: js('#Snacks.picker.get({source="files"})[1]:items()') >= 2)
+    keys('<Tab>'); keys('<Tab>'); keys('<CR>')
+    wait(lambda: js('#vim.t.uzume_task.context.files') == 3)
+    keys(' am')
+    wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+    keys('<CR>')
+    wait(lambda: js('#vim.t.uzume_task.context.files') == 2)
+
+    label = lua('vim.b[ ' + str(current['buf']) + '].uzume_agent_label')
     assert label.startswith(('Codex', 'Claude'))
     rendered = lua('vim.api.nvim_eval_statusline(vim.o.tabline,{use_tabline=true}).str')
-    assert 'python3' not in rendered and ('Codex' in rendered or 'Claude' in rendered)
-
+    assert 'python3' not in rendered
     do('vim.cmd.stopinsert(); vim.api.nvim_set_current_tabpage(' + str(origin) + ')')
     emit(a, 'PermissionRequest')
     wait(lambda: js('require("uzume.agents").window_status(' + str(a['tab']) + ').state') == 'waiting')

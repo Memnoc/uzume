@@ -161,6 +161,7 @@ function M.create(path, opts)
   path = vim.fs.normalize(vim.fn.fnamemodify(vim.fn.expand(path), ":p"))
   assert(vim.fn.isdirectory(path) == 1, "Choose an existing project or worktree directory")
   vim.cmd.tabnew()
+  require("uzume.workspace_buffers").reset(api.nvim_get_current_tabpage())
   vim.cmd.tcd(vim.fn.fnameescape(path))
   api.nvim_tabpage_set_var(0, "ainvim_root", path)
   vim.t.uzume_project_root = opts.project_root or path

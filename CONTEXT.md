@@ -21,6 +21,12 @@ A visible editor or terminal surface belonging to a **Window**, presented in a t
 **Agent Instance**:
 A directly launched Codex or Claude Code CLI running in a **Pane**, associated with a **Project** and a task checkout; it may create its own **Workers**.
 
+**Marked File**:
+A saved local file explicitly included in an agent's context list. Files within
+the task checkout are working files; external files are reference material.
+Marks are local until supplied alongside a user-submitted prompt. Removing a
+mark affects future delivery, not previous conversation history.
+
 **Worker**:
 A child agent or process spawned by an **Agent Instance**. Its existence alone does not warrant a separate visible pane or attention entry.
 

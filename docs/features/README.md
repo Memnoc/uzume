@@ -16,7 +16,7 @@ records preserve what was actually checked at each increment.
 | Rust, Lua, C/C++, TypeScript/React, HTML/CSS, completion and formatting | [Languages](languages.md) |
 | Cursor animation and its controls | [Cursor animation](languages.md#cursor-animation) |
 | Separate config, nvims, dependencies, pins and upgrades | [Installation and releases](installation.md) |
-| Codex/Claude task windows, isolated worktrees, attention and scoped cleanup | [AI tasks](agents.md) |
+| Codex/Claude workspaces, marked files/reference context, attention and cleanup | [AI tasks](agents.md) |
 | Review suite, autosave, release management: planned behavior | [Design record](../design.md) |
 
 Start with the [launch guide](../../editor/README.md). Press **Space** and pause

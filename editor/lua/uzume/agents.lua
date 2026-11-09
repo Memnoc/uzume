@@ -50,7 +50,17 @@ function M.summary()
     count = count + 1
     needs = needs + (attention[item.status.state] and 1 or 0)
   end
-  return count > 0 and ("Agents " .. count .. (needs > 0 and " · " .. needs .. " need you" or "")) or ""
+  local summary = count > 0 and ("Agents " .. count .. (needs > 0 and " · " .. needs .. " need you" or "")) or ""
+  local task = vim.t.uzume_task
+  local item = task and M.instances[task.id]
+  local context = item and item.task.context
+  if context and #context.files > 0 then
+    summary = summary
+      .. " · Files "
+      .. #context.files
+      .. (item.status.context_revision == context.revision and " supplied" or " pending")
+  end
+  return summary
 end
 
 function M.focus(item)
@@ -108,15 +118,13 @@ local function dependencies(kind)
   return executable, python
 end
 
-local function launch(task, tab, project_name, kind, prompt)
+local function launch(task, tab, project_name, kind)
   local executable, python = dependencies(kind)
   local run = task.id .. "-" .. tostring(vim.uv.hrtime())
   local directory = vim.fn.stdpath("state") .. "/agents/" .. run
   vim.fn.mkdir(directory, "p", 448)
   local fd = assert(vim.uv.fs_open(directory .. "/launch.json", "w", 384))
-  assert(
-    vim.uv.fs_write(fd, vim.json.encode({ kind = kind, executable = executable, cwd = task.cwd, prompt = prompt }), 0)
-  )
+  assert(vim.uv.fs_write(fd, vim.json.encode({ kind = kind, executable = executable, cwd = task.cwd }), 0))
   vim.uv.fs_close(fd)
   vim.cmd("botright vnew")
   local buf = api.nvim_get_current_buf()
@@ -129,6 +137,7 @@ local function launch(task, tab, project_name, kind, prompt)
     directory = directory,
     status = { state = "starting", reason = "Starting CLI", since = os.time() },
   }
+  require("uzume.context").write(item)
   local job = vim.fn.jobstart({ python, supervisor, directory }, {
     term = true,
     cwd = task.cwd,
@@ -173,13 +182,22 @@ local function launch(task, tab, project_name, kind, prompt)
   return item
 end
 
-function M.start(kind, label, done)
+function M.start(kind, opts, done)
   dependencies(kind)
-  label = vim.trim(label or "")
-  assert(label ~= "" and not label:find("[%c]"), "Describe the task on one line")
-  local instruction = label
-  label = vim.fn.strcharpart(instruction, 0, 60) .. (vim.fn.strchars(instruction) > 60 and "…" or "")
+  opts = opts or {}
+  assert(type(opts) == "table", "Use :UzumeAgent codex or :UzumeAgent codex empty; enter instructions in the CLI")
   local project = assert(require("ainvim.projects").current(), "Open a project first: Space ap")
+  local file, relative
+  if not opts.empty then
+    file = require("uzume.context").file()
+    local checkout = vim.uv.fs_realpath(vim.t.ainvim_root or project.root)
+    assert(
+      vim.startswith(file, checkout .. "/"),
+      "Choose a file in this workspace, or start an empty agent with Space ae"
+    )
+    relative = file:sub(#checkout + 2)
+  end
+  local label = file and vim.fs.basename(file) or (kind == "codex" and "Codex workspace" or "Claude workspace")
   local origin = api.nvim_get_current_win()
   require("uzume.worktrees").create(project.root, label, function(task, err)
     if not task then
@@ -212,8 +230,16 @@ function M.start(kind, label, done)
         empty = true,
       })
       local editor = require("uzume.task_editor").create(task)
-      local item = launch(task, tab, project.name, kind, instruction)
-      if previous == origin then
+      local selected = relative and (task.cwd .. "/" .. relative) or nil
+      if selected and vim.fn.filereadable(selected) == 1 then
+        vim.cmd.edit(vim.fn.fnameescape(selected))
+      elseif selected then
+        notify("This file is absent from committed HEAD; use the picker to choose a task file", vim.log.levels.WARN)
+      end
+      local item = launch(task, tab, project.name, kind)
+      if selected and vim.fn.filereadable(selected) == 1 then
+        require("uzume.context").add(item, { selected })
+      elseif previous == origin then
         require("uzume.task_editor").pick(editor, task)
       end
       return item
@@ -231,45 +257,6 @@ function M.start(kind, label, done)
       done(ok and result or nil, not ok and tostring(result) or nil)
     end
   end)
-end
-
-function M.prompt(kind)
-  -- Resolve project before the floating input temporarily changes the cwd context.
-  require("ainvim.sessions").adopt()
-  Snacks.input(
-    { prompt = "Task for " .. (kind == "codex" and "Codex" or "Claude") .. " · Enter starts agent: " },
-    function(label)
-      if label and vim.trim(label) ~= "" then
-        require("ainvim.panes").run(function()
-          M.start(kind, label)
-        end)
-      end
-    end
-  )
-end
-
-function M.add_file()
-  local task = assert(vim.t.uzume_task, "Open a file in an AI task window first")
-  local item = assert(M.instances[task.id], "Start this task's agent with Space ar first")
-  assert(alive(item), "Agent has stopped; Space ar starts a fresh CLI")
-  assert(
-    item.status.state ~= "working" and item.status.state ~= "waiting" and item.status.state ~= "starting",
-    "Finish or interrupt the agent's current interaction before adding a file"
-  )
-  local buf = api.nvim_get_current_buf()
-  assert(vim.bo[buf].buftype == "", "Focus the file you want to add to the agent prompt")
-  assert(not vim.bo[buf].modified, "Save this file first; the agent reads its contents from disk")
-  local file = vim.uv.fs_realpath(api.nvim_buf_get_name(buf))
-  local root = vim.uv.fs_realpath(task.cwd)
-  assert(file and root and vim.startswith(file, root .. "/"), "Choose a file inside this task's worktree")
-  local relative = file:sub(#root + 2)
-  assert(not relative:find("[%c]"), "File paths containing control characters cannot be added to a terminal prompt")
-  local reference = " File open in the editor: " .. vim.json.encode(relative) .. ". "
-  M.focus(item)
-  assert(api.nvim_get_current_buf() == item.buf, "Restore the agent pane before adding a file")
-  -- Bracketed paste inserts a draft reference. Never send Enter or source text.
-  vim.api.nvim_chan_send(item.job, "\027[200~" .. reference .. "\027[201~")
-  vim.cmd.startinsert()
 end
 
 function M.restart()
@@ -329,25 +316,34 @@ function M.setup()
   })
   local function map(key, fn, desc)
     vim.keymap.set("n", "<leader>a" .. key, function()
-      require("ainvim.panes").run(fn)
+      require("uzume.context").run(fn)
     end, { desc = desc })
   end
   map("c", function()
-    M.prompt("codex")
-  end, "New Codex Task")
+    M.start("codex")
+  end, "Codex with Current File")
   map("C", function()
-    M.prompt("claude")
-  end, "New Claude Task")
+    M.start("claude")
+  end, "Claude with Current File")
   map("a", M.pick, "Agents / Attention")
-  map("f", M.add_file, "Add File to Agent Prompt")
+  map("e", function()
+    M.start("codex", { empty = true })
+  end, "Empty Codex Workspace")
+  map("E", function()
+    M.start("claude", { empty = true })
+  end, "Empty Claude Workspace")
+  map("f", require("uzume.context").mark, "Mark Current File for Agent")
+  map("F", require("uzume.context").select, "Mark Multiple Files")
+  map("m", require("uzume.context").manage, "Marked Context / Remove File")
+  map("d", require("uzume.context").draft, "Insert Marked Context in Prompt")
   map("r", M.restart, "Restart Task CLI (Fresh Conversation)")
   api.nvim_create_user_command("UzumeAgent", function(args)
-    require("ainvim.panes").run(function()
-      if #args.fargs > 1 then
-        M.start(args.fargs[1], table.concat(args.fargs, " ", 2))
-      else
-        M.prompt(args.fargs[1])
-      end
+    require("uzume.context").run(function()
+      assert(
+        #args.fargs == 1 or (#args.fargs == 2 and args.fargs[2] == "empty"),
+        "Use :UzumeAgent codex [empty] or :UzumeAgent claude [empty]"
+      )
+      M.start(args.fargs[1], { empty = args.fargs[2] == "empty" })
     end)
   end, {
     nargs = "+",

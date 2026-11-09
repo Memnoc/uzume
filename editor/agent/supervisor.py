@@ -39,8 +39,6 @@ def command_for(config, root):
         command = [config["executable"], "--settings", str(settings)]
     else:
         raise ValueError("Unsupported agent")
-    if config.get("prompt"):
-        command.extend(["--", config["prompt"]])
     return command
 
 
@@ -48,8 +46,6 @@ def main():
     os.umask(0o077)
     root = Path(sys.argv[1])
     config = json.loads((root / "launch.json").read_text())
-    # The initial instruction is a one-shot handoff, not restart metadata.
-    atomic(root / "launch.json", {key: value for key, value in config.items() if key != "prompt"})
     events = root / "events"
     events.mkdir(mode=0o700, exist_ok=True)
     env = dict(os.environ)

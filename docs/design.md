@@ -42,6 +42,12 @@ The initial animation discussion suggested 60 updates per second as an experimen
 
 ## Agents and attention
 
+Interaction refinement, 2026-11-09: launch either with the current file's
+worktree counterpart marked or as an empty workspace. Both skip a separate task
+dialog; instructions are entered directly in the CLI. Each agent owns a visible
+file-context list, including explicit external references. Buffer tabs are scoped
+to the active workspace without deleting the original checkout's buffers.
+
 Codex and Claude Code are the first-release agents. Use their existing interactive terminal UIs, with editor actions for sending selected code, file references, diagnostics, and review feedback. A custom chat interface is deferred unless actual usage demonstrates friction.
 
 The attention interface answers who needs the user, why, and where to go. Show project/task context, the actionable need, and waiting time; provide direct navigation to the relevant agent. Ordinary background activity should remain quiet. A process tree or agent count is secondary to actionable information. Worker needs should surface when the user can act on them, without duplicating a need already being handled by a parent.

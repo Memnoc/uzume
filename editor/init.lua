@@ -11,6 +11,7 @@ require("uzume.input").setup()
 require("ainvim.extras").setup()
 require("ainvim.languages").setup()
 require("ainvim.installer").setup()
+require("uzume.workspace_buffers").setup()
 require("ainvim.navigator").setup()
 require("uzume.agents").setup()
 if require("ainvim.extras").enabled("smear") then
