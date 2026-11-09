@@ -35,6 +35,9 @@ the left pane. Choosing a file opens it but does not mark it automatically. Use
 Space af or Space aF when ready. Cancel the chooser to leave the left pane empty.
 
 Buffer tabs show files visited in the active workspace and its owned terminals.
+Agent tabs replace the generic file icon with a compact terminal-friendly mark:
+`✳` for Claude and `>_` for Codex. Icon colors use the theme's MiniIcons orange
+and azure highlights; ordinary file and shell icons retain their normal provider.
 The original checkout's buffer remains available in its original workspace; it
 is hidden from the task's tab strip rather than closed or unloaded. A reference
 file explicitly opened in the task workspace remains visible there.

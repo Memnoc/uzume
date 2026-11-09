@@ -144,6 +144,19 @@ require("bufferline").setup({
       return require("uzume.workspace_buffers").contains(buf)
     end,
     diagnostics = "nvim_lsp",
+    get_element_icon = function(element)
+      local buf = vim.fn.bufnr(element.path)
+      if buf == -1 then
+        return
+      end
+      local kind = vim.b[buf].uzume_agent_kind
+      if kind == "claude" then
+        return "✳", "MiniIconsOrange"
+      elseif kind == "codex" then
+        return ">_", "MiniIconsAzure"
+      end
+      -- Returning nil keeps the normal file/shell icon provider.
+    end,
     name_formatter = function(buffer)
       return vim.b[buffer.bufnr].uzume_agent_label or buffer.name
     end,

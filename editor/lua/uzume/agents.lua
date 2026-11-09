@@ -169,6 +169,7 @@ local function launch(task, tab, project_name, kind)
   item.job = job
   M.instances[task.id] = item
   vim.b[buf].uzume_agent_id = task.id
+  vim.b[buf].uzume_agent_kind = kind
   vim.b[buf].uzume_agent_label = (kind == "codex" and "Codex" or "Claude") .. " · " .. task.label
   vim.b[buf].ainvim_owner = tab
   vim.bo[buf].bufhidden = "hide"
