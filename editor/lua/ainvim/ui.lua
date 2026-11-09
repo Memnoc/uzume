@@ -37,6 +37,13 @@ require("rose-pine").setup({
 vim.cmd.colorscheme("rose-pine")
 
 Snacks.setup({
+  styles = {
+    notification = {
+      border = "rounded",
+      wo = { wrap = true, linebreak = true, winblend = 0 },
+    },
+    notification_history = { wo = { wrap = true, linebreak = true } },
+  },
   bigfile = { enabled = true },
   quickfile = { enabled = true },
   explorer = { enabled = true },
@@ -47,7 +54,9 @@ Snacks.setup({
   input = { enabled = true },
   notifier = {
     enabled = true,
-    style = "minimal",
+    style = "compact",
+    timeout = 7000,
+    width = { min = 40, max = 0.45 },
     level = vim.log.levels.INFO,
     filter = function(notification)
       return notification.title == "Agent context"

@@ -1,6 +1,34 @@
 -- Git owns checkout creation. Uzume never removes task files or branches on close.
 local M = {}
 
+-- A project window can display the original checkout or another task's copy.
+-- Resolve against owned checkouts, not just the active window's working dir.
+function M.relative_file(project, file)
+  local roots = { project.root }
+  for _, window in ipairs(project.windows) do
+    local task = vim.t[window.tab].uzume_task
+    if task then
+      roots[#roots + 1] = task.cwd
+    end
+  end
+  local canonical = {}
+  for _, root in ipairs(roots) do
+    local path = vim.uv.fs_realpath(root)
+    if path then
+      canonical[#canonical + 1] = path
+    end
+  end
+  -- Prefer the most specific checkout if one is nested inside another.
+  table.sort(canonical, function(a, b)
+    return #a > #b
+  end)
+  for _, root in ipairs(canonical) do
+    if vim.startswith(file, root .. "/") then
+      return file:sub(#root + 2)
+    end
+  end
+end
+
 local function git(root, args, done)
   local command = { "git", "-C", root }
   vim.list_extend(command, args)

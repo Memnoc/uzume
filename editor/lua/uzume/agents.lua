@@ -191,12 +191,13 @@ function M.start(kind, opts, done)
   local file, relative
   if not opts.empty then
     file = require("uzume.context").file()
-    local checkout = vim.uv.fs_realpath(vim.t.ainvim_root or project.root)
-    assert(
-      vim.startswith(file, checkout .. "/"),
-      "Choose a file in this workspace, or start an empty agent with Space ae"
+    relative = assert(
+      require("uzume.worktrees").relative_file(project, file),
+      "This file is outside this project's checkouts.\n\n"
+        .. "Space ae / aE: start an empty Codex / Claude workspace.\n"
+        .. "Space af: mark the file as a reference for that agent.\n"
+        .. "Space ap: open the file's own project instead."
     )
-    relative = file:sub(#checkout + 2)
   end
   local label = file and vim.fs.basename(file) or (kind == "codex" and "Codex workspace" or "Claude workspace")
   local origin = api.nvim_get_current_win()
@@ -318,7 +319,7 @@ function M.setup()
   })
   local function map(key, fn, desc)
     vim.keymap.set("n", "<leader>a" .. key, function()
-      require("uzume.context").run(fn)
+      require("uzume.context").run(fn, desc)
     end, { desc = desc })
   end
   map("c", function()

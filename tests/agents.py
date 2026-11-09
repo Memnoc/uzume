@@ -117,8 +117,39 @@ try:
     origin = js('vim.api.nvim_get_current_tabpage()')
     for count, kind in enumerate(('codex', 'claude', 'codex', 'claude'), 1):
         do('vim.cmd.stopinsert(); vim.api.nvim_set_current_tabpage(' + str(origin) + ')')
+        if count == 2:
+            # The original checkout can be open beside the task copy. Marking it
+            # for the first agent must not prevent launching another with it.
+            first = item(1)
+            do('vim.api.nvim_set_current_tabpage(' + str(first['tab']) + '); vim.cmd.vsplit(' + json.dumps(str(project/'example.txt')) + ')')
+            source_pane = js('vim.api.nvim_get_current_win()')
+            keys(' af')
+            assert js('#vim.t.uzume_task.context.files') == 2
+        if count == 3:
+            # Unrelated files remain reference-only; the warning must be readable,
+            # and an empty launch must work from this very same editor state.
+            foreign_dir = root / (project.name + '-other')
+            foreign_dir.mkdir()
+            foreign = foreign_dir / 'example.txt'
+            foreign.write_text('reference only\n')
+            original_pane = js('vim.api.nvim_get_current_win()')
+            original_buf = js('vim.api.nvim_get_current_buf()')
+            do('vim.cmd.edit(' + json.dumps(str(foreign)) + ')')
+            keys(' ac')
+            assert js('#require("uzume.agents").list()') == 2
+            warning = js('(function() for _,n in ipairs(Snacks.notifier.get_history()) do if n.level=="warn" and n.msg:find("outside this project",1,true) and n.win then return {win=n.win.win,msg=n.msg} end end end)()')
+            assert warning and 'Space ae / aE' in warning['msg'] and 'Space af' in warning['msg']
+            notification_win = str(warning['win'])
+            assert js('vim.wo[' + notification_win + '].wrap')
+            assert js('vim.api.nvim_win_get_config(' + notification_win + ').border')[0] == '╭'
+            assert js('vim.api.nvim_win_text_height(' + notification_win + ',{}).all') <= js('vim.api.nvim_win_get_height(' + notification_win + ')'), 'Warning is clipped'
+            assert js('vim.api.nvim_get_current_win()') == original_pane, 'Notification stole focus'
         keys({1:' ac', 2:' aC', 3:' ae', 4:' aE'}[count])
         wait(lambda: js('#require("uzume.agents").list()') == count)
+        if count == 2:
+            do('vim.api.nvim_win_close(' + str(source_pane) + ',false)')
+        if count == 3:
+            do('vim.api.nvim_win_set_buf(' + str(original_pane) + ',' + str(original_buf) + ')')
         if count <= 2:
             wait(lambda: lua('vim.api.nvim_get_mode().mode') == 't')
             assert lua('vim.bo.filetype') != 'snacks_input'

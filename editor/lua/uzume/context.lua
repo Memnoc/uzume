@@ -2,11 +2,11 @@
 local M = {}
 local api = vim.api
 
-function M.run(fn)
+function M.run(fn, title)
   local ok, err = pcall(fn)
   if not ok then
     local message = tostring(err):gsub("^.-%.lua:%d+: ", "")
-    vim.notify(message, vim.log.levels.WARN, { title = "Agent context" })
+    vim.notify(message, vim.log.levels.WARN, { title = title or "Agent context" })
   end
 end
 

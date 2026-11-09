@@ -30,6 +30,14 @@ must be saved. The worktree still starts at the parent project's committed HEAD;
 unsaved/uncommitted edits are not copied. If the file is absent from HEAD, Uzume
 explains that and opens the file chooser instead.
 
+The selected file may come from the original project checkout or any of its
+open task worktrees, even when displayed inside another task window. Uzume maps
+its relative path into the new checkout. Marking the original copy for an
+existing agent does not prevent launching another agent with that file.
+Files outside those checkouts remain references: start an empty workspace and
+mark them with Space af, or open their own project. The warning explains these
+options in a titled, wrapped Snacks notification; Space n reopens its history.
+
 **Empty launch:** starts without marked files and opens a searchable chooser in
 the left pane. Choosing a file opens it but does not mark it automatically. Use
 Space af or Space aF when ready. Cancel the chooser to leave the left pane empty.
@@ -53,6 +61,8 @@ Marks form a per-agent list, not another session. Marking is idempotent and work
 while an agent is busy. From outside a task window, Space af asks which agent
 should receive the file. Space aF allows several files to be selected at once.
 Space am shows the list, its working/reference roles, and the delivery state.
+Space af adds to an existing agent; it does not stage marks for a future launch.
+Space ac / aC start a new agent with the current file already marked.
 
 Files within the task's checkout are working files. Other local files—including
 files from another project—are labelled **reference** and accompanied by an
@@ -121,7 +131,9 @@ repositories. It covers both launch modes without submitted prompts, workspace
 buffer filtering, agent selection through keyboard/mouse/picker without mirrored
 terminals, pane swapping/docking, file marking/deduplication, multi-select/removal, external
 reference roles, hook output and metadata privacy, input deletion, concurrent
-agents, pane cleanup, restart and layout restore. `--inputs-only` runs the input
+agents, launching from a marked original-checkout file inside a task window,
+readable rejection of unrelated files, empty launch from that same state,
+pane cleanup, restart and layout restore. `--inputs-only` runs the input
 regression; `--crash` tests forced editor exit.
 
 Authenticated hook delivery needs hands-on verification with the installed CLI

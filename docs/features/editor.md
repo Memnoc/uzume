@@ -16,6 +16,12 @@ indent guides, status-column UI, input prompts and warning/error notifications.
 Indent-guide animation is disabled. WhichKey's Helix-style menu appears after
 pressing Space and pausing; no function-row key is required.
 
+Notifications use Snacks' compact style with a rounded border, a visible title,
+opaque background and wrapped text. They stay for seven seconds without taking
+focus. **Space n** opens notification history to reread longer messages. Agent
+shortcut failures identify the attempted action in the title and omit Lua source
+locations; invalid file selections include the next available actions.
+
 Uzume gives Rose Pine's main variant a gentle mauve text palette: ordinary text
 uses `#e0d4eb`, comments and secondary text `#a99ab8`, and muted text `#8b7c98`.
 The dashboard's logo, headings, and navigation icons use iris (`#c4a7e7`), labels
