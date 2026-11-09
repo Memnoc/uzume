@@ -62,6 +62,7 @@ Snacks.setup({
       return notification.title == "Agent context"
         or notification.title == "Extras"
         or notification.title == "Editor"
+        or notification.title == "Task review"
         or notification.level == "warn"
         or notification.level == "error"
     end,
@@ -129,6 +130,7 @@ require("which-key").setup({
     { "<leader>q", group = "quit" },
     { "<leader>s", group = "search" },
     { "<leader>u", group = "ui" },
+    { "<leader>v", group = "review" },
     { "<leader>w", group = "windows" },
     { "<leader>p", group = "panes" },
     { "<leader>pg", group = "focus" },

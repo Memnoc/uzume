@@ -17,15 +17,17 @@ records preserve what was actually checked at each increment.
 | Cursor animation and its controls | [Cursor animation](languages.md#cursor-animation) |
 | Separate config, nvims, dependencies, pins and upgrades | [Installation and releases](installation.md) |
 | Codex/Claude workspaces, marked files/reference context, attention and cleanup | [AI tasks](agents.md) |
-| Review suite, autosave, release management: planned behavior | [Design record](../design.md) |
+| Task changes picker, stable side-by-side/unified diffs and explicit refresh | [Task review](review.md) |
+| Review feedback, autosave, release management: planned behavior | [Design record](../design.md) |
 
 Start with the [launch guide](../../editor/README.md). Press **Space** and pause
 for WhichKey, **Space sk** to search mappings, or **Space ?** for buffer mappings.
 The Extras menu also carries its own control hints and icon legend.
 
 The editor preview includes supervised Codex/Claude terminals in task worktrees.
-The custom review suite, project autosave and complete managed releases remain
-planned. The earlier standalone agent pilot is retained for comparison.
+Stable task review is available; review feedback, project autosave and complete
+managed releases remain planned. The earlier standalone agent pilot is retained
+for comparison.
 
 For every feature change, update its write-up with what changed, how to use it,
 how it works, dependencies and stored state, what was verified, and known limits.

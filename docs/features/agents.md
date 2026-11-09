@@ -17,6 +17,7 @@ current project; tmux is not required.
 | Space ad | Manually insert marked paths into the CLI's draft, without Enter |
 | Space aa | Agents and attention |
 | Space ar | Restart a stopped CLI with a fresh conversation |
+| Space av / Space vr | Review this task's changes against its starting commit |
 | Space ww / Space ap | Windows / projects |
 | Esc Esc in an agent | Editor controls; `i` returns to terminal input |
 | Space pd / Space wd | Close pane / whole window |
@@ -139,5 +140,6 @@ regression; `--crash` tests forced editor exit.
 Authenticated hook delivery needs hands-on verification with the installed CLI
 trust settings. Process ownership uses PID/start-time checks, not OS containment;
 very quickly detached children and a killed supervisor can escape cleanup.
-Linux, terminal performance, the review suite and queued review feedback remain
+The first [task review view](review.md) is available. Linux, terminal performance
+and queued review feedback remain
 future validation/work.

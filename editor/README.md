@@ -71,7 +71,7 @@ Rust, Lua, C/C++, and TypeScript/React/HTML/CSS packs now supply language server
 completion, diagnostics and formatting. Native Treesitter handles the captured
 language parsers, including TSX; CSS retains native Vim syntax highlighting.
 Smear Cursor is enabled and can be toggled with **Space ua**. Debugging/test
-adapters, remaining language previews/custom extras and the custom review suite
+adapters, remaining language previews/custom extras and review feedback
 are still separate work.
 
 **Space ac / aC** opens Codex / Claude with the current file's worktree copy
@@ -81,6 +81,12 @@ instructions directly in the terminal. **Space af** marks a saved file,
 paths are supplied by the hook on your next prompt; Codex may require `/hooks`
 trust. **Space ad** inserts them into the draft manually if needed. Normal CLI
 exit collapses the agent pane. See [AI tasks](../docs/features/agents.md).
+
+**Space vr** (or **Space av**) opens task changes against the starting commit,
+including committed and uncommitted edits. Enter opens a stable side-by-side
+diff. Inside review, **u** toggles unified, **f** returns to files, **R** captures
+newer changes and **q** closes it. The agent keeps running. See
+[Task review](../docs/features/review.md).
 
 Unlike the original fixture spike, edits to opened files and normal editor
 recovery/history persist. Source-file saving remains explicit. Root detection
