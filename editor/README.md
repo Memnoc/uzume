@@ -88,6 +88,11 @@ diff. Inside review, **u** toggles unified, **f** returns to files, **R** captur
 newer changes and **q** closes it. The agent keeps running. See
 [Task review](../docs/features/review.md).
 
+In review, select lines and press **c** to write a multiline comment. **Ctrl-s**
+saves it locally; **C** lists comments, with Enter to inspect and **e/d** to
+edit/delete. Saved comments retain their original excerpts across refresh and
+restart. Nothing is sent to the agent by these controls.
+
 Unlike the original fixture spike, edits to opened files and normal editor
 recovery/history persist. Source-file saving remains explicit. Root detection
 uses the attached LSP root, then `.git` (including worktrees), `lua`, and cwd.

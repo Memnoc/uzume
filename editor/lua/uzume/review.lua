@@ -6,10 +6,24 @@ local script = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(debug.getinfo(1, "S"
 local labels = { A = "+ Added", M = "~ Modified", D = "- Deleted", T = "~ Type changed", U = "! Unmerged" }
 local function footer(state)
   return (state.stale and " New changes · R refresh " or " R refresh ")
-    .. "· q close · f files · u toggle · ]c / [c hunks "
+    .. "· c comment · C list"
+    .. (state.comment_count and (" (" .. state.comment_count .. ")") or "")
+    .. " · f files · u diff · q close "
 end
 local function notify(message, level)
   vim.notify(message, level or vim.log.levels.INFO, { title = "Task review" })
+end
+local function update_comments(state)
+  if M.current ~= state then
+    return
+  end
+  local ok, comments = pcall(require("uzume.review_comment_store").read, state.task)
+  state.comment_count = ok and #comments or nil
+  for _, win in ipairs(state.views) do
+    if api.nvim_win_is_valid(win) then
+      api.nvim_win_set_config(win, { footer = footer(state) })
+    end
+  end
 end
 local function lines(text)
   local result = vim.split(text, "\n", { plain = true })
@@ -32,6 +46,8 @@ function M.close()
     return
   end
   M.current = nil
+  state.closed = true
+  require("uzume.review_comments").close()
   if state.timer then
     state.timer:stop()
     state.timer:close()
@@ -98,6 +114,76 @@ local function remember(state)
   end
 end
 
+function M.comment()
+  local state = M.current
+  if not state or not state.snapshot or not vim.tbl_contains(state.views, api.nvim_get_current_win()) then
+    return notify("Select lines in a review pane first.", vim.log.levels.WARN)
+  end
+  local file = state.snapshot.files[state.index]
+  if file.note then
+    return notify("This file has no text preview to comment on.", vim.log.levels.WARN)
+  end
+  local first, last = api.nvim_win_get_cursor(0)[1], api.nvim_win_get_cursor(0)[1]
+  local mode = api.nvim_get_mode().mode
+  if mode == "\22" then
+    return notify("Use a line or character selection for review comments.", vim.log.levels.WARN)
+  end
+  if mode == "v" or mode == "V" then
+    first = vim.fn.getpos("v")[2]
+    if first > last then
+      first, last = last, first
+    end
+    api.nvim_feedkeys(api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
+  end
+  local selected = { before = {}, after = {} }
+  if state.mode == "unified" then
+    local positions = patch_positions(file)
+    for row = first, last do
+      local position = positions[row]
+      if not position then
+        return notify("Select code lines within one diff hunk, excluding headers.", vim.log.levels.WARN)
+      end
+      for _, side in ipairs({ "before", "after" }) do
+        if position[side] then
+          selected[side][#selected[side] + 1] = position[side]
+        end
+      end
+    end
+  else
+    local side = api.nvim_get_current_win() == state.views[1] and "before" or "after"
+    if file[side] == "" then
+      return notify("This side is empty; select code on the other side.", vim.log.levels.WARN)
+    end
+    for row = first, last do
+      selected[side][#selected[side] + 1] = row
+    end
+  end
+  local anchor = {}
+  for _, side in ipairs({ "before", "after" }) do
+    local rows = selected[side]
+    if #rows > 0 then
+      local source = lines(file[side])
+      local excerpt = {}
+      for _, row in ipairs(rows) do
+        excerpt[#excerpt + 1] = source[row]
+      end
+      anchor[side] = { first = rows[1], last = rows[#rows], lines = excerpt }
+    end
+  end
+  require("uzume.review_comments").add(state, file, anchor, function()
+    update_comments(state)
+  end)
+end
+function M.comments()
+  if not M.current or not M.current.snapshot then
+    return notify("Open a task review first: Space vr.", vim.log.levels.WARN)
+  end
+  local state = M.current
+  require("uzume.review_comments").list(state, function()
+    update_comments(state)
+  end)
+end
+
 function M.show(index)
   local state = M.current
   if not state or not state.snapshot then
@@ -144,9 +230,10 @@ function M.show(index)
     state.views[#state.views + 1] = win
     vim.wo[win].wrap, vim.wo[win].number, vim.wo[win].cursorline = false, true, true
     vim.bo[buf].filetype = ft or "text"
-    for key, action in pairs({ q = M.close, f = M.files, u = M.toggle, R = M.refresh }) do
+    for key, action in pairs({ q = M.close, f = M.files, u = M.toggle, R = M.refresh, C = M.comments }) do
       vim.keymap.set("n", key, action, { buffer = buf, nowait = true, desc = "Review: " .. key })
     end
+    vim.keymap.set({ "n", "x" }, "c", M.comment, { buffer = buf, desc = "Comment on review lines" })
     vim.keymap.set("n", "<Tab>", function()
       for index, view in ipairs(state.views) do
         if view == api.nvim_get_current_win() then
@@ -365,6 +452,7 @@ function M.open()
       mode = "split",
       views = {},
     }
+    update_comments(M.current)
     watch(M.current)
     capture(M.current)
   end
@@ -400,9 +488,11 @@ function M.setup()
     u = { M.toggle, "Toggle Unified Diff" },
     R = { M.refresh, "Refresh Review Snapshot" },
     q = { M.close, "Close Review" },
+    C = { M.comments, "Review Comments" },
   }) do
     vim.keymap.set("n", "<leader>v" .. key, mapping[1], { desc = mapping[2] })
   end
+  vim.keymap.set({ "n", "x" }, "<leader>vc", M.comment, { desc = "Comment on Review Lines" })
   vim.keymap.set("n", "<leader>av", M.open, { desc = "Review Task Changes" })
   api.nvim_create_user_command("UzumeReview", M.open, {})
   api.nvim_create_autocmd("VimLeavePre", { callback = M.close })

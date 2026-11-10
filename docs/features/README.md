@@ -17,7 +17,7 @@ records preserve what was actually checked at each increment.
 | Cursor animation and its controls | [Cursor animation](languages.md#cursor-animation) |
 | Separate config, nvims, dependencies, pins and upgrades | [Installation and releases](installation.md) |
 | Codex/Claude workspaces, marked files/reference context, attention and cleanup | [AI tasks](agents.md) |
-| Task changes picker, stable side-by-side/unified diffs and explicit refresh | [Task review](review.md) |
+| Task changes picker, stable diffs, local line comments and explicit refresh | [Task review](review.md) |
 | Review feedback, autosave, release management: planned behavior | [Design record](../design.md) |
 
 Start with the [launch guide](../../editor/README.md). Press **Space** and pause
