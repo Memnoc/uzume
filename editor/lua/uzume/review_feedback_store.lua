@@ -132,4 +132,21 @@ function M.cancel(batch)
   local ok = uv.fs_rename(delivery(batch, "pending"), delivery(batch, "cancelled"))
   assert(ok, "The hook has already claimed this review; it can no longer be cancelled")
 end
+function M.prompt_requested(batch)
+  return uv.fs_stat(delivery(batch, "wake")) ~= nil
+end
+function M.request_prompt(task, batch)
+  assert(M.status(task, batch) == "queued", "This review is no longer pending")
+  if M.prompt_requested(batch) then
+    return false
+  end
+  local fd = assert(uv.fs_open(delivery(batch, "wake"), "wx", 384))
+  local ok, err = pcall(function()
+    assert(uv.fs_write(fd, "{}", 0) == 2)
+    assert(uv.fs_fsync(fd))
+  end)
+  uv.fs_close(fd)
+  assert(ok, err)
+  return true
+end
 return M

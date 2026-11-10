@@ -27,6 +27,14 @@ presented as agent work. Clean sources reuse HEAD. Unsaved buffers are excluded.
 This replaces the original committed-HEAD-only starting policy; independent
 working directories and stop-on-close behavior remain unchanged.
 
+Launch refinement, 2026-11-10: the user chooses a local branch before a CLI starts.
+New tasks inherit that branch's checkout state when available, or its committed
+state without a checkout. Continuing a task reuses its checkout and baseline,
+focusing a running agent rather than creating another writer. The picker discloses
+saved edits and refuses conflicts, unfinished Git operations and unsaved buffers.
+Source-file location suggests the initial selection; it no longer silently chooses
+the starting branch.
+
 ## Context
 
 Agents must work concurrently without independent features overwriting one shared checkout. Persistent background processes are undesirable when a user intentionally ends a session, but switching projects must preserve concurrent work.

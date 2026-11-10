@@ -92,19 +92,30 @@ supplied feedback batch.
 1. Save your comments, then press **s** in review or **Space vs**.
 2. Read the floating preview: it names the task and agent and contains all unsent
    comment versions, file paths, original line ranges, and code excerpts.
-3. Press **Ctrl-s** to explicitly queue this frozen batch for that task's agent.
-   Opening the preview or saving a comment alone never publishes feedback.
-4. If the agent is working, its next eligible end-of-turn hook supplies the batch
-   and requests a continuation. If it is idle, press **a** to return to its terminal
-   and submit a prompt such as `Apply my queued review`. The prompt hook supplies
-   the batch alongside marked file context.
+3. Press **a** to send the preview and focus its agent. This queues the batch if
+   necessary and automatically submits a short trigger when the CLI is confirmed
+   ready. No second instruction is needed. The prompt hook supplies the full
+   batch alongside marked file context.
+4. Busy agents retain the batch for the next eligible turn-end hook, which requests
+   continuation. **Ctrl-s** remains queue-only: it leaves focus in review and does
+   not submit terminal input. Saving a comment or previewing alone sends nothing.
 5. **r** refreshes delivery status. **x** cancels a pending batch. **q** returns to
    review. These shortcuts also appear in the preview footer.
 
-Delivery does not type into the terminal, submit a draft, or steal focus. Permission
-and question prompts are left to the user. For urgent feedback, queue it, press
-**a**, interrupt using the CLI's own controls, then submit your correction; the
-queued review accompanies that prompt. An automatic interrupt-and-send action
+The explicit **a** action uses bracketed paste and Enter at a confirmed message
+prompt, then focuses that agent. Queue-only and background delivery do not type
+or move focus. Permission/question dialogs, startup and unknown readiness block
+automatic submission; feedback remains queued until those conditions are resolved.
+Typing and paste activity are tracked by timestamp only. If an unfinished draft
+may exist, Uzume offers to keep it or explicitly submit it with the review. It
+never clears the draft. This conservative check may still ask after the user
+erased a draft; direct terminal writes from other plugins cannot be observed.
+
+Each batch gets at most one automatic trigger attempt, recorded before terminal
+input. Repeated **a** presses focus without submitting again. **Request submitted**
+means the attempt was issued; **Supplied** requires a hook receipt. Terminal
+parsing depends on the CLI version and still needs hands-on validation. For urgent
+corrections, use the CLI's own interrupt controls; automatic interrupt-and-send
 is not implemented in this increment.
 
 Only one batch is queued per running task. Reopening **s** shows that pending
@@ -176,4 +187,5 @@ local persistence and the absence of terminal input to the agent.
 Neovim controls with isolated mock CLIs and the real hook entry point. They cover
 preview versus publication, single-use delivery, cancellation, outdated excerpts,
 additive file context, ignored worker/permission events, edited comment versions,
-restart isolation and private batch storage. They make no model requests.
+restart isolation, private batch storage, automatic idle prompting, busy queues,
+permission-dialog protection and existing draft handling. They make no model requests.

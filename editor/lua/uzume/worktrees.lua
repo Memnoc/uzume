@@ -29,7 +29,7 @@ function M.relative_file(project, file)
   end
 end
 
-function M.create(project, label, done, source)
+function M.create(project, label, done, source, selection)
   source = source or project
   local slug = label:lower():gsub("[^a-z0-9]+", "-"):gsub("^-", ""):gsub("-$", ""):sub(1, 40)
   slug = slug ~= "" and slug or "task"
@@ -39,8 +39,12 @@ function M.create(project, label, done, source)
   local task = { id = id, label = label, project = project, cwd = parent .. "/" .. id, branch = "uzume/" .. id }
   local script = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(debug.getinfo(1, "S").source:sub(2))))
     .. "/agent/create_worktree.py"
+  local command = { "python3", script, source, task.cwd, task.branch }
+  if selection then
+    command[#command + 1] = vim.json.encode(selection)
+  end
   vim.system(
-    { "python3", script, source, task.cwd, task.branch },
+    command,
     { text = true, timeout = 120000 },
     vim.schedule_wrap(function(result)
       if result.code ~= 0 then

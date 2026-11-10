@@ -1,9 +1,9 @@
 # Agents and file context
 
-Open an agent workspace directly and write your instructions in the official
-Codex or Claude terminal. There is no separate task-name or task-instruction
-dialog. Both entry points retain an isolated Git branch/worktree under the
-current project; tmux is not required.
+Choose a branch before opening the official Codex or Claude terminal, then write
+your instructions there. New tasks use isolated branches/worktrees; retained
+task branches can be continued in their existing checkouts. No separate task-name
+or task-instruction dialog is needed; tmux is not required.
 
 ## Controls
 
@@ -26,9 +26,37 @@ current project; tmux is not required.
 `:UzumeAgent codex` and `:UzumeAgent claude` use the current file. Append `empty`
 for an empty workspace. Instructions belong in the terminal, not this command.
 
+## Branch selection and preflight
+
+All four launch shortcuts and `:UzumeAgent` open a local branch picker before
+starting a CLI. Rows show saved-change counts; the preview shows checkout paths
+and changed files. The current file's checkout is listed first. Empty launch
+prefers the active task's checkout. After selecting a branch, choose:
+
+- **New isolated task from this branch**: create a separate `uzume/...` branch
+  and worktree. Inherit saved changes when the selected branch has a checkout;
+  otherwise use its committed files, without unrelated original-project edits.
+- **Continue this task branch**: reuse its checkout, edits and review baseline.
+  A running agent is focused, not duplicated. A stopped task starts the selected
+  CLI with a fresh conversation. Current-file launch opens and marks that file's
+  counterpart in the retained checkout. Known task windows and retained Uzume
+  branches with recoverable branch-creation reflogs support continuation.
+
+Saved edits are disclosed rather than discarded. Unsaved buffers in the selected
+checkout must be saved before launch. Conflicts, unfinished Git operations
+(merge, rebase, cherry-pick, revert or bisect), and unavailable checkouts block
+launch with an explanation. Branch HEAD and checkout status are checked again
+after selection. These checks do not fetch remotes, predict merge conflicts with
+`main`, or lock files against other running agents. Browsing never modifies Git.
+
+`editor/agent/branches.py` reads Git metadata; `uzume.branch_launch` owns the
+picker and advisories. Programmatic `uzume.agents.start()` remains available to
+callers that explicitly choose a source. Continuation does not merge or delete
+branches; integration and cleanup controls remain a separate increment.
+
 **Current-file launch:** opens the file's counterpart from the new worktree on
 the left, marks it as working context, and focuses the agent. The current file
-must be saved. The new worktree inherits the selected file's checkout: its HEAD,
+must be saved. The new worktree inherits the branch selected in the picker: its HEAD,
 saved tracked edits, staged changes as they currently appear on disk, deletions,
 and non-ignored new files. Related changes across that checkout travel together.
 Unsaved editor buffers are not included. The source files, index/staging choices
@@ -58,11 +86,11 @@ options in a titled, wrapped Snacks notification; Space n reopens its history.
 **Empty launch:** starts without marked files and opens a searchable chooser in
 the left pane. Choosing a file opens it but does not mark it automatically. Use
 Space af or Space aF when ready. Cancel the chooser to leave the left pane empty.
-The checkout still inherits the active task's saved state, or the original
-project's state when launched outside a task. "Empty" refers to marked context.
+The checkout inherits the selected branch's saved state. "Empty" refers to
+marked context for a new task; continuing a task retains its existing context.
 
-Current-file launch chooses the checkout containing that file, even when the
-file is displayed in another task's window. A new file need not be committed
+Current-file launch initially suggests the checkout containing that file, even
+when it is displayed in another task's window. A new file need not be committed
 first. Ignored, untracked files are excluded; if the selected file is excluded,
 Uzume explains why and opens the file chooser. Existing task worktrees are never
 retroactively updated by this behavior.
@@ -181,6 +209,10 @@ index/HEAD, the initial review baseline, and independent nested tasks.
 `python3 tests/task_navigation.py` verifies automatic task checkout selection,
 file search and explorer scope after reading an original file, and preservation
 of the original project's branch and file content.
+
+`python3 tests/branch_launch.py` checks selection before launch, saved-change
+disclosure, running/closed task continuation, current-file context, review baseline
+retention, branches without checkouts and conflict refusal without index changes.
 
 Authenticated hook delivery needs hands-on verification with the installed CLI
 trust settings. Process ownership uses PID/start-time checks, not OS containment;

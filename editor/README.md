@@ -71,18 +71,21 @@ Rust, Lua, C/C++, and TypeScript/React/HTML/CSS packs now supply language server
 completion, diagnostics and formatting. Native Treesitter handles the captured
 language parsers, including TSX; CSS retains native Vim syntax highlighting.
 Smear Cursor is enabled and can be toggled with **Space ua**. Debugging/test
-adapters, remaining language previews/custom extras and review feedback
+adapters and remaining language previews/custom extras
 are still separate work.
 
-**Space ac / aC** opens Codex / Claude with the current file's worktree copy
-marked as context. **Space ae / aE** opens an empty agent workspace. Write your
+**Space ac / aC** first offers a branch picker for Codex / Claude, with saved
+changes shown before launch. Choose **Continue this task branch** for its existing
+checkout and edits, or **New isolated task** for a separate branch from that starting
+point. The current file's counterpart is marked as context. **Space ae / aE** uses
+the same picker for an empty new workspace. Write your
 instructions directly in the terminal. **Space af** marks a saved file,
 **Space aF** marks several, and **Space am** manages the context list. Marked
 paths are supplied by the hook on your next prompt; Codex may require `/hooks`
 trust. **Space ad** inserts them into the draft manually if needed. Normal CLI
 exit collapses the agent pane. See [AI tasks](../docs/features/agents.md).
 
-New tasks inherit saved changes from the checkout you launch from, including
+New tasks inherit saved changes from the selected branch's checkout, including
 non-ignored new files, while leaving the original files and staging untouched.
 Save before launching. An inherited-state commit on the new task branch provides
 the review baseline; review then shows changes made after launch.
@@ -98,10 +101,10 @@ saves it locally; **C** lists comments, with Enter to inspect and **e/d** to
 edit/delete. Saved comments retain their original excerpts across refresh and
 restart. Nothing is sent to the agent by these controls.
 
-Press **s** in review or **Space vs** to preview unsent comments. **Ctrl-s** in
-that preview queues the batch; **x** cancels it, **r** checks status and **a**
-returns to the agent. Busy agents receive feedback at an eligible turn end;
-idle agents receive it with your next prompt, such as `Apply my queued review`.
+Press **s** in review or **Space vs** to preview unsent comments, then **a** to
+send and focus the agent. Ready agents receive an automatically submitted prompt;
+busy agents receive queued feedback at an eligible turn end. **Ctrl-s** queues
+without leaving review; **x** cancels pending delivery and **r** checks status.
 Restarting an agent requires explicitly queuing again. See
 [sending review feedback](../docs/features/review.md#sending-review-feedback).
 

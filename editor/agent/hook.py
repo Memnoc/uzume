@@ -71,6 +71,8 @@ def main():
     if state:
         stamp = time.time_ns()
         value = {"event": event, "state": state[0], "reason": state[1], "since": stamp / 1e9}
+        if event == "UserPromptSubmit":
+            value["prompt_submitted_at"] = stamp / 1e9
         if revision is not None:
             value["context_revision"] = revision
         path = Path(folder) / f"{stamp}-{os.getpid()}.json"

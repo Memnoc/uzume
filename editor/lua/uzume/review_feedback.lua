@@ -90,6 +90,9 @@ function M.open(state)
     local function render()
       local status = batch and labels[store.status(state.task, batch)]
         or "PREVIEW · Local until Ctrl-s queues this batch"
+      if batch and store.status(state.task, batch) == "queued" and store.prompt_requested(batch) then
+        status = "REQUEST SUBMITTED · Waiting for the feedback hook · r checks status"
+      end
       local text =
         { "To: " .. (batch and batch.kind or state.task.kind) .. " · " .. state.task.label, status, "", body }
       vim.bo[buf].modifiable = true
@@ -107,7 +110,7 @@ function M.open(state)
       title = " Send review ",
       title_pos = "center",
       zindex = 75,
-      footer = " Ctrl-s queue · x cancel queue · r status · a agent · q back ",
+      footer = " Ctrl-s queue · a send & focus · x cancel queue · r status · q back ",
       footer_pos = "center",
       wo = { wrap = true, linebreak = true, number = false, relativenumber = false },
     })
@@ -120,7 +123,7 @@ function M.open(state)
     map("q", M.close)
     map("<Esc>", M.close)
     map("r", render)
-    map("<C-s>", function()
+    local function queue()
       assert(not state.closed, "Review has closed")
       assert(not batch, "This batch is already saved. Press r for its status or reopen to preview new comments.")
       local current = {}
@@ -135,9 +138,11 @@ function M.open(state)
       end
       batch = store.queue(state.task, selected, body)
       render()
+    end
+    map("<C-s>", function()
+      queue()
       vim.notify(
-        "Review queued. It will be supplied at turn end or with your next prompt.\n"
-          .. "If the agent is idle, press a and submit a prompt such as ‘Apply my queued review’.",
+        "Review queued. Press a to send and focus the agent; busy agents receive it at turn end.",
         vim.log.levels.INFO,
         { title = "Task review" }
       )
@@ -147,11 +152,47 @@ function M.open(state)
       store.cancel(batch)
       render()
     end)
-    map("a", function()
+    local function send(allow_draft)
       local item = assert(store.agent(state.task), "Start this task's agent with Space ar first")
+      if not batch then
+        queue()
+      end
+      local delivery = store.status(state.task, batch)
+      assert(
+        delivery == "queued" or delivery == "supplied" or delivery == "claimed",
+        "Preview and queue this review again"
+      )
+      if delivery == "queued" and not store.prompt_requested(batch) then
+        local input = require("uzume.agent_input")
+        local status = input.status(item)
+        if status.state ~= "working" then
+          assert(
+            status.state == "ready" or status.state == "review",
+            "Review is queued, but the agent is not at a confirmed message prompt. Resolve login, trust or its pending question first."
+          )
+          if input.has_draft(item, status) and not allow_draft then
+            Snacks.picker.select({ "Keep existing draft", "Submit draft with review" }, {
+              prompt = "The agent may have an unfinished draft. Submit it with this review?",
+            }, function(choice)
+              if choice == "Submit draft with review" and not state.closed then
+                protect(function()
+                  send(true)
+                end)
+              end
+            end)
+            return
+          end
+          if store.request_prompt(state.task, batch) and store.status(state.task, batch) == "queued" then
+            api.nvim_chan_send(item.job, "\027[200~\nApply my queued Uzume review (" .. batch.id .. ").\027[201~\r")
+          end
+        end
+      end
       require("uzume.review").close()
       require("uzume.agents").focus(item)
       vim.cmd.startinsert()
+    end
+    map("a", function()
+      send(false)
     end)
   end)
 end

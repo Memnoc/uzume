@@ -8,6 +8,7 @@ try:
     original_tab = js('vim.api.nvim_get_current_tabpage()')
     original_branch = git('branch', '--show-current')
     keys(' ac')
+    choose_new_task()
     wait(lambda: js('#require("uzume.agents").list()') == 1)
     agent = item(1)
     checkout = Path(agent['task']['cwd'])

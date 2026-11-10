@@ -15,6 +15,18 @@ def text():
     return '\n'.join(js('vim.api.nvim_buf_get_lines(0,0,-1,false)'))
 
 
+def review_comment(body):
+    do('vim.cmd.stopinsert(); vim.cmd("UzumeReview")')
+    wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+    keys('<CR>')
+    wait(lambda: js('vim.wo.diff'))
+    keys('ggc')
+    wait(lambda: lua('vim.bo.filetype') == 'uzume_review_comment')
+    wait(lambda: lua('vim.api.nvim_get_mode().mode') == 'i')
+    keys(body); keys('<C-s>'); keys('s')
+    wait(lambda: lua('vim.bo.filetype') == 'uzume_review_feedback')
+
+
 try:
     wait(lambda: lua('vim.fn.exists(":UzumeAgent")') == '2')
     kind = sys.argv[1] if len(sys.argv) > 1 else 'codex'
@@ -126,6 +138,54 @@ try:
     records = list((root/'state/ai-nvim/review-feedback').glob('*/*.json'))
     assert records and all(path.stat().st_mode & 0o777 == 0o600 for path in records)
     print('PASS: edited comments can be sent anew; restart requires explicit requeue; previous run cannot replay')
+    keys('q'); keys('ggc')
+    wait(lambda: lua('vim.bo.filetype') == 'uzume_review_comment')
+    wait(lambda: lua('vim.api.nvim_get_mode().mode') == 'i')
+    keys('Apply this final correction.')
+    keys('<C-s>')
+    hook(restarted, 'Stop')
+    wait(lambda: item(1)['status']['state'] == 'review')
+    keys('s')
+    wait(lambda: lua('vim.bo.filetype') == 'uzume_review_feedback')
+    keys('a')
+    wait(lambda: (Path(restarted['directory'])/'input.bin').exists())
+    wait(lambda: b'\r' in (Path(restarted['directory'])/'input.bin').read_bytes())
+    sent = (Path(restarted['directory'])/'input.bin').read_bytes()
+    assert b'Apply my queued Uzume review' in sent
+    output = hook(restarted, 'UserPromptSubmit')
+    assert 'Apply this final correction.' in output['hookSpecificOutput']['additionalContext']
+    print('PASS: send-and-focus queues the preview and submits the idle-agent prompt automatically')
+    before = (Path(restarted['directory'])/'input.bin').read_bytes()
+    review_comment('Feedback while busy.')
+    keys('a')
+    wait(lambda: lua('vim.api.nvim_get_mode().mode') == 't')
+    assert (Path(restarted['directory'])/'input.bin').read_bytes() == before, 'Send typed into a working CLI'
+    assert 'Feedback while busy.' in hook(restarted, 'Stop')['reason']
+    review_comment('Feedback after the permission question.')
+    hook(restarted, 'PermissionRequest')
+    keys('a')
+    assert lua('vim.bo.filetype') == 'uzume_review_feedback'
+    assert (Path(restarted['directory'])/'input.bin').read_bytes() == before, 'Send answered a permission dialog'
+    hook(restarted, 'SessionStart')
+    do('require("uzume.review").close(); require("uzume.agents").focus(require("uzume.agents").list()[1]); vim.cmd.startinsert()')
+    wait(lambda: lua('vim.api.nvim_get_mode().mode') == 't')
+    keys('unfinished personal draft')
+    wait(lambda: b'unfinished personal draft' in (Path(restarted['directory'])/'input.bin').read_bytes())
+    with_draft = (Path(restarted['directory'])/'input.bin').read_bytes()
+    do('vim.cmd.stopinsert(); vim.cmd("UzumeReview")')
+    wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+    keys('<CR>'); keys('s'); keys('a')
+    wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+    assert 'unfinished draft' in lua('vim.inspect(Snacks.picker.get()[1].opts.title)')
+    keys('<CR>')
+    assert (Path(restarted['directory'])/'input.bin').read_bytes() == with_draft
+    keys('a')
+    wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+    keys('Submit draft'); keys('<CR>')
+    wait(lambda: (Path(restarted['directory'])/'input.bin').read_bytes().count(b'Apply my queued Uzume review') == 2)
+    output = hook(restarted, 'UserPromptSubmit')
+    assert 'Feedback after the permission question.' in output['hookSpecificOutput']['additionalContext']
+    print('PASS: busy delivery remains queued; permission dialogs and existing drafts are protected')
 finally:
     if proc.poll() is None:
         try: do('vim.cmd("qa!")')

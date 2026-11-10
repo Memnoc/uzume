@@ -33,3 +33,10 @@ cancelled until claimed; supplied is a hook receipt, not proof of model action.
 Restarted CLIs require an explicit requeue. Urgent corrections currently use the
 CLI's own interrupt controls followed by a prompt; automatic interrupt-and-send
 remains deferred. See [the feature guide](../features/review.md#sending-review-feedback).
+
+Usability refinement, 2026-11-10: **a** in the feedback preview explicitly queues,
+submits to a ready CLI and focuses it; the user no longer types a second instruction
+to consume an idle queue. **Ctrl-s** remains queue-only. Busy agents receive feedback
+at turn end; permission/question states refuse terminal submission. Possible drafts
+require an explicit choice before being submitted with the review. Each batch has
+at most one automatic prompt attempt. This replaces the idle manual-prompt step above.

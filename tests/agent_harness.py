@@ -73,6 +73,12 @@ def js(expr): return json.loads(lua('vim.json.encode(' + expr + ')'))
 def keys(text):
     lua("vim.api.nvim_input(" + json.dumps(text, ensure_ascii=False) + ")")
     time.sleep(.2)
+def choose_new_task():
+    wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+    wait(lambda: 'Choose task branch' in lua('vim.inspect(Snacks.picker.get()[1].opts.title)'))
+    keys('<CR>')
+    wait(lambda: 'saved changes' in lua('vim.inspect(Snacks.picker.get()[1].opts.title)'))
+    keys('New isolated'); keys('<CR>')
 def wait(fn):
     for _ in range(120):
         try:

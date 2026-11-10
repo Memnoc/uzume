@@ -55,6 +55,7 @@ try:
             assert js('vim.api.nvim_win_text_height(' + notification_win + ',{}).all') <= js('vim.api.nvim_win_get_height(' + notification_win + ')'), 'Warning is clipped'
             assert js('vim.api.nvim_get_current_win()') == original_pane, 'Notification stole focus'
         keys({1:' ac', 2:' aC', 3:' ae', 4:' aE'}[count])
+        choose_new_task()
         wait(lambda: js('#require("uzume.agents").list()') == count)
         if count == 2:
             do('vim.api.nvim_win_close(' + str(source_pane) + ',false)')

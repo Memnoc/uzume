@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 
-def create(source, target, branch):
+def create(source, target, branch, selection=None):
     source = Path(source).resolve()
     env = dict(os.environ)
     for key in ('GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR',
@@ -24,7 +24,20 @@ def create(source, target, branch):
             raise ValueError(result.stderr.decode('utf-8', 'replace').strip())
         return result.stdout
 
+    if selection:
+        selection = json.loads(selection)
+        selected = git('rev-parse', '--verify', 'refs/heads/' + selection['branch'] + '^{commit}').decode().strip()
+        if selected != selection['head']:
+            raise ValueError('The selected branch moved. Choose it again before launching.')
+        if not selection['checkout']:
+            git('worktree', 'add', '-b', branch, str(target), selected)
+            return {'base': selected, 'source_head': selected, 'source_branch': selection['branch'], 'inherited': False}
+        current = git('symbolic-ref', '--short', 'HEAD').decode().strip()
+        if current != selection['branch']:
+            raise ValueError('The selected checkout switched branches. Choose it again before launching.')
     head = git('rev-parse', '--verify', 'HEAD^{commit}').decode().strip()
+    if selection and head != selection['head']:
+        raise ValueError('The selected branch moved. Choose it again before launching.')
     if git('ls-files', '--unmerged', '-z'):
         raise ValueError('Resolve merge conflicts before starting a new agent task.')
     for entry in git('ls-files', '--stage', '-z').split(b'\0'):

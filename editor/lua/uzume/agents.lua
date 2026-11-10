@@ -202,6 +202,9 @@ function M.start(kind, opts, done)
     )
   end
   local label = file and vim.fs.basename(file) or (kind == "codex" and "Codex workspace" or "Claude workspace")
+  if opts.selection then
+    source = opts.selection.cwd or project.root
+  end
   local origin = api.nvim_get_current_win()
   require("uzume.worktrees").create(project.root, label, function(task, err)
     if not task then
@@ -260,7 +263,84 @@ function M.start(kind, opts, done)
     if done then
       done(ok and result or nil, not ok and tostring(result) or nil)
     end
-  end, source)
+  end, source, opts.selection)
+end
+
+function M.continue_task(task, kind, relative)
+  dependencies(kind)
+  local function select_file(item)
+    local path = relative and (item.task.cwd .. "/" .. relative)
+    if not path or vim.fn.filereadable(path) ~= 1 then
+      return
+    end
+    local editor
+    for _, win in ipairs(api.nvim_tabpage_list_wins(item.tab)) do
+      local buf = api.nvim_win_get_buf(win)
+      if
+        api.nvim_win_get_config(win).relative == ""
+        and (vim.bo[buf].buftype == "" or vim.bo[buf].filetype == "uzume_task")
+      then
+        editor = win
+        break
+      end
+    end
+    if not editor then
+      M.focus(item)
+      vim.cmd("topleft vnew")
+      editor = api.nvim_get_current_win()
+    end
+    api.nvim_win_call(editor, function()
+      vim.cmd.edit(vim.fn.fnameescape(path))
+      vim.cmd("checktime " .. api.nvim_get_current_buf())
+    end)
+    require("uzume.context").add(item, { path })
+  end
+  for _, item in pairs(M.instances) do
+    if item.task.cwd == task.cwd and alive(item) then
+      select_file(item)
+      M.focus(item)
+      vim.cmd.startinsert()
+      return item
+    end
+  end
+  local project = assert(require("ainvim.projects").current(), "Open a project first")
+  local tab
+  for _, candidate in ipairs(project.windows) do
+    local known = vim.t[candidate.tab].uzume_task
+    if known and known.cwd == task.cwd then
+      tab, task = candidate.tab, known
+      break
+    end
+  end
+  task.kind = kind
+  if tab then
+    api.nvim_set_current_tabpage(tab)
+    vim.t.uzume_task = task
+    local item = M.restart()
+    select_file(item)
+    M.focus(item)
+    vim.cmd.startinsert()
+    return item
+  end
+  tab = require("ainvim.sessions").create(task.cwd, {
+    name = task.label,
+    project_name = project.name,
+    project_root = project.root,
+    task = task,
+    empty = true,
+  })
+  local editor = require("uzume.task_editor").create(task)
+  local selected = relative and (task.cwd .. "/" .. relative)
+  if selected and vim.fn.filereadable(selected) == 1 then
+    vim.cmd.edit(vim.fn.fnameescape(selected))
+  end
+  local item = launch(task, tab, project.name, kind)
+  if selected and vim.fn.filereadable(selected) == 1 then
+    require("uzume.context").add(item, { selected })
+  else
+    require("uzume.task_editor").pick(editor, task)
+  end
+  return item
 end
 
 function M.restart()
@@ -299,6 +379,7 @@ end
 
 function M.setup()
   require("uzume.agent_views").setup()
+  require("uzume.agent_input").setup()
   local group = api.nvim_create_augroup("uzume_agents", { clear = true })
   local timer = assert(vim.uv.new_timer())
   timer:start(500, 500, vim.schedule_wrap(poll))
@@ -325,17 +406,17 @@ function M.setup()
     end, { desc = desc })
   end
   map("c", function()
-    M.start("codex")
+    require("uzume.branch_launch").open("codex")
   end, "Codex with Current File")
   map("C", function()
-    M.start("claude")
+    require("uzume.branch_launch").open("claude")
   end, "Claude with Current File")
   map("a", M.pick, "Agents / Attention")
   map("e", function()
-    M.start("codex", { empty = true })
+    require("uzume.branch_launch").open("codex", { empty = true })
   end, "Empty Codex Workspace")
   map("E", function()
-    M.start("claude", { empty = true })
+    require("uzume.branch_launch").open("claude", { empty = true })
   end, "Empty Claude Workspace")
   map("f", require("uzume.context").mark, "Mark Current File for Agent")
   map("F", require("uzume.context").select, "Mark Multiple Files")
@@ -348,7 +429,7 @@ function M.setup()
         #args.fargs == 1 or (#args.fargs == 2 and args.fargs[2] == "empty"),
         "Use :UzumeAgent codex [empty] or :UzumeAgent claude [empty]"
       )
-      M.start(args.fargs[1], { empty = args.fargs[2] == "empty" })
+      require("uzume.branch_launch").open(args.fargs[1], { empty = args.fargs[2] == "empty" })
     end)
   end, {
     nargs = "+",
