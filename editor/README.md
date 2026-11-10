@@ -82,6 +82,11 @@ paths are supplied by the hook on your next prompt; Codex may require `/hooks`
 trust. **Space ad** inserts them into the draft manually if needed. Normal CLI
 exit collapses the agent pane. See [AI tasks](../docs/features/agents.md).
 
+New tasks inherit saved changes from the checkout you launch from, including
+non-ignored new files, while leaving the original files and staging untouched.
+Save before launching. An inherited-state commit on the new task branch provides
+the review baseline; review then shows changes made after launch.
+
 **Space vr** (or **Space av**) opens task changes against the starting commit,
 including committed and uncommitted edits. Enter opens a stable side-by-side
 diff. Inside review, **u** toggles unified, **f** returns to files, **R** captures

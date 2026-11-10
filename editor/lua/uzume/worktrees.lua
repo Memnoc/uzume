@@ -24,46 +24,42 @@ function M.relative_file(project, file)
   end)
   for _, root in ipairs(canonical) do
     if vim.startswith(file, root .. "/") then
-      return file:sub(#root + 2)
+      return file:sub(#root + 2), root
     end
   end
 end
 
-local function git(root, args, done)
-  local command = { "git", "-C", root }
-  vim.list_extend(command, args)
+function M.create(project, label, done, source)
+  source = source or project
+  local slug = label:lower():gsub("[^a-z0-9]+", "-"):gsub("^-", ""):gsub("-$", ""):sub(1, 40)
+  slug = slug ~= "" and slug or "task"
+  local id = slug .. "-" .. vim.fn.sha256(project .. tostring(vim.uv.hrtime()) .. vim.fn.getpid()):sub(1, 10)
+  local parent = vim.fn.stdpath("data") .. "/worktrees/" .. vim.fn.sha256(project):sub(1, 16)
+  vim.fn.mkdir(parent, "p", 448)
+  local task = { id = id, label = label, project = project, cwd = parent .. "/" .. id, branch = "uzume/" .. id }
+  local script = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(debug.getinfo(1, "S").source:sub(2))))
+    .. "/agent/create_worktree.py"
   vim.system(
-    command,
-    { text = true },
+    { "python3", script, source, task.cwd, task.branch },
+    { text = true, timeout = 120000 },
     vim.schedule_wrap(function(result)
       if result.code ~= 0 then
-        done(nil, vim.trim(result.stderr ~= "" and result.stderr or result.stdout))
-      else
-        done(vim.trim(result.stdout))
+        return done(
+          nil,
+          "Could not create task worktree: "
+            .. vim.trim(result.stderr)
+            .. "\nAny partial checkout is retained at "
+            .. task.cwd
+        )
       end
-    end)
-  )
-end
-
-function M.create(project, label, done)
-  git(project, { "rev-parse", "--verify", "HEAD^{commit}" }, function(base, err)
-    if not base then
-      return done(nil, "A task needs a Git repository with a commit: " .. err)
-    end
-    local slug = label:lower():gsub("[^a-z0-9]+", "-"):gsub("^-", ""):gsub("-$", ""):sub(1, 40)
-    slug = slug ~= "" and slug or "task"
-    local id = slug .. "-" .. vim.fn.sha256(project .. tostring(vim.uv.hrtime()) .. vim.fn.getpid()):sub(1, 10)
-    local parent = vim.fn.stdpath("data") .. "/worktrees/" .. vim.fn.sha256(project):sub(1, 16)
-    vim.fn.mkdir(parent, "p", 448)
-    local task =
-      { id = id, label = label, project = project, cwd = parent .. "/" .. id, branch = "uzume/" .. id, base = base }
-    git(project, { "worktree", "add", "-b", task.branch, task.cwd, base }, function(result, failure)
-      if not result then
-        return done(nil, "Could not create task worktree: " .. failure)
+      local ok, captured = pcall(vim.json.decode, result.stdout)
+      if not ok then
+        return done(nil, "Could not read inherited task state; checkout retained at " .. task.cwd)
       end
+      task = vim.tbl_extend("force", task, captured)
       done(task)
     end)
-  end)
+  )
 end
 
 return M

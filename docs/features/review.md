@@ -36,7 +36,10 @@ changes in the footer; refresh is explicit. Unsaved editor buffers are not part
 of capture. Closing review discards its snapshot; reopening captures again.
 
 The baseline is the task's recorded starting commit, not the agent's latest
-commit. An agent committing its work therefore does not hide changes from review.
+commit. New tasks with inherited local edits use their inherited-state snapshot
+commit; those edits are already part of the starting point. Review therefore
+shows what changed after launch. An agent committing its work does not hide
+changes from review. Older tasks retain their original recorded baseline.
 Capture does not stage files, create commits, invoke external diff drivers or
 text converters, modify Git's index, or send source to an agent or service.
 

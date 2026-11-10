@@ -27,9 +27,18 @@ for an empty workspace. Instructions belong in the terminal, not this command.
 
 **Current-file launch:** opens the file's counterpart from the new worktree on
 the left, marks it as working context, and focuses the agent. The current file
-must be saved. The worktree still starts at the parent project's committed HEAD;
-unsaved/uncommitted edits are not copied. If the file is absent from HEAD, Uzume
-explains that and opens the file chooser instead.
+must be saved. The new worktree inherits the selected file's checkout: its HEAD,
+saved tracked edits, staged changes as they currently appear on disk, deletions,
+and non-ignored new files. Related changes across that checkout travel together.
+Unsaved editor buffers are not included. The source files, index/staging choices
+and branch stay unchanged. The two working directories are independent afterward.
+
+If inherited changes exist, Uzume records them in a local snapshot commit on the
+**new task branch only**, with the source HEAD as parent. This becomes the review
+baseline, so inherited user edits are not labelled as new agent work. Clean
+checkouts reuse HEAD directly. Snapshot commits use a local Uzume identity and
+do not run commit hooks or sign commits; worktree creation also skips repository
+hooks. Nothing is pushed. Git's normal clean/checkout filters still apply.
 
 The selected file may come from the original project checkout or any of its
 open task worktrees, even when displayed inside another task window. Uzume maps
@@ -42,6 +51,21 @@ options in a titled, wrapped Snacks notification; Space n reopens its history.
 **Empty launch:** starts without marked files and opens a searchable chooser in
 the left pane. Choosing a file opens it but does not mark it automatically. Use
 Space af or Space aF when ready. Cancel the chooser to leave the left pane empty.
+The checkout still inherits the active task's saved state, or the original
+project's state when launched outside a task. "Empty" refers to marked context.
+
+Current-file launch chooses the checkout containing that file, even when the
+file is displayed in another task's window. A new file need not be committed
+first. Ignored, untracked files are excluded; if the selected file is excluded,
+Uzume explains why and opens the file chooser. Existing task worktrees are never
+retroactively updated by this behavior.
+
+Creation uses a temporary private Git index; it never stashes, resets or stages
+the source checkout. It checks the captured tree twice and checks source HEAD and
+index stability, rejecting detected concurrent changes rather than starting with
+an uncertain capture. This is not an atomic filesystem transaction. Unresolved
+merge conflicts and dirty submodule working trees refuse launch. Clean submodule
+references are retained, but submodule working directories are not initialized.
 
 Buffer tabs show files visited in the active workspace and its owned terminals.
 Agent tabs replace the generic file icon with a compact terminal-friendly mark:
@@ -115,7 +139,8 @@ remain separate work.
 - `uzume.workspace_buffers` scopes the tab strip without deleting buffers.
 - `uzume.agent_views` routes duplicate terminal selections to their existing
   pane after layout operations settle, restoring the displaced editor buffer.
-- `uzume.worktrees` uses asynchronous argument-array Git calls.
+- `uzume.worktrees` launches the asynchronous `editor/agent/create_worktree.py`
+  helper, which captures saved state with Git argument arrays and a private index.
 - `editor/agent/supervisor.py` supervises the official CLI and observed children.
   `hook.py` supplies marked paths and lifecycle metadata, never logs incoming
   prompts/tool arguments/transcripts and never makes a permission decision.
@@ -136,6 +161,10 @@ agents, launching from a marked original-checkout file inside a task window,
 readable rejection of unrelated files, empty launch from that same state,
 pane cleanup, restart and layout restore. `--inputs-only` runs the input
 regression; `--crash` tests forced editor exit.
+
+`python3 tests/inheritance.py` checks inherited saved/staged/new/deleted/binary
+files, executable modes, ignored-file exclusion, hook isolation, unchanged source
+index/HEAD, the initial review baseline, and independent nested tasks.
 
 Authenticated hook delivery needs hands-on verification with the installed CLI
 trust settings. Process ownership uses PID/start-time checks, not OS containment;

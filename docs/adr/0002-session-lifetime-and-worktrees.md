@@ -13,9 +13,19 @@ The isolation and stop-on-close requirements below remain. The accepted mapping
 is one independent AI task per window, with its own branch and worktree and an
 editor pane beside its agent. Windows retain their parent project identity even
 when their checkouts differ. Switching preserves processes; closing stops them
-and retains checkout files. New task worktrees start at the parent project's
-committed HEAD, excluding uncommitted files. This was confirmed before integration. The text
-below preserves the original decision context.
+and retains checkout files. The text below preserves the original decision
+context.
+
+Starting-state refinement, 2026-11-10: after saved edits appeared to disappear
+when switching into a task's committed-only copy, the maintainer approved
+inheriting saved checkout state. Current-file launches inherit the checkout
+containing that file; empty launches inherit the active task or project checkout.
+Saved tracked edits and non-ignored new files are captured with a private index,
+leaving the source files, index and HEAD unchanged. When needed, a snapshot commit
+on the new task branch becomes its review baseline, so inherited edits are not
+presented as agent work. Clean sources reuse HEAD. Unsaved buffers are excluded.
+This replaces the original committed-HEAD-only starting policy; independent
+working directories and stop-on-close behavior remain unchanged.
 
 ## Context
 

@@ -23,12 +23,12 @@ try:
     keys('example'); keys('<CR>')
     wait(lambda: js('#vim.tbl_filter(function(w) return vim.wo[w].diff end,vim.api.nvim_list_wins())') == 2)
     texts = js(r'(function() local r={} for _,w in ipairs(vim.api.nvim_list_wins()) do if vim.wo[w].diff then r[#r+1]=table.concat(vim.api.nvim_buf_get_lines(vim.api.nvim_win_get_buf(w),0,-1,false),"\n") end end return r end)()')
-    assert sorted(texts) == ['base','working change'], texts
+    assert sorted(texts) == ['uncommitted source','working change'], texts
     print('PASS: task baseline includes committed, working and untracked changes')
     keys('u')
     assert lua('vim.bo.filetype') == 'diff'
     patch = js('vim.api.nvim_buf_get_lines(0,0,-1,false)')
-    assert '-base' in patch and '+working change' in patch, patch
+    assert '-uncommitted source' in patch and '+working change' in patch, patch
     assert lua('vim.api.nvim_get_current_line()') == '+working change', 'Toggle lost the source reading position'
     (checkout/'example.txt').write_text('newer agent edit\n')
     wait(lambda: 'New changes' in lua('vim.inspect(vim.api.nvim_win_get_config(0).footer)'))

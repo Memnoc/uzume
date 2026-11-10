@@ -129,7 +129,7 @@ try:
         assert record['cwd'] == entry['task']['cwd']
         assert '--' not in record['args'], 'Launch submitted a prompt'
         assert 'prompt' not in json.loads((Path(entry['directory']) / 'launch.json').read_text())
-        assert (Path(record['cwd']) / 'example.txt').read_text() == 'base\n'
+        assert (Path(record['cwd']) / 'example.txt').read_text() == 'uncommitted source\n'
         assert len(js('require("ainvim.sessions").windows(' + str(entry['tab']) + ')')) == 2
     assert (project / 'example.txt').read_text() == 'uncommitted source\n'
     # Marking is local, idempotent and allowed while the agent is working.

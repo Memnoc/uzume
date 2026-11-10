@@ -189,10 +189,12 @@ function M.start(kind, opts, done)
   assert(type(opts) == "table", "Use :UzumeAgent codex or :UzumeAgent codex empty; enter instructions in the CLI")
   local project = assert(require("ainvim.projects").current(), "Open a project first: Space ap")
   local file, relative
+  local source = (vim.t.uzume_task or {}).cwd or project.root
   if not opts.empty then
     file = require("uzume.context").file()
-    relative = assert(
-      require("uzume.worktrees").relative_file(project, file),
+    relative, source = require("uzume.worktrees").relative_file(project, file)
+    assert(
+      relative,
       "This file is outside this project's checkouts.\n\n"
         .. "Space ae / aE: start an empty Codex / Claude workspace.\n"
         .. "Space af: mark the file as a reference for that agent.\n"
@@ -236,7 +238,7 @@ function M.start(kind, opts, done)
       if selected and vim.fn.filereadable(selected) == 1 then
         vim.cmd.edit(vim.fn.fnameescape(selected))
       elseif selected then
-        notify("This file is absent from committed HEAD; use the picker to choose a task file", vim.log.levels.WARN)
+        notify("This file was not inherited (it may be ignored by Git); choose a task file", vim.log.levels.WARN)
       end
       local item = launch(task, tab, project.name, kind)
       if selected and vim.fn.filereadable(selected) == 1 then
@@ -258,7 +260,7 @@ function M.start(kind, opts, done)
     if done then
       done(ok and result or nil, not ok and tostring(result) or nil)
     end
-  end)
+  end, source)
 end
 
 function M.restart()

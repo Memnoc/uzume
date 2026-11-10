@@ -10,6 +10,9 @@ _Avoid_: session, project session as a separate entity, distro profile
 
 **Task**:
 A unit of work within a **Project**. Starting an AI task creates a dedicated **Window**, branch, and worktree, with editor and agent panes side by side. Independent tasks remain isolated; deliberate shared-checkout collaboration is a later extension.
+New tasks inherit saved state from the selected checkout. A task-local snapshot
+commit records inherited edits as its review baseline; the source branch and
+index are unchanged. Subsequent edits remain isolated.
 
 **Window**:
 A switchable container belonging to one **Project**, containing one or more **Panes** and retaining their layout. A window is distinct from an individual pane or a file buffer.

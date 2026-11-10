@@ -78,7 +78,7 @@ try:
     print('PASS: refresh marks outdated, editing preserves anchor, reopen retains drafts, explicit deletion')
     # One unified replacement can anchor both removed and added lines.
     keys('u')
-    do('vim.fn.search("^-base$", "w")')
+    do('vim.fn.search("^-uncommitted source$", "w")')
     keys('Vjjc')
     wait(lambda: lua('vim.bo.filetype') == 'uzume_review_comment')
     wait(lambda: lua('vim.api.nvim_get_mode().mode') == 'i')
@@ -91,7 +91,7 @@ try:
     keys('<CR>')
     wait(lambda: lua('vim.bo.filetype') == 'uzume_review_comment_detail')
     detail = '\n'.join(js('vim.api.nvim_buf_get_lines(0,0,-1,false)'))
-    assert 'Base L1 → Task L1–2' in detail and '\nbase\n' in detail and 'newer first line' in detail, detail
+    assert 'Base L1 → Task L1–2' in detail and '\nuncommitted source\n' in detail and 'newer first line' in detail, detail
     assert not (Path(agent['directory'])/'input.bin').exists()
     records = list((root/'state/ai-nvim/review-comments').glob('*.json'))
     assert len(records) == 1 and records[0].stat().st_mode & 0o777 == 0o600
