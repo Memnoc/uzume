@@ -98,6 +98,13 @@ saves it locally; **C** lists comments, with Enter to inspect and **e/d** to
 edit/delete. Saved comments retain their original excerpts across refresh and
 restart. Nothing is sent to the agent by these controls.
 
+Press **s** in review or **Space vs** to preview unsent comments. **Ctrl-s** in
+that preview queues the batch; **x** cancels it, **r** checks status and **a**
+returns to the agent. Busy agents receive feedback at an eligible turn end;
+idle agents receive it with your next prompt, such as `Apply my queued review`.
+Restarting an agent requires explicitly queuing again. See
+[sending review feedback](../docs/features/review.md#sending-review-feedback).
+
 Unlike the original fixture spike, edits to opened files and normal editor
 recovery/history persist. Source-file saving remains explicit. Root detection
 uses the attached LSP root, then `.git` (including worktrees), `lua`, and cwd.

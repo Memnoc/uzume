@@ -19,6 +19,7 @@ this first version.
 | Space vq / q in review | Close review and return to the previous pane |
 | Space vc / c in review | Comment on the current line or visual line range |
 | Space vC / C in review | List saved local comments for this task |
+| Space vs / s in review | Preview unsent comments or inspect the pending batch |
 
 Side-by-side is the default: the starting commit is on the left, captured task
 content on the right. Review opens above the existing workspace without
@@ -58,7 +59,9 @@ agent.
 
 **C** opens the comment list. Enter inspects the full comment and its original
 excerpt. In that view, **e** edits the text, **d** offers deletion, and **q**
-returns to review. The list shows file/line references and draft/outdated status.
+returns to review. **s** opens the send-review preview. The list shows file/line
+references, outdated status, and whether that comment version is draft, queued,
+supplied, paused, or awaiting an uncertain handoff.
 
 Both side-by-side and unified views support comments. Unified selections may
 include removed and added lines in one hunk; the saved comment keeps separate
@@ -81,12 +84,73 @@ atomic replacement. Only selected excerpts and comment text persist; the full
 review snapshot remains in memory. Deleting a comment removes it from the saved
 record. Closing a task retains its comments along with its checkout. No automatic
 expiry or task-wide cleanup interface is included yet. This local state is not
-encrypted. Agent delivery and queued feedback are separate future features.
+encrypted. Deleting a draft does not remove its copy from an already queued or
+supplied feedback batch.
+
+## Sending review feedback
+
+1. Save your comments, then press **s** in review or **Space vs**.
+2. Read the floating preview: it names the task and agent and contains all unsent
+   comment versions, file paths, original line ranges, and code excerpts.
+3. Press **Ctrl-s** to explicitly queue this frozen batch for that task's agent.
+   Opening the preview or saving a comment alone never publishes feedback.
+4. If the agent is working, its next eligible end-of-turn hook supplies the batch
+   and requests a continuation. If it is idle, press **a** to return to its terminal
+   and submit a prompt such as `Apply my queued review`. The prompt hook supplies
+   the batch alongside marked file context.
+5. **r** refreshes delivery status. **x** cancels a pending batch. **q** returns to
+   review. These shortcuts also appear in the preview footer.
+
+Delivery does not type into the terminal, submit a draft, or steal focus. Permission
+and question prompts are left to the user. For urgent feedback, queue it, press
+**a**, interrupt using the CLI's own controls, then submit your correction; the
+queued review accompanies that prompt. An automatic interrupt-and-send action
+is not implemented in this increment.
+
+Only one batch is queued per running task. Reopening **s** shows that pending
+batch. Cancel it before replacing it. Editing or deleting a comment never changes
+an already queued batch: cancel and preview again to include the new version.
+After delivery, unchanged comment versions are omitted from the next preview;
+edited versions are eligible again. Outdated comments remain visibly labelled
+and retain their original excerpts; the agent is instructed to check current
+code before applying feedback. This is not automatic reanchoring.
+
+**Supplied** means the hook emitted the batch, not that the model read, accepted,
+or completed it. If a hook claims a batch but crashes before recording output,
+the UI shows **handoff uncertain** and does not automatically replay it. Cancellation
+and delivery use an atomic rename: cancellation succeeds only before the hook
+claims the pending batch. Hooks disabled by policy or not yet trusted leave the
+batch pending. A continued Stop hook does not consume another batch; that batch
+waits for a later user prompt or eligible turn end, avoiding continuation loops.
+
+Stopping an agent pauses its pending delivery. Restarting a CLI never republishes
+feedback automatically. Open **s** and queue again explicitly; Uzume retires the
+previous run's pending copy before publishing to the new run. Original comments
+and batch records remain available locally. The first version shows unsent work,
+the pending batch, or the latest batch; a full delivery-history browser is deferred.
+
+### Implementation and storage
+
+`uzume.review_feedback` provides the preview; `review_feedback_store` owns frozen
+batches and run identity. Batch records live under
+`stdpath('state')/review-feedback/<task-hash>/`; run-scoped pending/claimed packets
+and receipts live under `stdpath('state')/agents/<run>/feedback/`. Directories use
+`0700`, records `0600`, and publication is atomic. The 256 KiB packet limit fails
+visibly. Batch records and packets retain the explicitly shared comment text and
+selected excerpts, including cancelled batches. There is no automatic expiry or
+history-cleanup UI yet. Full snapshots and CLI transcripts are not copied.
+
+The hook uses `UserPromptSubmit` additive context and `Stop` continuation output,
+with no permission decisions or subagent delivery. These contracts are documented
+by [Codex](https://developers.openai.com/codex/hooks) and
+[Claude Code](https://code.claude.com/docs/en/hooks#stop-decision-control).
+Hook output is not an acknowledgement from the model; authenticated, policy-enabled
+delivery still needs a hands-on check in the user's installed CLIs.
 
 ## Limits and verification
 
-This increment covers reading changes and local comments. Reviewed markers,
-feedback delivery, integration/merging and PR review remain future work.
+This increment covers reading changes, local comments and explicit queued feedback.
+Reviewed markers, integration/merging and PR review remain future work.
 
 Binary/non-UTF-8 files, submodules and special files have an explicit unavailable
 preview. Symlinks show their target text without reading the target. Text
@@ -107,3 +171,9 @@ of the running agent and underlying pane layout.
 `python3 tests/review_comments.py` exercises comment composition, saved line
 ranges and original excerpts, refresh/outdated status, editing and deletion,
 local persistence and the absence of terminal input to the agent.
+
+`python3 tests/feedback.py` and `python3 tests/feedback.py claude` exercise actual
+Neovim controls with isolated mock CLIs and the real hook entry point. They cover
+preview versus publication, single-use delivery, cancellation, outdated excerpts,
+additive file context, ignored worker/permission events, edited comment versions,
+restart isolation and private batch storage. They make no model requests.

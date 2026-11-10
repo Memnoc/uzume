@@ -47,6 +47,9 @@ Feedback tied to code in a **Review Snapshot**, retaining file, location, and sn
 
 **Feedback Delivery**:
 An explicit handoff of review comments or selected context to an **Agent Instance**, with a pending state when queued.
+Review comments are previewed and explicitly queued as an immutable batch for a
+specific agent run. **Supplied** means hook output was emitted, not that the
+agent acted on it. A restarted agent requires an explicit new handoff.
 
 **Interrupt**:
 Stopping an agent's current work to allow correction while retaining its session and conversation where the CLI supports this behavior.

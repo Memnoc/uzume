@@ -8,7 +8,7 @@ local function footer(state)
   return (state.stale and " New changes · R refresh " or " R refresh ")
     .. "· c comment · C list"
     .. (state.comment_count and (" (" .. state.comment_count .. ")") or "")
-    .. " · f files · u diff · q close "
+    .. " · s send · f files · u diff · q close "
 end
 local function notify(message, level)
   vim.notify(message, level or vim.log.levels.INFO, { title = "Task review" })
@@ -48,6 +48,7 @@ function M.close()
   M.current = nil
   state.closed = true
   require("uzume.review_comments").close()
+  require("uzume.review_feedback").close()
   if state.timer then
     state.timer:stop()
     state.timer:close()
@@ -230,7 +231,7 @@ function M.show(index)
     state.views[#state.views + 1] = win
     vim.wo[win].wrap, vim.wo[win].number, vim.wo[win].cursorline = false, true, true
     vim.bo[buf].filetype = ft or "text"
-    for key, action in pairs({ q = M.close, f = M.files, u = M.toggle, R = M.refresh, C = M.comments }) do
+    for key, action in pairs({ q = M.close, f = M.files, u = M.toggle, R = M.refresh, C = M.comments, s = M.send }) do
       vim.keymap.set("n", key, action, { buffer = buf, nowait = true, desc = "Review: " .. key })
     end
     vim.keymap.set({ "n", "x" }, "c", M.comment, { buffer = buf, desc = "Comment on review lines" })
@@ -481,6 +482,12 @@ function M.open()
     end
   end)
 end
+function M.send()
+  if not M.current then
+    return notify("Open a task review first: Space vr.", vim.log.levels.WARN)
+  end
+  require("uzume.review_feedback").open(M.current)
+end
 function M.setup()
   for key, mapping in pairs({
     r = { M.open, "Review Task Changes" },
@@ -489,6 +496,7 @@ function M.setup()
     R = { M.refresh, "Refresh Review Snapshot" },
     q = { M.close, "Close Review" },
     C = { M.comments, "Review Comments" },
+    s = { M.send, "Send Review Comments" },
   }) do
     vim.keymap.set("n", "<leader>v" .. key, mapping[1], { desc = mapping[2] })
   end

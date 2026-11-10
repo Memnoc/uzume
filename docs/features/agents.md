@@ -18,6 +18,7 @@ current project; tmux is not required.
 | Space aa | Agents and attention |
 | Space ar | Restart a stopped CLI with a fresh conversation |
 | Space av / Space vr | Review this task's changes against its starting commit |
+| Space vs / s in review | Preview and queue review comments for this task's agent |
 | Space ww / Space ap | Windows / projects |
 | Esc Esc in an agent | Editor controls; `i` returns to terminal input |
 | Space pd / Space wd | Close pane / whole window |
@@ -115,6 +116,11 @@ existing developer/system instructions. See the official
 [Codex hooks](https://developers.openai.com/codex/hooks) and
 [Claude hooks](https://code.claude.com/docs/en/hooks) references.
 
+Review feedback uses the same prompt hook, or a turn-end continuation hook when
+the agent is working. Explicitly queue a batch from **Space vs**; saved comments
+alone remain local. See [sending review feedback](review.md#sending-review-feedback)
+for cancellation, delivery status and restarting a stopped agent.
+
 ## Lifetime and recovery
 
 Switching windows and hiding panes preserves running agents. Closing a pane,
@@ -169,6 +175,5 @@ index/HEAD, the initial review baseline, and independent nested tasks.
 Authenticated hook delivery needs hands-on verification with the installed CLI
 trust settings. Process ownership uses PID/start-time checks, not OS containment;
 very quickly detached children and a killed supervisor can escape cleanup.
-The first [task review view](review.md) is available. Linux, terminal performance
-and queued review feedback remain
-future validation/work.
+[Task review and queued feedback](review.md) are available. Linux, terminal
+performance and authenticated feedback delivery remain hands-on validation work.

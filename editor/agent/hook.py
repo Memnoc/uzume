@@ -1,9 +1,10 @@
-"""Observational hook: retain lifecycle metadata only, never transcripts."""
+"""Observe lifecycle and supply explicitly queued feedback; never log transcripts."""
 import json
 import os
 from pathlib import Path
 import sys
 import time
+import feedback
 
 
 def main():
@@ -57,6 +58,16 @@ def main():
                         "do not modify reference files. Normal CLI permissions still apply. "
                         + json.dumps(files, ensure_ascii=False))
                 output = {"hookSpecificOutput": {"hookEventName": event, "additionalContext": text}}
+    claimed = None
+    if event == "UserPromptSubmit" or (event == "Stop" and not payload.get("stop_hook_active")):
+        text, claimed = feedback.take(folder)
+        if text:
+            if event == "Stop":
+                output = {"decision": "block", "reason": text}
+                state = ("working", "Review feedback supplied; agent continuing")
+            else:
+                specific = output.setdefault("hookSpecificOutput", {"hookEventName": event})
+                specific["additionalContext"] = specific.get("additionalContext", "") + "\n\n" + text
     if state:
         stamp = time.time_ns()
         value = {"event": event, "state": state[0], "reason": state[1], "since": stamp / 1e9}
@@ -66,12 +77,17 @@ def main():
         tmp = path.with_suffix(".tmp")
         tmp.write_text(json.dumps(value))
         tmp.replace(path)
-    return output
+    return output, claimed, event
 
 
 if __name__ == "__main__":
     try:
-        output = main() or {}
+        output, claimed, event = main() or ({}, None, None)
     except (OSError, ValueError, IndexError, AttributeError):
-        output = {}  # Never decide or block agent work.
-    print(json.dumps(output))
+        output, claimed, event = {}, None, None
+    print(json.dumps(output), flush=True)
+    if claimed:
+        try:
+            feedback.supplied(claimed, event)
+        except OSError:
+            pass  # Claimed remains visible as uncertain; never replay automatically.

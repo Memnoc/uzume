@@ -24,3 +24,12 @@ Review a stable local snapshot while agents continue editing, and expose newer c
 ## Consequences
 
 Snapshot identity, baseline selection, stale-comment handling, and delivery acknowledgments need explicit design. The default diff is side-by-side with an explicit unified toggle. PR review is a later extension; no automatic merge is implied by review completion.
+
+Implementation increment, 2026-11-10: an explicit preview/queue action publishes
+an immutable batch to the responsible running agent. Busy delivery uses the CLI's
+turn-end hook; idle delivery accompanies the next user-submitted prompt. Uzume
+does not inject terminal input or submit existing drafts. Pending batches can be
+cancelled until claimed; supplied is a hook receipt, not proof of model action.
+Restarted CLIs require an explicit requeue. Urgent corrections currently use the
+CLI's own interrupt controls followed by a prompt; automatic interrupt-and-send
+remains deferred. See [the feature guide](../features/review.md#sending-review-feedback).

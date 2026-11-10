@@ -2,6 +2,8 @@
 local M = {}
 local api = vim.api
 local store = require("uzume.review_comment_store")
+local feedback = require("uzume.review_feedback_store")
+local delivery_labels = { queued = "Queued", supplied = "Supplied", claimed = "Handoff uncertain", paused = "Paused" }
 local ui = {}
 local function protect(fn)
   local ok, result = pcall(fn)
@@ -108,10 +110,13 @@ function M.add(state, file, anchor, changed)
 end
 local function inspect(state, comment, changed)
   local outdated = store.outdated(comment, state.snapshot)
+  local delivery = feedback.versions(state.task)[feedback.revision(comment)]
   local text = {
     comment.display,
     location(comment),
-    outdated and "OUTDATED · File differs in this review snapshot" or "LOCAL DRAFT · Matches this review snapshot",
+    outdated and "OUTDATED · File differs in this review snapshot" or "Matches this review snapshot",
+    delivery_labels[delivery] or "LOCAL DRAFT",
+    "Edits and deletion affect this draft; queued or supplied batches keep their original copy.",
     "",
     comment.body,
     "",
@@ -129,10 +134,14 @@ local function inspect(state, comment, changed)
     "detail",
     table.concat(text, "\n"),
     "Review comment",
-    "e edit · d delete · q back · local only",
+    "e edit · d delete · s send review · q back",
     false,
     state.comment_origin
   )
+  vim.keymap.set("n", "s", function()
+    close("detail")
+    require("uzume.review").send()
+  end, { buffer = win.buf, desc = "Preview review feedback" })
   vim.keymap.set("n", "e", function()
     close("detail")
     compose(state, comment, function()
@@ -184,12 +193,15 @@ function M.list(state, changed)
       )
     end
     close("picker")
+    local versions = feedback.versions(state.task)
     ui.picker = Snacks.picker({
-      title = "Review comments · Enter inspect/edit · Esc back · local only",
+      title = "Review comments · Enter inspect/edit · Esc back",
       items = vim.tbl_map(function(comment)
         return {
           id = comment.id,
-          text = (store.outdated(comment, state.snapshot) and "! Outdated  " or "● Draft  ")
+          text = (store.outdated(comment, state.snapshot) and "! Outdated · " or "")
+            .. (delivery_labels[versions[feedback.revision(comment)]] or "Draft")
+            .. " · "
             .. comment.display
             .. " · "
             .. location(comment)
