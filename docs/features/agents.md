@@ -34,6 +34,12 @@ and non-ignored new files. Related changes across that checkout travel together.
 Unsaved editor buffers are not included. The source files, index/staging choices
 and branch stay unchanged. The two working directories are independent afterward.
 
+Launching selects the new task window and its branch/worktree. Root-based file
+search, explorer, grep and Git tools remain anchored to that task checkout even
+when an original-project or reference file is open beside the agent. Original
+project windows retain their own checkout. Explicitly opening a reference file
+still opens that exact path; it does not silently substitute another copy.
+
 If inherited changes exist, Uzume records them in a local snapshot commit on the
 **new task branch only**, with the source HEAD as parent. This becomes the review
 baseline, so inherited user edits are not labelled as new agent work. Clean
@@ -171,6 +177,10 @@ regression; `--crash` tests forced editor exit.
 `python3 tests/inheritance.py` checks inherited saved/staged/new/deleted/binary
 files, executable modes, ignored-file exclusion, hook isolation, unchanged source
 index/HEAD, the initial review baseline, and independent nested tasks.
+
+`python3 tests/task_navigation.py` verifies automatic task checkout selection,
+file search and explorer scope after reading an original file, and preservation
+of the original project's branch and file content.
 
 Authenticated hook delivery needs hands-on verification with the installed CLI
 trust settings. Process ownership uses PID/start-time checks, not OS containment;

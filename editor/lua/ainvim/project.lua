@@ -2,6 +2,12 @@ local M = {}
 
 function M.root(buf)
   if not buf then
+    -- Task navigation belongs to its checkout, even while reading a reference.
+    -- An explicit buffer argument still resolves that file's own project.
+    local task = vim.t.uzume_task
+    if task then
+      return task.cwd
+    end
     for _, picker in ipairs(Snacks.picker.get()) do
       if picker:is_focused() then
         return picker:cwd()
