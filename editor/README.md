@@ -75,7 +75,8 @@ adapters and remaining language previews/custom extras
 are still separate work.
 
 **Space ac / aC** first offers a branch picker for Codex / Claude, with saved
-changes shown before launch. Choose **Continue this task branch** for its existing
+changes shown before launch. **Ctrl-s** creates a new task from the highlighted
+branch; **Enter** opens the action menu. Choose **Continue this task branch** for its existing
 checkout and edits, or **New isolated task** for a separate branch from that starting
 point. The current file's counterpart is marked as context. **Space ae / aE** uses
 the same picker for an empty new workspace. Write your

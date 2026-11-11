@@ -62,7 +62,7 @@ function M.open(kind, opts)
       return a.branch < b.branch
     end)
     Snacks.picker({
-      title = "Choose task branch · Enter inspect · Esc cancel",
+      title = "Choose task branch",
       items = vim.tbl_map(function(entry)
         local problems = entry.conflicts and " · CONFLICTS" or entry.operation and (" · " .. entry.operation) or ""
         return {
@@ -70,14 +70,19 @@ function M.open(kind, opts)
           entry = entry,
           preview = {
             text = table.concat({
+              "Ctrl-s  New task from this branch",
+              "Enter   Choose new task or continue",
+              "Esc     Cancel",
+              "",
               "Branch: " .. entry.branch,
-              "Checkout: " .. (entry.cwd or "No checkout; uses committed files"),
-              "Saved changes: " .. entry.changes,
+              "Checkout: "
+                .. (entry.cwd and vim.fn.fnamemodify(entry.cwd, ":~") or "No checkout; uses committed files"),
+              "Changed files: " .. entry.changes,
+              "",
+              "New task creates a separate branch with these saved files.",
+              "Continue reopens an existing task with its edits.",
               "",
               table.concat(entry.files, "\n"),
-              "",
-              "New task: a separate branch and checkout from this starting point.",
-              "Continue task: reuse this task branch's existing checkout and edits.",
             }, "\n"),
             ft = "text",
           },
@@ -86,7 +91,21 @@ function M.open(kind, opts)
       format = "text",
       preview = "preview",
       layout = { preset = "default" },
-      confirm = function(picker, row)
+      win = {
+        input = {
+          footer = " Ctrl-s new task · Enter actions · Esc cancel ",
+          footer_pos = "center",
+          keys = { ["<c-s>"] = { "new_task", mode = { "i", "n" }, desc = "New task from selected branch" } },
+        },
+        list = { keys = { ["<c-s>"] = { "new_task", desc = "New task from selected branch" } } },
+        preview = { wo = { wrap = true, linebreak = true, breakindent = true, number = false, relativenumber = false } },
+      },
+      actions = {
+        new_task = function(picker)
+          picker.opts.confirm(picker, picker:current(), true)
+        end,
+      },
+      confirm = function(picker, row, new_task)
         picker:close()
         if not row then
           return
@@ -123,12 +142,7 @@ function M.open(kind, opts)
               choices[#choices + 1] = { text = "Continue this task branch · reuse its checkout", task = task }
             end
             choices[#choices + 1] = { text = "New isolated task from this branch" }
-            Snacks.picker.select(choices, {
-              prompt = entry.branch .. " · " .. entry.changes .. " saved changes",
-              format_item = function(choice)
-                return choice.text
-              end,
-            }, function(choice)
+            local function launch(choice)
               if not choice then
                 return
               end
@@ -165,7 +179,16 @@ function M.open(kind, opts)
                   end
                 end)
               end)
-            end)
+            end
+            if new_task == true then
+              return launch({})
+            end
+            Snacks.picker.select(choices, {
+              prompt = entry.branch .. " · " .. entry.changes .. " saved changes",
+              format_item = function(choice)
+                return choice.text
+              end,
+            }, launch)
           end)
         end)
       end,

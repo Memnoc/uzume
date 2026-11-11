@@ -31,7 +31,11 @@ for an empty workspace. Instructions belong in the terminal, not this command.
 All four launch shortcuts and `:UzumeAgent` open a local branch picker before
 starting a CLI. Rows show saved-change counts; the preview shows checkout paths
 and changed files. The current file's checkout is listed first. Empty launch
-prefers the active task's checkout. After selecting a branch, choose:
+prefers the active task's checkout. The preview wraps long paths and instructions.
+Highlight a branch and press **Ctrl-s** to create a new task directly, or **Enter**
+to open the new/continue action menu. Both paths run the same preflight checks.
+The shortcut hints appear beside the search and at the top of the preview.
+The action menu offers:
 
 - **New isolated task from this branch**: create a separate `uzume/...` branch
   and worktree. Inherit saved changes when the selected branch has a checkout;

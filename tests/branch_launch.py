@@ -15,10 +15,14 @@ try:
     keys(' ac')
     wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
     assert js('#require("uzume.agents").list()') == 0, 'CLI started before branch selection'
-    keys('selected-feature'); keys('<CR>')
-    wait(lambda: 'saved changes' in lua('vim.inspect(Snacks.picker.get()[1].opts.title)'))
-    assert js('#require("uzume.agents").list()') == 0
-    keys('<CR>')
+    wait(lambda: js('Snacks.picker.get()[1].preview.win:valid()'))
+    assert js('vim.wo[Snacks.picker.get()[1].preview.win.win].wrap'), 'Branch instructions are clipped'
+    assert js('vim.wo[Snacks.picker.get()[1].preview.win.win].linebreak')
+    assert not js('vim.wo[Snacks.picker.get()[1].preview.win.win].number')
+    keys('<C-n>')
+    assert js('#require("uzume.agents").list()') == 0, 'Navigation launched a task'
+    keys('selected-feature')
+    keys('<C-s>')
     wait(lambda: js('#require("uzume.agents").list()') == 1)
     agent = item(1)
     assert Path(agent['task']['cwd']) != other
