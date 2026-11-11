@@ -79,6 +79,8 @@ The home screen also offers **k · Search Keymaps**.
 | **Space ,** | Switch buffers |
 | **Ctrl-s** | Save the current file |
 | **Space l** / **Space cm** | Open Extras / Mason language tools |
+| **Ctrl-a** in Extras | [Add a user language pack](docs/features/user-language-packs.md) |
+| **:** | Open the floating command line |
 | **Space ap** | Pick or open a project |
 | **Space ww** / **Space wn** | Pick a window / create an editor window |
 | **Space ws** / **Space wR** | Save / restore the local file layout |

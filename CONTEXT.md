@@ -71,6 +71,13 @@ _Avoid_: delete project files, switch project, remove worktree, finish review
 **Project Autosave**:
 Local persistence of a **Project**'s window/pane arrangement, open-file references, review progress, and draft comments. It is not source-file autosave or authorization to transmit context to an agent.
 
+**Language Pack**:
+A named set of language-server, formatting and optional syntax configuration,
+with tool requirements. Built-in packs are curated with Uzume. User packs are
+local JSON definitions outside the installed checkout, enabled explicitly in
+Extras. Installed tools and active language configuration are distinct states;
+a pack does not install a project's runtime, compiler or libraries.
+
 **Distribution Release**:
 A tested combination of the distro, a distro-managed Neovim version, and selected dependencies, installed through an explicit user-controlled update with rollback.
 

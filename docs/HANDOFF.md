@@ -221,7 +221,8 @@ Linux CI's Neovim 0.11 restore failure was reproduced locally: routine file-posi
 messages caused a hit-enter prompt while sourcing a saved layout. `silent source`
 suppresses normal output while preserving real errors; the existing agent/crash
 regressions exercise restoration. Do not replace this with `silent!` or just raise
-the RPC timeout. The new user preference is to freeze feature expansion here and
+the RPC timeout. The [verification record](verification-user-packs-2026-11-11.md) records 21/21
+local cases and both Linux matrix jobs passing. The new user preference is to freeze feature expansion here and
 concentrate on polishing and bug fixes; the broader backlog below is not an
 instruction to add more features in the next iteration.
 
