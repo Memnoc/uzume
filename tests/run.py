@@ -10,6 +10,7 @@ CASES = [
     ('migration', ['migration.py'], {}),
     ('installation', ['installation.py'], {}),
     ('dashboard', ['dashboard.py'], {}),
+    ('keymaps', ['keymaps.py'], {}),
     ('pane-motion', ['pane_motion.py'], {}),
     ('agents', ['agents.py'], {}),
     ('agents-crash', ['agents.py', '--crash'], {}),

@@ -4,7 +4,7 @@ local M = {}
 local modes = {
   n = "Normal",
   i = "Insert",
-  v = "Visual",
+  v = "Visual/Sel",
   x = "Visual",
   s = "Select",
   o = "Operator",
@@ -24,12 +24,15 @@ end
 
 local function format(item, picker)
   local align = Snacks.picker.util.align
-  local width = picker.list.win:dim().width
-  local key_width = math.min(22, math.floor(width * 0.3))
+  -- Snacks prepends a selection cell. Leave one trailing cell too so the
+  -- mode label cannot be clipped at the right edge.
+  local width = picker.list.win:dim().width - 2
+  local key_width = math.min(18, math.floor(width * 0.28))
+  local mode_width = 10
   return {
     { align(item.shortcut, key_width, { truncate = true }), "SnacksPickerKeymapLhs" },
     { "  " },
-    { align(item.description, math.max(1, width - key_width - 12), { truncate = true }), "Normal" },
+    { align(item.description, math.max(1, width - key_width - mode_width - 4), { truncate = true }) },
     { "  " .. (modes[item.item.mode] or item.item.mode), "Comment" },
   }
 end
@@ -52,6 +55,9 @@ function M.open()
   return Snacks.picker.keymaps({
     title = "Shortcuts",
     format = format,
+    -- Match consecutive characters within each term, in any term order.
+    -- Fuzzy letters across columns made "swap" match "Toggle Wrap".
+    matcher = { fuzzy = false, filename_bonus = false, file_pos = false },
     main = { current = true },
     -- Filtering runs while the search input is focused. Always collect local
     -- mappings from the buffer where the user opened this guide.
@@ -64,6 +70,11 @@ function M.open()
         for _, item in ipairs(items) do
           item.shortcut = shortcut(item.item.lhs)
           item.description = item.item.desc or "Custom mapping (no description)"
+          if item.description == "vim.lsp.buf.selection_range(vim.v.count1)" then
+            item.description = "Expand Selection"
+          elseif item.description == "vim.lsp.buf.selection_range(-vim.v.count1)" then
+            item.description = "Shrink Selection"
+          end
           -- Only search what the guide presents, not callback paths or code.
           item.text = item.shortcut .. " " .. item.description .. " " .. (modes[item.item.mode] or item.item.mode)
         end
@@ -93,7 +104,7 @@ function M.open()
         border = "rounded",
         title = " {title} ",
         title_pos = "center",
-        footer = " C-b buffer · C-g global · Enter/Esc back ",
+        footer = " C-b buffer · C-g global · Esc close ",
         footer_pos = "center",
         { win = "input", height = 1, border = "bottom", title = "" },
         { win = "list", border = "none" },

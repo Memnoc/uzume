@@ -70,7 +70,12 @@ screen needs roughly 15 rows; extremely short terminals cannot display the compl
 floating, searchable shortcut guide. Type a description such as `review`,
 `split` or `inlay`, or a key such as `Space ac`. The compact rounded window shows readable shortcuts and action descriptions,
 with a muted mode label. Callback code, icons and source paths are omitted;
-search matches the displayed keys, descriptions and modes only. Mappings without
+search matches the displayed keys, descriptions and modes only. Each search term
+must occur as consecutive characters; terms can appear in any order. This avoids
+fuzzy matches such as `swap` finding “Toggle Wrap”. For example, `move pane left`
+or `left move pane` finds **Space pMh**, while `Space pMh` searches the keys.
+Directional actions include the verb and object in their mapping descriptions
+(e.g. “Move Pane Left” and “Focus Pane Left”). Mappings without
 a description remain listed as “Custom mapping (no description)”. Use Ctrl-n/p
 or arrow keys to browse; Ctrl-u clears the query and
 Backspace deletes it completely. Esc or Enter returns to the original buffer.
@@ -79,7 +84,7 @@ This is a reference menu: selecting a row does not run its action.
 The guide reads live global and current-buffer mappings, including plugin and
 LSP mappings that are currently registered. Ctrl-b toggles buffer mappings and
 Ctrl-g toggles global mappings. Mode labels spell out Normal, Insert, Visual,
-Select, Operator, Command and Terminal (`v` covers Visual/Select; `x` is Visual
+Select, Operator, Command and Terminal (`v` displays Visual/Sel; `x` displays Visual
 only). Unmapped built-in Vim commands are not a keymap catalog;
 **Space sh** opens their help. Internal `<Plug>` entries are hidden.
 
@@ -90,8 +95,13 @@ to that original buffer after the search field takes focus. **Space s?** retains
 the previous WhichKey buffer-only help. Scope toggles reset each time; queries
 use Snacks' existing local picker history. The dashboard regression drives the
 actual search UI, checks buffer mappings in Normal/Insert modes, toggles scopes,
-and confirms closing the guide does not execute the selected mapping. These
-checks pass on Neovim 0.11.0 and the installed 0.12 development build on macOS.
+and confirms closing the guide does not execute the selected mapping.
+`python3 tests/keymaps.py` covers search relevance, word order, exact shortcut
+lookup, no-result searches, and rendered rows at 60, 80 and 100 columns. It checks
+that the mode label fits and inline highlights do not paint background blocks
+across the floating surface or selected row. The action column inherits the
+picker background, and its width accounts for Snacks' leading selection cell.
+These checks pass on Neovim 0.11.0 and the installed 0.12 development build on macOS.
 
 | Control | Action |
 | --- | --- |

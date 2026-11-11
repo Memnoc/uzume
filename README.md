@@ -98,7 +98,8 @@ Keymap search is a floating shortcut guide: type to filter, use **Ctrl-n/p** or
 arrow keys to browse, and **Esc** or **Enter** to return. It lists live global
 and current-buffer mappings across modes, including those added by plugins and
 language servers. **Ctrl-b** toggles buffer mappings; **Ctrl-g** toggles global
-mappings. Search examples: `split`, `review`, `inlay`, `Space ac`.
+mappings. Search uses literal terms in any order. Examples: `split`, `move pane left`,
+`review`, `inlay`, `Space ac`.
 
 See the [editor walkthrough](editor/README.md#first-walkthrough) for a first tour,
 [Extras](editor/EXTRAS.md) for language packs, and the

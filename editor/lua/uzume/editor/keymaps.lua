@@ -66,6 +66,14 @@ map("n", "<leader>s?", function()
   require("which-key").show({ global = false })
 end, "Buffer Keymaps")
 
+local buffer_actions = {
+  BufferLineCyclePrev = "Previous Buffer",
+  BufferLineCycleNext = "Next Buffer",
+  BufferLineMovePrev = "Move Buffer Left",
+  BufferLineMoveNext = "Move Buffer Right",
+  BufferLineTogglePin = "Pin / Unpin Buffer",
+  BufferLinePick = "Pick Buffer",
+}
 for key, command in pairs({
   ["<S-h>"] = "BufferLineCyclePrev",
   ["<S-l>"] = "BufferLineCycleNext",
@@ -76,7 +84,7 @@ for key, command in pairs({
   ["<leader>bp"] = "BufferLineTogglePin",
   ["<leader>bj"] = "BufferLinePick",
 }) do
-  map("n", key, "<cmd>" .. command .. "<cr>", (command:gsub("BufferLine", "")))
+  map("n", key, "<cmd>" .. command .. "<cr>", buffer_actions[command])
 end
 map("n", "<leader>bb", "<cmd>e #<cr>", "Switch to Other Buffer")
 map("n", "<leader>`", "<cmd>e #<cr>", "Switch to Other Buffer")
@@ -91,7 +99,7 @@ map("n", "<leader>qq", "<cmd>confirm qall<cr>", "Quit All")
 
 local directions = { h = "Left", j = "Down", k = "Up", l = "Right" }
 for key, direction in pairs(directions) do
-  map({ "n", "t" }, "<C-" .. key .. ">", "<cmd>wincmd " .. key .. "<cr>", "Focus " .. direction)
+  map({ "n", "t" }, "<C-" .. key .. ">", "<cmd>wincmd " .. key .. "<cr>", "Focus Pane " .. direction)
 end
 local panes = require("uzume.editor.panes")
 local projects = require("uzume.editor.projects")
@@ -155,10 +163,10 @@ layout_map("<leader>wd", function()
   end)
 end, "Close Whole Window")
 for key, direction in pairs(directions) do
-  map("n", "<leader>pg" .. key, "<cmd>wincmd " .. key .. "<cr>", direction)
+  map("n", "<leader>pg" .. key, "<cmd>wincmd " .. key .. "<cr>", "Focus Pane " .. direction)
   layout_map("<leader>pM" .. key, function()
     panes.move(key:upper())
-  end, direction)
+  end, "Move Pane " .. direction)
 end
 layout_map("<leader>pR>", function()
   panes.resize(5, 0)
