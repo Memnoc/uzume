@@ -3,7 +3,7 @@ local M = {}
 local uv = vim.uv
 local root = vim.fn.stdpath("state") .. "/review-feedback"
 local function directory(task)
-  return root .. "/" .. vim.fn.sha256(task.project .. "\0" .. task.id)
+  return root .. "/" .. require("uzume.review.task_key")(task)
 end
 local function write(path, value)
   local parent = vim.fs.dirname(path)

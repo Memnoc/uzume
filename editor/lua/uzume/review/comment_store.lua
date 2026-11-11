@@ -3,7 +3,7 @@ local M = {}
 local uv = vim.uv
 local directory = vim.fn.stdpath("state") .. "/review-comments"
 local function path(task)
-  return directory .. "/" .. vim.fn.sha256(task.project .. "\0" .. task.id) .. ".json"
+  return directory .. "/" .. require("uzume.review.task_key")(task) .. ".json"
 end
 function M.read(task)
   local name = path(task)

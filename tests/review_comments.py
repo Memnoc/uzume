@@ -20,6 +20,12 @@ try:
     keys('Explain this change.\nPlease add a test.')
     keys('<C-s>')
     wait(lambda: js('vim.wo.diff'))
+    # Keep the existing binary-key format readable across Neovim versions.
+    task = agent['task']
+    storage_key = hashlib.sha256((task['project'] + '\0' + task['id']).encode()).hexdigest()
+    saved_path = root / 'state/uzume/review-comments' / (storage_key + '.json')
+    saved = json.loads(saved_path.read_text())
+    assert saved['comments'][0]['body'] == 'Explain this change.\nPlease add a test.'
     keys('C')
     wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
     wait(lambda: js('#Snacks.picker.get()[1]:items()') == 1)
