@@ -1,7 +1,7 @@
 # Feature guide
 
-This is the current feature inventory for the **editor preview** on
-`spike/editor-baseline`. Each write-up explains the behavior, controls,
+This is the current feature inventory for the **editor prototype** on `main`.
+Each write-up explains the behavior, controls,
 implementation, and limits. It is updated with feature changes; prototype
 records preserve what was actually checked at each increment.
 
@@ -19,15 +19,17 @@ records preserve what was actually checked at each increment.
 | Codex/Claude workspaces, marked files/reference context, attention and cleanup | [AI tasks](agents.md) |
 | Task changes picker, stable diffs, line comments, queued feedback and explicit refresh | [Task review](review.md) |
 | Combine tasks into a local feature branch, resolve conflicts and resume/abort | [Task integration](integration.md) |
-| Autosave and release management: planned behavior | [Design record](../design.md) |
+| Local layout persistence and recovery | [Native navigators](navigators.md) |
+| Full project autosave and release management: planned behavior | [Design record](../design.md) |
 
 Start with the [launch guide](../../editor/README.md). Press **Space** and pause
 for WhichKey, **Space sk** to search mappings, or **Space ?** for buffer mappings.
 The Extras menu also carries its own control hints and icon legend.
 
 The editor preview includes supervised Codex/Claude terminals in task worktrees.
-Stable task review and queued feedback are available; project autosave and complete
-managed releases remain planned. The earlier standalone agent pilot is retained
+Stable task review, queued feedback, local layout persistence and integration
+are available; complete project restoration and managed releases remain planned.
+The earlier standalone agent pilot is retained
 for comparison.
 
 For every feature change, update its write-up with what changed, how to use it,

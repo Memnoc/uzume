@@ -126,7 +126,11 @@ The editor code had no merge conflicts. The clean committed README already
 contained the desired single tagline; the duplicate test paragraph is backed up
 before removing it from the user's checkout. No task branches are pruned.
 
-After verification, main can advance to the consolidated commit. Do not confuse
+Main advanced locally to consolidation commit `f286734`, and the normal
+`/Code/uzume` checkout is now on main. The former main integration checkout is
+retained detached; its aborted operation and all task worktrees remain intact.
+The duplicate README test edit was backed up outside the repository as
+`/Users/matteostara/Code/uzume-readme-before-cleanup-20261111.md`. Do not confuse
 this repository-history operation with the product's one-task delta integration.
 Check `git status`, `git log --oneline --decorate -6`, and `git worktree list`
 on entry to a future session: local worktree placement and remote state can change.
@@ -193,9 +197,26 @@ namespace migration; Rust only where measurements or ownership justify it.
 
 ## Animation experiment
 
-Requested as a separate throwaway branch: `spike/pane-animations`. Explore
-whether small native tiling/resize transitions improve orientation without
-delaying input, stealing focus or destabilizing terminal geometry. Keep main's
-instant behavior intact. The experiment should have one launch command, visible
-mode controls, no new persisted preference and disposable data. Record observed
-tradeoffs; do not claim GPU frame rate or promote it before hands-on feedback.
+Implemented separately on `spike/pane-animations`, based on `f286734`, in
+`/Users/matteostara/Code/uzume-pane-animations`. Main retains instant pane behavior.
+Run `/Users/matteostara/Code/uzume-pane-animations/spike-animations` to compare
+Instant, Ease and Pulse in a disposable three-pane workspace with local output.
+Space uA opens the mode list (j/k, Enter); Space uD demonstrates a resize.
+The launcher shares only pinned plugin files read-only, disables automatic tool
+installation, and discards its demo state on exit. Ordinary `uzume` is unaffected.
+
+The real-Neovim probe showed native geometry tweening is feasible without an
+extra dependency. Eased operations settled in approximately 142–157 ms and pulse
+cues around 189–191 ms in that run. Split/resize, floating, fullscreen/restore,
+docking, repeated operations, keyboard mode selection and cancellation ran
+without editor errors. These are callback timings, not measured GPU frame rates.
+Eased mode repeatedly resizes terminals; pulse leaves final geometry immediate.
+Native topology movement stays atomic and receives a cue. Arbitrary native
+commands, mouse arbitration, CPU/battery cost and four live agents remain
+unverified. No motion policy has been accepted for main.
+
+The full usage/observation record is on the experiment branch:
+`git show spike/pane-animations:docs/prototypes/0009-pane-animations.md`.
+Keep the demo and monkeypatch implementation off main. If a mode is preferred,
+rewrite a small opt-in implementation with cancellation/focus/layout coverage
+and load measurements rather than promoting the experiment wholesale.

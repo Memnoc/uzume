@@ -134,5 +134,6 @@ These steps are proposed sequencing, not an approved implementation ticket list.
 The [maintainer handoff](HANDOFF.md) records the consolidated prototype baseline,
 module map, verification commands, and prioritized remaining work. Historical
 trial steps above describe the development sequence, not a fresh implementation
-plan. A separate `spike/pane-animations` experiment will explore tiling/resize
-motion; no animation behavior is accepted for the main editor yet.
+plan. A separate `spike/pane-animations` experiment provides Instant, Ease and Pulse
+variants for tiling/resize evaluation; no animation behavior is accepted for the
+main editor yet. Its launch command and observations are in the handoff.
