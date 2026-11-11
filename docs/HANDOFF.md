@@ -182,15 +182,22 @@ See [Linux](features/linux.md), [installation](features/installation.md),
 Intel Mac, Linux ARM64 and hands-on Linux terminal trials remain pending.
 Earlier cached-install reports are historical evidence, not the new-machine path.
 
-Namespace/Linux implementation is published on `feat/uzume-namespace-linux` in
-`/Code/uzume-namespace`. The user's normal `/Code/uzume` checkout remains at
-`8a86dc0` pending closure of their live Uzume windows. After they confirm closure:
-recheck process and Git state, fast-forward main to the verified feature tip,
-run `python3 setup-editor --migrate --register` from `/Code/uzume`, narrowly update
-the old app name in their backed-up `uzume` shell function and `nvims` picker,
-and verify startup, tool references and retained worktrees before publishing main.
-The user authorized the migration; closing the live editor is the outstanding
-safety prerequisite. Never kill it or move its directories underneath it.
+Namespace/Linux implementation was fast-forwarded into the normal `/Code/uzume`
+main checkout from `e56b2c0` after the user closed Uzume and no live instances
+remained. `setup-editor --migrate --register` completed on 2026-11-11: canonical
+config/data/state/cache paths are active, legacy links preserve absolute paths,
+and bundle `2b1f2b0916ce` is installed. The pre/post audit matched 1,707 saved
+files/links, 23 retained Git worktrees (HEAD, staging, unstaged changes and status),
+and all four directory identities. All 13 tool references remain executable.
+Both the standalone launcher and updated shell function passed startup checks.
+
+Only the Uzume function, its comment and the `nvims` entry changed in `.zshrc`;
+the backup is `~/.zshrc.before-uzume-namespace-20261111-214304`. Existing shells
+must reload the file or open a new shell to use the new function. Plain `nvim`
+was not changed. Do not remove compatibility links or rename `/Code/ai-nvim`:
+that historical checkout owns the common Git directory used by linked worktrees.
+See the verification record for rollout evidence; check current Git/remote state
+before subsequent work instead of assuming the development branch is still ahead.
 
 The harness verifies the adapters' contract, not every live vendor CLI release.
 Manual Codex and Claude trials have informed the workflow, but upgrades still

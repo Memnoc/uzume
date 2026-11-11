@@ -87,10 +87,28 @@ Passing fixtures do not establish live vendor CLI compatibility, terminal
 smoothness, every Linux distribution, Linux ARM64 or Intel macOS. See
 [Linux](features/linux.md) and [the handoff](HANDOFF.md).
 
-The implementation is published on `feat/uzume-namespace-linux`; the normal
-`/Code/uzume` checkout remains on `main` at `8a86dc0` pending local rollout. At the
-last check, the user's two Neovim processes still used the old namespace. Their
-editor must be closed before changing its active checkout and real storage.
-No test authorizes closing their editor or pruning retained tasks.
+The user confirmed closure and authorized rollout. With no live Uzume processes,
+the normal `/Code/uzume` main checkout fast-forwarded to `e56b2c0`; the public
+`setup-editor --migrate --register` command then completed successfully.
+
+- Config/data/state/cache now have canonical `uzume` names and relative legacy
+  aliases. The original directory identities and permissions were preserved.
+- The pre/post audit matched **1,707 saved files/links** and **23 retained Git
+  worktrees**, including HEAD, staged/unstaged diffs and status. After launcher
+  smoke tests, only Neovim's LSP log changed; all other audited files and Git
+  state still matched. No source, index or review history was rewritten.
+- Bundle **2b1f2b0916ce** was built and activated. All **13/13** retained language
+  tool references are executable; previous bundles remain in place.
+- `.zshrc` was backed up to `.zshrc.before-uzume-namespace-20261111-214304`.
+  Comparison verified only three intended lines changed: the Uzume function's
+  app name, its comment and the `nvims` entry. Shell syntax validation passed.
+- Both the generated executable and the actual updated function passed headless
+  startup checks: canonical paths, selected bundle, agent/review commands and
+  launch mapping, with no startup error. No real agent was started.
+
+Local logs: `/tmp/uzume-live-migration.log`, `/tmp/uzume-live-startup.log` and
+`/tmp/uzume-shell-startup.log`. The private pre-migration digest inventory is
+`/tmp/uzume-migration-before.json`; it contains hashes, not source contents.
+An existing shell needs `source ~/.zshrc` or a new terminal to reload the function.
 Old-name compatibility links and the common historical Git checkout are deliberate
 retentions, not leftover competing implementations.
