@@ -107,6 +107,7 @@ Snacks.setup({
             Snacks.picker.recent()
           end,
         },
+        { icon = " ", key = "k", desc = "Search Keymaps", action = require("uzume.ui.keymaps").open },
         { icon = " ", key = "q", desc = "Quit", action = ":qa" },
       },
     },

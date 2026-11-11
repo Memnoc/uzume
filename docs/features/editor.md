@@ -16,7 +16,7 @@ indent guides, status-column UI, input prompts and warning/error notifications.
 Indent-guide animation is disabled. WhichKey's Helix-style menu appears after
 pressing Space and pausing; no function-row key is required.
 The dashboard budgets its full content height on every resize. It reserves top
-and bottom breathing room, keeps all six navigation shortcuts, and shows up to
+and bottom breathing room, keeps all seven navigation shortcuts, and shows up to
 five recent files and projects only when they fit. At 40 rows it uses the full
 wordmark; at 30–39 rows it uses the emblem and compact name; below 30 it keeps
 the compact name. Short windows omit history before sacrificing navigation.
@@ -63,12 +63,37 @@ the compact layouts described above. File, search, explorer, and quit shortcuts 
 below the startup artwork.
 `python3 tests/dashboard.py` resizes a populated dashboard through 100×34,
 80×24, 150×55, 100×40, 80×18 and back to 100×34, checking visible margins,
-shortcuts, history and the new-file action. The six-action home screen needs
-roughly 14 rows; extremely short terminals cannot display the complete menu.
+shortcuts, history, keymap search and the new-file action. The seven-action home
+screen needs roughly 15 rows; extremely short terminals cannot display the complete menu.
+
+**Space ?**, **Space sk**, or **k · Search Keymaps** on the home screen opens a
+floating, searchable shortcut guide. Type a description such as `review`,
+`split` or `inlay`, or a key such as `Space ac`. Rows show the mode, shortcut and
+description. Use Ctrl-n/p or arrow keys to browse; Ctrl-u clears the query and
+Backspace deletes it completely. Esc or Enter returns to the original buffer.
+This is a reference menu: selecting a row does not run its action.
+
+The guide reads live global and current-buffer mappings, including plugin and
+LSP mappings that are currently registered. Ctrl-b toggles buffer mappings and
+Ctrl-g toggles global mappings. Mode labels follow Neovim: `n` normal, `i` insert,
+`v` visual/select, `x` visual, `s` select, `o` operator-pending, `c` command line
+and `t` terminal. Unmapped built-in Vim commands are not a keymap catalog;
+**Space sh** opens their help. Internal `<Plug>` entries are hidden.
+
+[keymaps.lua](../../editor/lua/uzume/ui/keymaps.lua) configures the already-pinned
+Snacks picker; there is no separate mapping registry or new dependency. Opening
+it from a buffer includes that buffer's local shortcuts; filtering stays anchored
+to that original buffer after the search field takes focus. **Space s?** retains
+the previous WhichKey buffer-only help. Scope toggles reset each time; queries
+use Snacks' existing local picker history. The dashboard regression drives the
+actual search UI, checks buffer mappings in Normal/Insert modes, toggles scopes,
+and confirms closing the guide does not execute the selected mapping. These
+checks pass on Neovim 0.11.0 and the installed 0.12 development build on macOS.
 
 | Control | Action |
 | --- | --- |
-| Space sk / Space ? | Search all mappings / show buffer mappings |
+| Space ? / Space sk | Search live mappings by description or keys |
+| Space s? | Show buffer-only shortcut help |
 | Space n | Notification history |
 | Space uC | Select a colorscheme for this run |
 | Space uw / us | Toggle wrapping / spelling |
@@ -85,7 +110,7 @@ Inside the explorer, `a` adds a file (a trailing slash creates a directory), `r`
 renames, `d` deletes, `c` copies, `m` moves, `y` yanks and `p` pastes. `h/l`
 collapse/expand, `Tab` selects, `H` toggles hidden files and `I` ignored files.
 These are real filesystem operations supplied by Snacks; use disposable files
-when learning them. **Space ?** reveals the current buffer's mappings.
+when learning them. **Space s?** reveals the current buffer's mappings.
 
 | Control | Action |
 | --- | --- |

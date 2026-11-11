@@ -46,7 +46,8 @@ accelerate plugin installation. Syntax parsers are built locally.
    selects buffers. These are floating pickers; opening a file keeps the explorer.
 3. Press **Space** and pause for the leader menu. **Space f**, **Space s**,
    **Space w** (windows), and **Space p** (panes) expose their control groups.
-   **Space ?** shows buffer-local help.
+   **Space ?** searches live key mappings by typing; **Space s?** shows buffer-local
+   help. The home screen also offers **k · Search Keymaps**.
 4. **Shift h/l** cycles buffers; **Space bd** closes a buffer while retaining the
    window layout. **Space |** and **Space -** create splits; **Ctrl-h/j/k/l** moves
    between them. Native **Ctrl-w** resizing remains available without arrow keys.

@@ -26,7 +26,8 @@ records preserve what was actually checked at each increment.
 | Full project autosave and release management: planned behavior | [Design record](../design.md) |
 
 Start with the [launch guide](../../editor/README.md). Press **Space** and pause
-for WhichKey, **Space sk** to search mappings, or **Space ?** for buffer mappings.
+for WhichKey, **Space ?** (or **Space sk**) to search mappings, or **Space s?** for
+buffer mappings. The home screen's **k · Search Keymaps** opens the same search.
 The Extras menu also carries its own control hints and icon legend.
 
 The editor preview includes supervised Codex/Claude terminals in task worktrees.

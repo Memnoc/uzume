@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="#project-status"><img src="https://img.shields.io/badge/status-prototype-eb6f92" alt="Status: prototype"></a>
+  <a href="#development-approach"><img src="https://img.shields.io/badge/status-prototype-eb6f92" alt="Status: prototype"></a>
   <a href="editor/README.md#installation-and-pins"><img src="https://img.shields.io/badge/Neovim-0.11%2B-c4a7e7" alt="Requires Neovim 0.11 or newer"></a>
   <a href="docs/features/installation.md#verification-and-remaining-work"><img src="https://img.shields.io/badge/preview-macOS_ARM64%20%7C%20Linux_x86__64-9ccfd8" alt="Tested preview: macOS ARM64 and Linux x86_64"></a>
 </p>
@@ -18,7 +18,7 @@
 <p align="center">
   <a href="editor/README.md#installation-and-pins"><strong>Install</strong></a> ·
   <a href="docs/features/README.md">Features</a> ·
-  <a href="editor/README.md#first-walkthrough">Shortcuts</a> ·
+  <a href="#shortcuts">Shortcuts</a> ·
   <a href="editor/EXTRAS.md">Extras</a> ·
   <a href="docs/design.md">Design</a>
 </p>
@@ -59,27 +59,52 @@ No existing Neovim config or caches are needed. See the
 [installation guide](docs/features/installation.md) for platform status, language
 tools and adding the launcher to PATH.
 
-## Project status
+Run `uzume path/to/file` to open a file directly. Plain `nvim` keeps your existing
+configuration. Upgrading an older preview? Follow the
+[namespace migration guide](docs/features/namespace-migration.md).
 
-The main development baseline contains the independent editor, project/window/pane management, isolated agent tasks, stable review and feedback, and local task integration. This is a working prototype, not a production release; the full production specification remains open.
+## Shortcuts
 
-Run `uzume`, or `uzume path/to/file` to open a file directly. The existing `nvims` → **uzume** entry also works. See the [editor guide](editor/README.md) for setup, familiar controls, and the current boundaries. Plain `nvim` keeps your default configuration.
+**Space** is the leader key. Press it and pause to browse the menus, or press
+**Space ?** to search mappings by typing a description or key combination.
+The home screen also offers **k · Search Keymaps**.
 
-The code, launcher and config/data directories use **Uzume** consistently. Existing
-preview installations can migrate safely with `python3 setup-editor --migrate --register`;
-see the [migration guide](docs/features/namespace-migration.md).
+| Shortcut | Action |
+| --- | --- |
+| **Space ?** / **Space sk** | Search all active key mappings |
+| **Space s?** | Show current-buffer shortcut help |
+| **Space e** | Toggle the project file explorer |
+| **Space Space** | Find project files |
+| **Space /** | Search project text |
+| **Space ,** | Switch buffers |
+| **Ctrl-s** | Save the current file |
+| **Space l** | Open Extras and language tools |
+| **Space ap** | Pick or open a project |
+| **Space ww** / **Space wn** | Pick a window / create an editor window |
+| **Space ps** / **Space pv** | Split the editor down / right |
+| **Ctrl-h/j/k/l** | Focus the pane to the left / down / up / right |
+| **Space pf** / **Space pm** | Float or dock a pane / fullscreen or restore it |
+| **Space ac** / **Space aC** | Start a Codex / Claude task on a named branch |
+| **Space aa** | Find agents needing attention |
+| **Space vr** | Review task changes |
+| **Space vc** / **Space vs** | Comment on review lines / preview comments to send |
+| **Space vi** | Integrate a task into a local branch or continue integration |
+| **Space gs** | Inspect Git status |
+| **Space uh** | Toggle inlay hints |
+| **Space uA** | Choose pane animations or Instant |
+| **Space qq** | Quit with unsaved-change confirmation |
 
-**Space l** opens [Extras](editor/EXTRAS.md): Rust, Lua, C/C++, TypeScript/React/HTML/CSS, and Smear Cursor. Save choices with Ctrl-s and restart to apply pack-loading changes. Missing
-language tools now install automatically through isolated, pinned Mason when you
-open supported files. The [tool workflow](docs/features/tool-installation.md)
-covers catalog views, manual installation, disabling automation and retries.
+Keymap search is a floating shortcut guide: type to filter, use **Ctrl-n/p** or
+arrow keys to browse, and **Esc** or **Enter** to return. It lists live global
+and current-buffer mappings across modes, including those added by plugins and
+language servers. **Ctrl-b** toggles buffer mappings; **Ctrl-g** toggles global
+mappings. Search examples: `split`, `review`, `inlay`, `Space ac`.
 
-**Space ac** starts a Codex task; **Space aC** starts Claude Code. Each task opens
-in its own branch/worktree window under the current project. **Space aa** shows
-agent attention. See the [AI task guide](docs/features/agents.md).
+See the [editor walkthrough](editor/README.md#first-walkthrough) for a first tour,
+[Extras](editor/EXTRAS.md) for language packs, and the
+[AI task guide](docs/features/agents.md) for the agent → review → integration flow.
 
-**Space uA** selects [pane animation](docs/features/pane-animations.md): Slide is
-enabled by default, with Instant available for immediate layout changes.
+## Documentation
 
 - [Lua module map](editor/lua/README.md): code grouped by editor feature.
 - [Maintainer handoff](docs/HANDOFF.md): architecture, verification, decisions, and prioritized next work.
