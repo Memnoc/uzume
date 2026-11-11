@@ -284,7 +284,9 @@ function M.restore()
   vim.uv.fs_close(fd)
   vim.fn.writefile(saved.layout, temporary)
   M.restoring = true
-  local ok, err = pcall(vim.cmd, "source " .. vim.fn.fnameescape(temporary))
+  -- File-position messages can fill the command area and block 0.11 at a
+  -- hit-enter prompt halfway through restoration. Keep errors visible (no !).
+  local ok, err = pcall(vim.cmd, "silent source " .. vim.fn.fnameescape(temporary))
   vim.fn.delete(temporary)
   if ok then
     local focused = api.nvim_get_current_win()
