@@ -75,7 +75,7 @@ try:
     assert not fixture_modes()
     keys('<C-b>')
     wait(lambda: fixture_modes() == {'n', 'i'})
-    keys('<CR>')
+    keys('<Esc>')
     wait(lambda: js('vim.api.nvim_get_current_buf()') == source_buffer)
     assert not js('vim.g.keymap_fixture_ran'), 'Reading the guide must not execute the selected mapping'
     keys(' sk')

@@ -66,12 +66,12 @@ configuration. Upgrading an older preview? Follow the
 ## Shortcuts
 
 **Space** is the leader key. Press it and pause to browse the menus, or press
-**Space ?** to search mappings by typing a description or key combination.
+**Space k** to search mappings by typing a description or key combination.
 The home screen also offers **k · Search Keymaps**.
 
 | Shortcut | Action |
 | --- | --- |
-| **Space ?** / **Space sk** | Search all active key mappings |
+| **Space k** / **Space ?** / **Space sk** | Search active key mappings; Enter runs a Normal-mode action |
 | **Space s?** | Show current-buffer shortcut help |
 | **Space e** | Toggle the project file explorer |
 | **Space Space** | Find project files |
@@ -95,7 +95,9 @@ The home screen also offers **k · Search Keymaps**.
 | **Space qq** | Quit with unsaved-change confirmation |
 
 Keymap search is a floating shortcut guide: type to filter, use **Ctrl-n/p** or
-arrow keys to browse, and **Esc** or **Enter** to return. It lists live global
+arrow keys to browse, **Enter** to run a Normal-mode action in the original pane,
+and **Esc** to close. Other modes remain searchable with a mode reminder on Enter.
+It lists live global
 and current-buffer mappings across modes, including those added by plugins and
 language servers. **Ctrl-b** toggles buffer mappings; **Ctrl-g** toggles global
 mappings. Search uses literal terms in any order. Examples: `split`, `move pane left`,

@@ -40,7 +40,7 @@ controls remain primary. Preserve plain `nvim` and its existing configuration.
 | Feedback | Preview first; a queues, submits to a ready CLI and focuses it; Ctrl-s queues only; busy delivery at eligible hook boundary | No need to manually tell an idle agent to check its queue; no injection into permission prompts |
 | Integration | Preview reviewed task delta, select local destination, apply one commit; labeled conflict resolver, continue/abort, saved operation history | Combine several tasks into a feature branch without importing inherited starting edits or publishing remotely |
 | Home | Responsive cave/sun artwork and history list budgeting, visible shortcuts | Populated history must fit too; padding alone hid the bottom of the dashboard |
-| Shortcut discovery | Space ? / Space sk or dashboard k searches live mappings; Space s? retains buffer-only help | Literal multiword search with complete action names; uniform floating rows; excludes callback code/paths and never replays an action |
+| Shortcut discovery | Space k / Space ? / Space sk or dashboard k searches live mappings; Enter runs Normal-mode actions, Esc closes | Literal multiword search; native dispatch in the original pane; guards wrong-mode, changed or overridden mappings; Space s? retains buffer-only help |
 
 The active code and app namespace are now `uzume`. Existing storage can be renamed
 using `setup-editor --migrate --register` after closing Uzume. Legacy absolute

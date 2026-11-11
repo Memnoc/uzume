@@ -16,7 +16,7 @@ def search(query):
 
 try:
     wait(lambda: lua('vim.v.vim_did_enter') == '1')
-    do('vim.keymap.set("o", "<leader>zq", function() end, '
+    do('vim.g.operator_shortcut_ran=false; vim.keymap.set("o", "<leader>zq", function() vim.g.operator_shortcut_ran=true end, '
        '{buffer=0,desc="Long operator fixture with enough words to exercise truncation at narrow widths"})')
     keys(' ?')
     wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
@@ -57,6 +57,53 @@ try:
         check(not backgrounds, ('Inline background blocks', cols, backgrounds))
     assert not failures, failures
     print('PASS: literal multiword/key search, directional action names, full mode labels and uniform row backgrounds')
+    keys('<Esc>')
+    wait(lambda: lua('vim.bo.filetype') != 'snacks_picker_input')
+    source_window = js('vim.api.nvim_get_current_win()')
+    do('vim.wo.wrap=false; vim.cmd("vsplit"); vim.wo.wrap=false')
+    other_window = js('vim.api.nvim_get_current_win()')
+    do('vim.api.nvim_set_current_win(' + str(source_window) + ')')
+    keys(' k')
+    wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+    search('Toggle Wrap')
+    keys('<CR>')
+    wait(lambda: js('vim.wo[' + str(source_window) + '].wrap'))
+    assert not js('vim.wo[' + str(other_window) + '].wrap'), 'Action ran in the wrong pane'
+    assert js('vim.api.nvim_get_current_win()') == source_window
+    keys(' k')
+    wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+    search('Toggle Wrap')
+    keys('<Esc>')
+    wait(lambda: lua('vim.bo.filetype') != 'snacks_picker_input')
+    assert js('vim.wo[' + str(source_window) + '].wrap'), 'Escape executed the action'
+    print('PASS: Space k opens shortcuts; Enter executes in the original pane; Escape only closes')
+    source_buffer = js('vim.api.nvim_get_current_buf()')
+    do('vim.keymap.set("n", "<leader>z<", "<Cmd>let g:shortcut_rhs_buffer = bufnr() <CR>", '
+       '{buffer=0,desc="RHS execution fixture"})')
+    keys(' k')
+    wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+    search('RHS execution fixture')
+    keys('<CR>')
+    wait(lambda: js('vim.g.shortcut_rhs_buffer') == source_buffer)
+    keys(' k')
+    wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+    search('long operator fixture')
+    keys('<CR>')
+    assert lua('vim.bo.filetype') == 'snacks_picker_input', 'Wrong-mode action closed the guide'
+    assert not js('vim.g.operator_shortcut_ran'), 'Operator shortcut ran in Normal mode'
+    assert 'Operator mode' in lua('vim.inspect(Snacks.notifier.get_history())')
+    search('RHS execution fixture')
+    do('vim.g.replacement_shortcut_ran=false; vim.keymap.set("n", "<leader>z<", '
+       'function() vim.g.replacement_shortcut_ran=true end, '
+       '{buffer=' + str(source_buffer) + ',desc="Changed execution fixture"})')
+    keys('<CR>')
+    assert lua('vim.bo.filetype') == 'snacks_picker_input'
+    assert not js('vim.g.replacement_shortcut_ran'), 'Changed mapping ran without refreshing'
+    assert 'changed or is overridden' in lua('vim.inspect(Snacks.notifier.get_history())')
+    keys('<Esc>')
+    print('PASS: buffer-local RHS with literal < executes; wrong-mode and changed mappings are not replayed')
+
+
 finally:
     if proc.poll() is None:
         try: do('vim.cmd("qa!")')
