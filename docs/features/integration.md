@@ -29,12 +29,35 @@ when its checkout passes the same checks; it is not the automatic destination.
 
 ## Conflicts and recovery
 
-Conflicts pause the operation and open a file picker. Select a conflicted file:
-**Destination** and **Task** are read-only comparison panes; the editable result
-contains Git's conflict markers. Edit the result, remove markers and save it.
+Conflicts pause the operation and open a file picker. The resolver labels its
+panes **DESTINATION · read only**, **EDIT RESULT**, and **TASK CHANGES · read only**.
+The middle pane is your final file; its header shows the remaining conflict count
+and **Space vm**, which opens the action menu. Conflict marker lines also identify
+the destination and task sections.
+
+| Shortcut in the resolver | Action |
+| --- | --- |
+| Space vm | Open conflict actions with their shortcuts |
+| Space vo | Keep the destination side of the current conflict |
+| Space vt | Keep the task side of the current conflict |
+| Space vb | Keep both sides, destination first |
+| ]x / [x | Next / previous conflict, wrapping at the end |
+| u in the result | Undo the last choice using ordinary editor undo |
+| Space vf | Choose another conflict file (save your current edits first) |
+| Space vS | Save this result and finish the integration |
+
+Choosing a side replaces only the marker block containing the result cursor,
+removes that block's markers, and advances to the next block. Other conflicts
+and surrounding text remain intact. Commands from a comparison pane target the
+result pane's cursor. Choices do not save or commit; **Space vS** is the explicit
+save-and-finish action and refuses remaining conflicts or other unsaved files.
+The commands understand ordinary and diff3-style markers. Manual edits remain
+available when you need to combine parts rather than keep a whole side.
+
 Do not edit the comparison panes. For deletion conflicts, remove the result file
-if deletion is the intended resolution. Binary conflicts need Git/manual tooling;
-the text comparison cannot resolve binary contents.
+if deletion is intended. Binary conflicts need Git/manual tooling; the text
+comparison cannot resolve binary contents. After finishing or aborting, the
+comparison panes and temporary resolver mappings are removed.
 
 Press **Space vi** from the integration checkout to reopen its status, then:
 
@@ -83,3 +106,6 @@ throwaway repositories. It verifies preview-before-mutation, a combined feature
 with two task commits, source preservation, exclusion of inherited edits, dirty
 destination refusal, three-pane conflict editing, stale-preview refusal, saved
 conflict recovery and explicit abort. No model requests or remote pushes run.
+The same test checks side choices, keeping both, undo, navigation, action-menu
+selection, preservation of other conflicts and cleanup of resolver controls.
+Run with `UZUME_TEST_CONFLICT_STYLE=diff3` to exercise Git's base-section markers.

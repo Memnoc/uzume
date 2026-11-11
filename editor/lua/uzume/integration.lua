@@ -61,6 +61,7 @@ function M.close()
   end
 end
 local function edit(plan, path)
+  saved(plan.cwd)
   M.close()
   require("uzume.review").close()
   local tab
@@ -80,6 +81,7 @@ local function edit(plan, path)
     })
   end
   vim.t.uzume_integration = plan.record
+  require("uzume.conflicts").detach(api.nvim_get_current_tabpage())
   for _, win in ipairs(vim.t.uzume_resolution_wins or {}) do
     if api.nvim_win_is_valid(win) then
       api.nvim_win_close(win, true)
@@ -105,7 +107,7 @@ function M.files(plan)
               return
             end
             local wins = {}
-            for index, side in ipairs({ { "Destination", sides.ours }, { "Task", sides.theirs } }) do
+            for index, side in ipairs({ { "DESTINATION", sides.ours }, { "TASK CHANGES", sides.theirs } }) do
               api.nvim_set_current_win(result_win)
               vim.cmd(index == 1 and "leftabove vsplit" or "rightbelow vsplit")
               local buf = api.nvim_create_buf(false, true)
@@ -122,6 +124,15 @@ function M.files(plan)
             api.nvim_set_current_win(result_win)
             vim.cmd.diffthis()
             vim.wo.foldenable = false
+            require("uzume.conflicts").attach(result_win, wins, {
+              files = function()
+                M.files(plan)
+              end,
+              finish = function()
+                guard(plan.task, plan.cwd)
+                request({ action = "finish", record = plan.record }, M.show)
+              end,
+            })
           end)
         end
       end)
@@ -130,6 +141,9 @@ function M.files(plan)
 end
 function M.show(plan)
   M.close()
+  if (plan.state == "integrated" or plan.state == "aborted") and vim.t.uzume_integration == plan.record then
+    require("uzume.conflicts").detach(api.nvim_get_current_tabpage(), true)
+  end
   M.current = plan
   local lines = {
     plan.state:upper() .. " · Local integration",

@@ -102,8 +102,10 @@ newer changes and **q** closes it. The agent keeps running. See
 After reviewing a task, **Space vi** (or **i** in its diff) offers local integration
 into an existing or newly named feature branch. Preview the delta, then **a**
 creates one local commit. Repeat for other tasks to build a combined feature.
-Conflicts open editable results with destination/task comparisons; save, reopen
-**Space vi** and press **c** to continue. **Space vI** reopens saved operations.
+Conflicts show a labelled **EDIT RESULT** pane between read-only comparisons.
+**Space vm** opens its action menu: **Space vo / vt / vb** chooses destination,
+task or both for one conflict; **[x / ]x** navigates and **u** undoes. **Space vS**
+saves and finishes. **Space vI** reopens saved operations.
 See [integration and recovery](../docs/features/integration.md). Push, PR creation
 and task cleanup remain separate actions.
 
