@@ -53,14 +53,18 @@ assert result.returncode == 0, result.stderr
 subprocess.run(command, env=env, check=True, capture_output=True)
 assert (root / 'data/ai-nvim').is_symlink()
 # Never migrate data underneath a running editor using those XDG roots.
-editor = subprocess.Popen(['nvim', '--headless', '-u', 'NONE', '-i', 'NONE', '-c', 'lua vim.wait(10000)', '-c', 'qa!'],
-    env=dict(env, NVIM_APPNAME='ai-nvim'), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-try:
-    time.sleep(.3)
-    result = subprocess.run(command, env=env, capture_output=True, text=True)
-    assert result.returncode != 0 and 'Save and close Uzume' in result.stderr, result.stdout + result.stderr
-finally:
-    editor.terminate(); editor.wait(timeout=5)
+(root / 'state-alias').symlink_to(root / 'state', target_is_directory=True)
+for editor_env in (env, dict(env, XDG_DATA_HOME=str(root / 'other-data'),
+                           XDG_CONFIG_HOME=str(root / 'other-config'), XDG_CACHE_HOME=str(root / 'other-cache'),
+                           XDG_STATE_HOME=str(root / 'state-alias'))):
+    editor = subprocess.Popen(['nvim', '--headless', '-u', 'NONE', '-i', 'NONE', '-c', 'lua vim.wait(10000)', '-c', 'qa!'],
+        env=dict(editor_env, NVIM_APPNAME='ai-nvim'), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        time.sleep(.3)
+        result = subprocess.run(command, env=env, capture_output=True, text=True)
+        assert result.returncode != 0 and 'Save and close Uzume' in result.stderr, result.stdout + result.stderr
+    finally:
+        editor.terminate(); editor.wait(timeout=5)
 # Preflight every directory before changing any, even when a later one conflicts.
 collision = root / 'collision'; collision.mkdir()
 conflict_env = dict(os.environ, **{f'XDG_{key}_HOME': str(collision / value) for key,value in

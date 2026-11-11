@@ -75,7 +75,7 @@ local function name(project, entry, origin, file, opts, kind)
         selected
           and selected.head == entry.head
           and selected.token == entry.token
-          and paths.same(selected.cwd, entry.cwd)
+          and (selected.cwd == entry.cwd or paths.same(selected.cwd, entry.cwd))
           and not selected.conflicts
           and not selected.operation,
         "The source branch changed while naming the task. Launch again to inspect its latest state."
@@ -246,7 +246,7 @@ function M.choose(kind, opts)
                     selected
                       and selected.head == entry.head
                       and selected.token == entry.token
-                      and paths.same(selected.cwd, entry.cwd)
+                      and (selected.cwd == entry.cwd or paths.same(selected.cwd, entry.cwd))
                       and not selected.conflicts
                       and not selected.operation,
                     "The branch changed during selection. Choose it again to inspect the latest state."

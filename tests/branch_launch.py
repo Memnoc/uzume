@@ -76,6 +76,9 @@ try:
     resumed = item(1)
     assert resumed['kind'] == 'claude' and resumed['task']['cwd'] == str(task_root)
     assert resumed['task']['base'] == agent['task']['base']
+    marked = resumed['task']['context']['files']
+    assert all(file['role'] == 'working' for file in marked), 'Migrated task files must remain writable context'
+    assert len({str(Path(file['path']).resolve()) for file in marked}) == len(marked), 'Aliases must not duplicate marked files'
     assert (task_root/'example.txt').read_text() == 'latest edits in the retained task\n'
     print('PASS: closed task reopens through a compatibility path with its original review baseline')
     do('vim.cmd.stopinsert(); vim.api.nvim_set_current_tabpage(' + str(original_tab) + ')')

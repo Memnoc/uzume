@@ -45,9 +45,9 @@ def active_editors(bases):
             if values.get('NVIM_APPNAME') not in (LEGACY, APP):
                 continue
             # A fixture with isolated XDG roots must not block a different installation.
-            default = Path(values.get('HOME', str(Path.home()))) / '.local/share'
-            data = Path(values.get('XDG_DATA_HOME', str(default))).absolute()
-            if data == bases['DATA']:
+            home_path = Path(values.get('HOME', str(Path.home())))
+            if any(Path(values.get('XDG_' + key + '_HOME', str(home_path / default))).resolve() == bases[key].resolve()
+                   for key, default in DEFAULTS.items()):
                 found.append(pid)
         except (FileNotFoundError, ProcessLookupError):
             continue
@@ -98,6 +98,8 @@ def migrate():
             alias = old.is_symlink() and old.resolve() == new.resolve()
             if os.path.lexists(old) and os.path.lexists(new) and not alias:
                 raise RuntimeError('Both app paths exist; migration will not merge them: ' + str(old) + ' and ' + str(new))
+            if (old.exists() and not old.is_dir()) or (new.exists() and not new.is_dir()):
+                raise RuntimeError('App storage must be a directory: ' + str(old))
             if not old.exists() and not new.exists():
                 raise RuntimeError('Migration path is missing; inspect ' + str(old))
         if not record['moves']:

@@ -1,6 +1,7 @@
 -- Per-task file references. Marking is local; the next submitted prompt consumes them.
 local M = {}
 local api = vim.api
+local locations = require("uzume.core.paths")
 
 function M.run(fn, title)
   local ok, err = pcall(fn)
@@ -37,7 +38,7 @@ function M.add(item, paths)
   local context = item.task.context or { files = {}, revision = 0 }
   local seen = {}
   for _, file in ipairs(context.files) do
-    seen[file.path] = true
+    seen[locations.canonical(file.path) or file.path] = true
   end
   local pending = {}
   for _, path in ipairs(paths) do
@@ -50,7 +51,7 @@ function M.add(item, paths)
       seen[path] = true
       pending[#pending + 1] = {
         path = path,
-        role = vim.startswith(path, item.task.cwd .. "/") and "working" or "reference",
+        role = locations.contains(item.task.cwd, path) and "working" or "reference",
       }
     end
   end
