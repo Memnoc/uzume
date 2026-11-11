@@ -234,6 +234,14 @@ Instant cancellation and exact destinations still worked. Use Space pf to try
 the entrance, Space uD for resize, and Space uA to compare. This remains an
 experiment awaiting visual feedback, with no runtime animation added to main.
 
+Directional reveal refinement is also implemented on the experiment branch:
+Slide opens right splits inward from their right edge and bottom splits upward
+from their bottom edge, while floating panes retain the fixed-size upward slide.
+It animates the source side of the shared divider so unrelated panes do not
+donate space during the reveal. Nested file/shell probes confirmed anchored
+outer edges, stable neighboring layouts, retained focus, split-from-float and
+Instant cancellation. Try Space pv/ps and pT/pt; focus switching stays instant.
+
 The full usage/observation record is on the experiment branch:
 `git show spike/pane-animations:docs/prototypes/0009-pane-animations.md`.
 Keep the demo and monkeypatch implementation off main. If a mode is preferred,
