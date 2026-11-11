@@ -28,6 +28,21 @@
 The design combines native Neovim editing with built-in project, window, and pane management, first-class support for Codex and Claude Code, and a substantial local diff and review experience.
 Plugins are used when they offer meaningful value at a reasonable maintenance cost.
 
+## Install
+
+With Neovim 0.11+, Python 3.12+, Git, ripgrep, fd and a C compiler installed:
+
+```sh
+git clone https://github.com/Memnoc/uzume.git ~/Code/uzume
+cd ~/Code/uzume
+python3 setup-editor --register
+~/.local/bin/uzume
+```
+
+No existing Neovim config or caches are needed. See the
+[installation guide](docs/features/installation.md) for platform status, language
+tools and adding the launcher to PATH.
+
 ## Why Uzume?
 
 Uzume takes its name from **Ame-no-Uzume**, the Japanese goddess whose dance helped draw the sun goddess Amaterasu out of her cave. Her story connects creativity, laughter, and the return of light—an inspiration for a personal editor that helps bring clarity to complex work. See [Kokugakuin University's Encyclopedia of Shinto](https://d-museum.kokugakuin.ac.jp/eos/detail/?id=9422) for the myth behind the name.
@@ -71,3 +86,15 @@ Development proceeds in small, testable increments. Record design decisions, use
 The initial reference terminals are Ghostty and WezTerm on macOS and Linux. Kitty is an additional compatibility target. Pane motion uses native terminal cells; visual performance still needs evaluation under busy agent output.
 
 The Uzume name and cave-and-sun logo are established. Rust component boundaries and the production dependency set remain open.
+
+## Repository layout
+
+- `editor/`: the active distribution, including Lua UI and Python process/Git helpers.
+- `installer/` and `setup-editor`: source installation and launcher registration.
+- `tests/`: regression tests; `docs/`: features, architecture decisions and handoff.
+- `spikes/` and `spike`: historical experiments, never loaded by the installed editor.
+
+`editor/lua/ainvim/` is active core code under the original module namespace.
+It does not load another distribution or your old config. The similarly named
+`ai-nvim` config/data directories preserve existing user state; renaming them
+requires a separate migration. See the [Lua map](editor/lua/README.md).

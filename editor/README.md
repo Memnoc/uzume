@@ -17,8 +17,11 @@ group, its implementation, shortcuts, stored state and known limits.
 
 Uzume currently uses the original `ai-nvim` installation name to preserve the preview's existing settings and state.
 
-After registration, open a new terminal and run `uzume`. It forwards all arguments to Neovim, so `uzume .` and `uzume path/to/file` work too. In an existing shell, run `source ~/.zshrc` once to load the command. You can also run `nvims`, then choose **ai-nvim**.
-The **default** entry and plain `nvim` retain the default Neovim configuration.
+After `python3 setup-editor --register`, run `~/.local/bin/uzume`, or just `uzume`
+if `~/.local/bin` is on PATH. The executable forwards all arguments to Neovim.
+Registration does not edit your shell files or require `nvims`. Existing preview
+shell functions and `nvims` entries continue to work; plain `nvim` retains its
+default configuration.
 To launch directly:
 
 ```sh
@@ -132,29 +135,23 @@ Formatting runs on explicit saves by default; **Space uf** toggles it globally,
 ## Installation and pins
 
 ```sh
-./setup-editor --register
+git clone https://github.com/Memnoc/uzume.git ~/Code/uzume
+cd ~/Code/uzume
+python3 setup-editor --register
+~/.local/bin/uzume
 ```
 
-Requires Neovim 0.11+, Python 3.12+, Git, `rg`, and `fd`. A Nerd Font provides the
-icons throughout the interface. The shell picker also needs `fzf`.
-This local preview's captured parser binaries are for macOS ARM64. Installation
-also requires the exact parser/query cache identified in the lockfile; portable
-parser builds are not implemented yet. The setup script discovers existing tools
-without modifying them. At runtime,
-Mason installs missing tools for supported files into ai-nvim’s own directory;
-see [Tool installation](../docs/features/tool-installation.md).
+Requires Neovim 0.11+, Python 3.12+, Git, `rg`, `fd` (or `fdfind`), and a C
+compiler. A Nerd Font provides icons. Plugins, grammar sources and queries are
+pinned; syntax is built locally and checked in Neovim before activation. No
+existing Neovim configuration or parser cache is required. Install agent CLIs
+separately; Node/npm and language toolchains are needed for the relevant Extras.
 
-The installer adds the `ai-nvim` entry to the existing `nvims` list and a
-`uzume` shell function that launches the same configuration. It backs up `.zshrc`
-and refuses to replace an unrelated config. Registration is idempotent.
-No global `NVIM_APPNAME` is exported and the `nvim` command/aliases are unchanged.
+See [Installation](../docs/features/installation.md) for prerequisites, optional
+caches, XDG paths, existing-install updates, tests and uninstall instructions.
+Source builds support macOS/Linux; the verified platform remains macOS ARM64.
+Neovim itself is still user-installed, and release/rollback management is pending.
 
-`plugins.lock.json` determines a separate immutable package bundle. Plugin
-startup does not download or update packages. Opening a supported file
-can trigger background language-tool installation; **Space uI** toggles that
-behavior. Changing plugin pins requires an explicit installer run; old bundles
-remain available. This is not yet the distribution’s Neovim installer, upgrade UI, or complete release/rollback mechanism.
-
-Keep this worktree while its configuration link is installed. To remove the
-preview, remove only that link, the `uzume` function, and the `ai-nvim` candidate in `nvims`; remove its
-separate data/state/cache only if the local history is no longer wanted.
+Keep this checkout while its config link is installed. Re-run the installer after
+updates that change pins, before restarting the editor. Existing task worktrees,
+settings and state remain under the compatible `ai-nvim` namespace.

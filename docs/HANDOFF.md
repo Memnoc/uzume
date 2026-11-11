@@ -51,7 +51,7 @@ worktrees, snapshots and saved records. Do not do a blind string replacement.
 | Entry point / module | Responsibility |
 | --- | --- |
 | `editor/init.lua`, `editor/lua/ainvim/` | Bootstrap, native package load, editor options, Extras/languages/tools, UI/keymaps |
-| `setup-editor`, `editor/plugins.lock.json`, `editor/tools.lock.json` | Exact plugin bundle installation, syntax hashes, selected tool versions; optional shell registration |
+| `setup-editor`, `editor/plugins.lock.json`, `editor/tools.lock.json` | Exact plugin bundle installation, pinned grammar/query sources, selected tool versions; optional standalone launcher registration |
 | `ainvim/projects.lua`, `sessions.lua`, `panes.lua`, `navigator.lua` | Product grouping, layout persistence, pane operations and pickers; native window terminology differs from product Window |
 | `ainvim/branding.lua`, `ui.lua` | Logo and whole-dashboard size budget; dashboard-only viewport correction |
 | `uzume/agents/init.lua`, `views.lua`, `input.lua`, `context.lua` | Agent lifecycle/UI, meaningful labels/icons, terminal routing and explicit file context |
@@ -149,8 +149,8 @@ inspect the remote and verification record for the completed publication state.
 
 ## Verification and how to continue safely
 
-Run `python3 tests/run.py` from the repository root. It runs 14 cases sequentially:
-dashboard resizing; pane motion, restoration and interruption; normal and forced-exit agent cleanup; saved-state inheritance;
+Run `python3 tests/run.py` from the repository root. It runs 15 cases sequentially:
+installer registration and conflict refusal; dashboard resizing; pane motion, restoration and interruption; normal and forced-exit agent cleanup; saved-state inheritance;
 task navigation; named and existing-branch launch; review; comments; Codex and
 Claude feedback; normal and diff3 conflict integration. Each uses real Neovim/PTY
 and real disposable Git repositories, with mock external CLIs and isolated XDG
@@ -163,13 +163,20 @@ Use the actual editor and Git boundary for behavioral regressions, not tests
 that simply assert private helper structure. The accepted pane-motion behavior now has permanent coverage in
 `tests/pane_motion.py`; the throwaway demo remains separate.
 
-Fresh-install smoke: isolate all four XDG roots, provide plugin repositories
-containing the pinned commits and the matching syntax cache to `setup-editor`,
-then repeat installation and launch Neovim against that isolated config. Do not
-use `--register` when testing installation against the real home directory.
-On 2026-11-11 this passed from local caches, including startup commands and the
-populated resize test; the default config and `.zshrc` hashes were unchanged.
-See [verification record](verification-2026-11-11.md) for consolidated results.
+Fresh installation no longer needs personal caches. `python3 tests/install_clean.py`
+performs an opt-in network test with empty XDG roots: fetch/build the pinned
+plugins, nine grammar parsers and matching query files, register a temporary
+launcher, exercise real language samples and startup, then repeat installation.
+The default shell/config/bin paths are untouched. Use the printed temporary
+`XDG_DATA_HOME` to run the editor suite against that bundle. The registration
+case is part of the regular suite and does not download anything.
+
+The first cache-free build and the existing 14 editor cases passed on macOS
+ARM64; installer checks passed separately and bring the suite to 15 cases.
+See [installation](features/installation.md), [ADR-0008](adr/0008-source-based-installation.md)
+and [verification record](verification-installation-2026-11-11.md). No Linux or
+Intel Mac run has been performed yet. The previous cached-install verification
+is historical evidence, not the new-machine installation path.
 
 The harness verifies the adapters' contract, not every live vendor CLI release.
 Manual Codex and Claude trials have informed the workflow, but upgrades still
@@ -188,8 +195,9 @@ evaluation; a passing PTY test cannot establish perceived smoothness.
    boundaries, external Git changes, lost records, hooks/signing failures, and
    partial operation receipts. Keep errors actionable and conflicts labeled.
 3. **Release/install story.** Select and test a supported Neovim version, define
-   OS/terminal matrix, provide syntax artifacts without assuming an existing
-   local cache, automate release checks, and build explicit update/rollback.
+   OS/terminal matrix, automate source-build release checks, consider prebuilt
+   syntax artifacts, and build explicit update/rollback. Independent source
+   installation is implemented; personal caches are no longer required.
    Plugins/tools are pinned today; Neovim itself is not distro-managed yet.
 4. **Coverage and maintenance.** Add CI on the supported platform, maintain
    vendor CLI compatibility probes, expand meaningful editor/language smoke

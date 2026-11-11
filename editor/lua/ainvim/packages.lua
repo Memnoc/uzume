@@ -8,6 +8,12 @@ function M.load()
     vim.fn.filereadable(path .. "/.complete") == 1,
     "Uzume packages missing. Run ./setup-editor from the Uzume checkout."
   )
+  local system = vim.uv.os_uname()
+  local platform = system.sysname:lower() .. "-" .. system.machine:lower()
+  assert(
+    vim.fn.filereadable(path .. "/.platform") == 1 and vim.fn.readfile(path .. "/.platform")[1] == platform,
+    "Uzume packages belong to another platform. Build them locally with ./setup-editor."
+  )
   vim.opt.packpath:prepend(path)
   -- Native opt packages, installed from exact commits. Startup never updates.
   for _, plugin in ipairs(vim.json.decode(lock).plugins) do

@@ -7,6 +7,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES = [
+    ('installation', ['installation.py'], {}),
     ('dashboard', ['dashboard.py'], {}),
     ('pane-motion', ['pane_motion.py'], {}),
     ('agents', ['agents.py'], {}),

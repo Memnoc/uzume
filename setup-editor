@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install pinned editor packages; optionally register zsh launch commands."""
+"""Build pinned editor packages and syntax; optionally register an isolated launcher."""
 import argparse
 import hashlib
 import json
@@ -7,20 +7,19 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
-import tarfile
+import platform
+import shlex
+import sys
 import tempfile
-import time
+from installer.registration import preflight, register
+from installer.sources import export
+from installer.syntax import build, host, validate
 
 SOURCE = Path(__file__).resolve().parent / "editor"
 APP = "ai-nvim"
-LAUNCHER = '''# Uzume direct launcher (keeps the preview's existing data and state).
-function uzume() {
-  NVIM_APPNAME=ai-nvim command nvim "$@"
-}
-'''
 
 
-def install(cache, syntax_cache):
+def install(cache, compiler):
     raw = (SOURCE / "plugins.lock.json").read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     data = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / APP
@@ -30,6 +29,8 @@ def install(cache, syntax_cache):
     if (target / ".complete").is_file():
         if (target / ".complete").read_text().strip() != digest:
             raise RuntimeError("Package bundle identity mismatch: " + str(target))
+        if (target / ".platform").read_text().strip() != host():
+            raise RuntimeError("Package bundle was built for another platform; use a separate XDG_DATA_HOME")
         print("Pinned packages already installed: " + digest[:12])
         return
     if target.exists():
@@ -37,36 +38,19 @@ def install(cache, syntax_cache):
     with tempfile.TemporaryDirectory(prefix=".install-", dir=releases) as temporary:
         staging = Path(temporary)
         bundle = staging / "bundle"
-        for plugin in json.loads(raw)["plugins"]:
-            repo = cache / plugin["name"]
-            commit = plugin["commit"]
-            available = repo.is_dir() and subprocess.run(
-                ["git", "-C", str(repo), "cat-file", "-e", commit + "^{commit}"],
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-            ).returncode == 0
-            if not available:
-                repo = staging / (plugin["name"] + ".git")
-                subprocess.run(["git", "clone", "--filter=blob:none", "--no-checkout", plugin["url"], str(repo)], check=True)
+        spec = json.loads(raw)
+        for plugin in spec["plugins"]:
             dest = bundle / "pack" / APP / "opt" / plugin["name"]
-            dest.mkdir(parents=True)
-            archive = staging / "package.tar"
-            with archive.open("wb") as output:
-                subprocess.run(["git", "-C", str(repo), "archive", "--format=tar", commit], stdout=output, check=True)
-            with tarfile.open(archive) as package:
-                package.extractall(dest, filter="data")
-            print("Installed " + plugin["name"] + " @ " + commit[:12])
-        syntax = json.loads(raw).get("syntax", {})
-        for relative, expected in syntax.get("files", {}).items():
-            source = syntax_cache / relative
-            if not source.is_file() or hashlib.sha256(source.read_bytes()).hexdigest() != expected:
-                raise RuntimeError("Pinned syntax resource missing or changed: " + str(source))
-            dest = bundle / "pack" / APP / "opt" / "syntax" / relative
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, dest)
+            export(plugin["url"], plugin["commit"], dest, staging, cache / plugin["name"] if cache else None)
+            print("Installed " + plugin["name"] + " @ " + plugin["commit"][:12], flush=True)
+        syntax = bundle / "pack" / APP / "opt" / "syntax"
+        build(spec["syntax"], syntax, staging, compiler)
+        validate(syntax, spec["syntax"], "nvim", staging)
         docs = sorted(bundle.glob("pack/ai-nvim/opt/*/doc"))
         lua = "for _, p in ipairs({" + ",".join(json.dumps(str(p), ensure_ascii=False) for p in docs) + "}) do vim.cmd('helptags ' .. vim.fn.fnameescape(p)) end"
         env = dict(os.environ, NVIM_APPNAME=APP, NVIM_LOG_FILE=str(staging / "nvim.log"))
         subprocess.run(["nvim", "--headless", "-u", "NONE", "-i", "NONE", "-c", "lua " + lua, "-c", "qa!"], env=env, check=True)
+        (bundle / ".platform").write_text(host() + "\n")
         (bundle / ".complete").write_text(digest + "\n")
         bundle.rename(target)
     print("Bundle: " + str(target))
@@ -78,7 +62,7 @@ def discover_tools(cache):
              "vscode-eslint-language-server", "prettier", "tailwindcss-language-server", "emmet-ls"]
     paths = {}
     for name in names:
-        candidates = [cache / "bin" / name, cache / "packages/eslint-lsp/node_modules/.bin" / name]
+        candidates = [cache / "bin" / name, cache / "packages/eslint-lsp/node_modules/.bin" / name] if cache else []
         if shutil.which(name):
             candidates.append(Path(shutil.which(name)))
         for candidate in candidates:
@@ -93,48 +77,46 @@ def discover_tools(cache):
     print("External tools found (read-only references): " + str(len(paths)) + "/" + str(len(names)))
 
 
-def register():
-    config = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / APP
-    shell = Path.home() / ".zshrc"
-    original = shell.read_text()
-    old = "for candidate in KickstartNeovim LazyVim NvChad FrontVim MemnocVim; do"
-    new = "for candidate in KickstartNeovim LazyVim NvChad FrontVim MemnocVim ai-nvim; do"
-    if old not in original and new not in original:
-        raise RuntimeError("nvims has changed; register ai-nvim in its candidate list manually")
-    if original.count(old) + original.count(new) != 1:
-        raise RuntimeError("Ambiguous nvims definition; no shell change made")
-    updated = original.replace(old, new, 1)
-    if LAUNCHER not in updated:
-        updated = updated.rstrip() + "\n\n" + LAUNCHER
-    if config.exists() or config.is_symlink():
-        if not config.is_symlink() or config.resolve() != SOURCE.resolve():
-            raise RuntimeError("Refusing to replace existing configuration: " + str(config))
-    else:
-        config.parent.mkdir(parents=True, exist_ok=True)
-        config.symlink_to(SOURCE, target_is_directory=True)
-    if updated != original:
-        backup = shell.with_name(".zshrc.before-ai-nvim-" + str(time.time_ns()))
-        shutil.copy2(shell, backup)
-        shell.write_text(updated)
-        print("Shell backup: " + str(backup))
-    print("Registered " + str(config) + " -> " + str(SOURCE))
-    print("Open a new shell and run uzume, or run nvims and choose ai-nvim. nvim/default stays unchanged.")
+def prerequisites(compiler):
+    if sys.version_info < (3, 12):
+        raise RuntimeError("Python 3.12 or newer is required")
+    if platform.system() not in ("Darwin", "Linux"):
+        raise RuntimeError("Source installation currently supports macOS and Linux")
+    command = shlex.split(compiler)
+    required = ["git", "nvim", "rg"]
+    missing = [name for name in required if not shutil.which(name)]
+    if not (shutil.which("fd") or shutil.which("fdfind")):
+        missing.append("fd (or fdfind)")
+    if not command or not shutil.which(command[0]):
+        missing.append("C compiler (install Xcode Command Line Tools or build-essential)")
+    if missing:
+        raise RuntimeError("Missing prerequisites: " + ", ".join(missing))
+    subprocess.run(["nvim", "--headless", "-u", "NONE", "-i", "NONE", "-c",
+                    'if !has("nvim-0.11") | cquit 1 | endif', "-c", "qa!"], check=True)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--plugin-cache", type=Path,
-                        default=Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / "nvim/lazy")
-    parser.add_argument("--register", action="store_true", help="add ~/.config/ai-nvim, the nvims candidate, and the uzume command")
-    parser.add_argument("--syntax-cache", type=Path, default=Path.home() / ".local/share/nvim/site")
-    parser.add_argument("--tool-cache", type=Path, default=Path.home() / ".local/share/nvim/mason")
+    parser.add_argument("--plugin-cache", type=Path, help="optional local Git repositories containing pinned plugin commits")
+    parser.add_argument("--register", action="store_true", help="link the isolated configuration and install the uzume executable (no shell edits)")
+    parser.add_argument("--tool-cache", type=Path, help="optional external Mason directory (read-only tool discovery)")
+    parser.add_argument("--no-cache", action="store_true", help="ignore supplied plugin/tool caches; fetch pinned sources")
+    parser.add_argument("--cc", default=os.environ.get("CC", "cc"), help="C compiler command (default: CC or cc)")
+    parser.add_argument("--bin-dir", type=Path, default=Path.home() / ".local/bin", help="launcher directory (default: ~/.local/bin)")
     args = parser.parse_args()
-    install(args.plugin_cache, args.syntax_cache)
-    discover_tools(args.tool_cache)
     if args.register:
-        register()
+        preflight(SOURCE, args.bin_dir)
+    prerequisites(args.cc)
+    install(None if args.no_cache else args.plugin_cache, args.cc)
+    discover_tools(None if args.no_cache else args.tool_cache)
+    if args.register:
+        register(SOURCE, args.bin_dir)
     print("Configuration source: " + str(SOURCE))
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (RuntimeError, OSError, subprocess.SubprocessError) as error:
+        print("Uzume installation failed: " + str(error), file=sys.stderr)
+        raise SystemExit(1)

@@ -1,5 +1,5 @@
--- EDITOR SPIKE: independent configuration, evaluated incrementally.
-assert(vim.fn.has("nvim-0.11") == 1, "ai-nvim needs Neovim 0.11+")
+-- Uzume: independent editor configuration.
+assert(vim.fn.has("nvim-0.11") == 1, "Uzume needs Neovim 0.11+")
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 require("ainvim.options")
