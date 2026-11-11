@@ -40,8 +40,9 @@
 
 ---
 
-The design combines native Neovim editing with built-in project, window, and pane management, first-class support for Codex and Claude Code, and a substantial local diff and review experience.
-Plugins are used when they offer meaningful value at a reasonable maintenance cost.
+## Why Uzume?
+
+Uzume takes its name from **Ame-no-Uzume**, the Japanese goddess whose dance helped draw the sun goddess Amaterasu out of her cave. Her story connects creativity, laughter, and the return of light—an inspiration for a personal editor that helps bring clarity to complex work. See [Kokugakuin University's Encyclopedia of Shinto](https://d-museum.kokugakuin.ac.jp/eos/detail/?id=9422) for the myth behind the name.
 
 ## Install
 
@@ -57,10 +58,6 @@ python3 setup-editor --register
 No existing Neovim config or caches are needed. See the
 [installation guide](docs/features/installation.md) for platform status, language
 tools and adding the launcher to PATH.
-
-## Why Uzume?
-
-Uzume takes its name from **Ame-no-Uzume**, the Japanese goddess whose dance helped draw the sun goddess Amaterasu out of her cave. Her story connects creativity, laughter, and the return of light—an inspiration for a personal editor that helps bring clarity to complex work. See [Kokugakuin University's Encyclopedia of Shinto](https://d-museum.kokugakuin.ac.jp/eos/detail/?id=9422) for the myth behind the name.
 
 ## Project status
 
