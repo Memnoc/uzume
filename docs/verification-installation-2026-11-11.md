@@ -48,3 +48,24 @@ maintainer's Neovim files; it is not a separate physical machine or a pristine O
 System compiler, Python, Git and Neovim remain prerequisites. No Linux/Intel Mac
 execution, distro-managed Neovim, fully pinned host toolchain, or packaged release
 update/rollback has been verified in this increment.
+
+## Stable and minimum-version installation checks
+
+The same cache-free download/build, nine-language parse/query, launcher startup
+and repeat-install test also passed with official macOS ARM64 Neovim **0.12.6**
+and **0.11.0** archives. Archives were checked against GitHub's asset digest or
+published `shasum.txt` before extraction into `/tmp`; the system Neovim was not
+replaced. Official sources: [0.12.6](https://github.com/neovim/neovim/releases/tag/v0.12.6)
+and [0.11.0](https://github.com/neovim/neovim/releases/tag/v0.11.0).
+Logs: `/tmp/uzume-stable-install.log`, `/tmp/uzume-minimum-install.log`.
+These are installation/startup/syntax checks; the complete editor workflow suite
+was run on the development executable identified above, not all three versions.
+
+A follow-up public CLI test exposed loss of saved external tool references when
+rerunning without `--tool-cache`. Discovery now preserves working saved references
+and only replaces them when a supplied cache provides an executable. That
+regression passed on both the development executable and stable 0.12.6.
+
+The tested source bundle was also installed alongside the user's old bundle for
+the normal Uzume checkout, without registration or shell changes. All 13 existing
+tool references remained available. Existing data and old releases were retained.

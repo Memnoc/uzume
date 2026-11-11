@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Installer CLI and generated launcher, with isolated XDG state and real Neovim."""
 import hashlib
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -29,6 +30,15 @@ result = subprocess.run([str(launcher), '--headless', '-i', 'NONE',
                          '+lua assert(vim.fn.exists(":UzumeMotion")==2)', '+qa'],
                         env=env, capture_output=True, text=True)
 assert result.returncode == 0 and 'Error' not in result.stderr, result.stderr
+# An upgrade without cache flags must retain working external tool references.
+tool_cache = root / 'optional tools'
+(tool_cache / 'bin').mkdir(parents=True)
+tool = tool_cache / 'bin/stylua'
+tool.write_text('#!/bin/sh\nexit 0\n'); tool.chmod(0o755)
+subprocess.run(command + ['--tool-cache', str(tool_cache)], env=env, check=True, capture_output=True)
+subprocess.run(command, env=env, check=True, capture_output=True)
+record = json.loads((root / 'data/ai-nvim/tool-paths.json').read_text())
+assert record.get('stylua') == str(tool), 'Repeat installation must preserve working external tools'
 first = launcher.read_bytes()
 subprocess.run(command, env=env, check=True, capture_output=True)
 assert launcher.read_bytes() == first, 'Repeat registration must be stable'

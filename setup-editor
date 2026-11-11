@@ -60,17 +60,27 @@ def discover_tools(cache):
     names = ["rust-analyzer", "rustfmt", "lua-language-server", "stylua", "clangd", "vtsls",
              "vscode-html-language-server", "vscode-css-language-server", "vscode-json-language-server",
              "vscode-eslint-language-server", "prettier", "tailwindcss-language-server", "emmet-ls"]
+    data = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / APP
+    target = data / "tool-paths.json"
+    previous = {}
+    if target.is_file():
+        try:
+            previous = json.loads(target.read_text())
+            if not isinstance(previous, dict):
+                previous = {}
+        except (ValueError, OSError):
+            print("Cannot read previous tool references; rediscovering available executables.")
     paths = {}
     for name in names:
         candidates = [cache / "bin" / name, cache / "packages/eslint-lsp/node_modules/.bin" / name] if cache else []
+        if isinstance(previous.get(name), str):
+            candidates.append(Path(previous[name]))
         if shutil.which(name):
             candidates.append(Path(shutil.which(name)))
         for candidate in candidates:
             if candidate.is_file() and os.access(candidate, os.X_OK):
                 paths[name] = str(candidate)
                 break
-    data = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / APP
-    target = data / "tool-paths.json"
     temporary = target.with_suffix(".tmp")
     temporary.write_text(json.dumps(paths, indent=2) + "\n")
     temporary.replace(target)
@@ -117,6 +127,6 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except (RuntimeError, OSError, subprocess.SubprocessError) as error:
+    except (RuntimeError, OSError, ValueError, subprocess.SubprocessError) as error:
         print("Uzume installation failed: " + str(error), file=sys.stderr)
         raise SystemExit(1)

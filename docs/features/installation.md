@@ -61,7 +61,8 @@ and forwards arguments to `nvim`. It does not install Neovim itself.
 
 `--plugin-cache PATH` optionally reads local Git repositories containing the
 pinned commits; otherwise sources are fetched. `--tool-cache PATH` optionally
-discovers existing Mason executables as read-only references. Neither option is
+discovers existing Mason executables as read-only references. Later installs
+retain working previously recorded executables when no replacement is supplied. Neither option is
 needed. `--no-cache` ignores both options for a clean-source check. `--cc COMMAND`
 (or `CC`) chooses the C compiler. The old `--syntax-cache` option has been removed:
 syntax is built from sources now.

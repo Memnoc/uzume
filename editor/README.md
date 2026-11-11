@@ -32,8 +32,8 @@ Configuration lives in this checkout's `editor/` directory, linked as
 `~/.config/ai-nvim`.
 Neovim uses its own `ai-nvim` data, cache, and state directories. It never loads
 your default Neovim configuration or shares its plugin installation. The initial
-setup copies committed plugin contents from the local cache when available;
-otherwise it downloads the declared repository and extracts the pinned commit.
+setup downloads exact source commits; an explicitly supplied local Git cache can
+accelerate plugin installation. Syntax parsers are built locally.
 
 ## First walkthrough
 
@@ -71,7 +71,7 @@ otherwise it downloads the declared repository and extracts the pinned commit.
    Press **Space w** for windows or **Space p** for panes and pause for the menu. See [Window management](../docs/features/window-management.md).
 
 Rust, Lua, C/C++, and TypeScript/React/HTML/CSS packs now supply language servers,
-completion, diagnostics and formatting. Native Treesitter handles the captured
+completion, diagnostics and formatting. Native Treesitter handles the pinned, locally built
 language parsers, including TSX; CSS retains native Vim syntax highlighting.
 Pane animations default to Slide. **Space uA** chooses and saves Slide, Instant,
 Pulse or Spring; see [Pane animations](../docs/features/pane-animations.md).
