@@ -45,6 +45,21 @@ tools and adding the launcher to PATH.
 
 ## Why Uzume?
 
+<p align="center">
+  <a href="https://commons.wikimedia.org/wiki/File:Uzume_dancing.jpg">
+    <img src="docs/assets/uzume-dancing.jpg" width="360" alt="Ame-no-Uzume dancing to lure Amaterasu from her cave, in an 1879 print by Tsukioka Yoshitoshi">
+  </a>
+</p>
+
+<p align="center">
+  <em>“We are rejoicing, laughing, and enjoying ourselves because there is a deity more noble than you.”</em><br>
+  — Ame-no-Uzume, adapted from the <a href="https://sacred-texts.com/book/the-kojiki-2/section-xvi-the-door-of-the-heavenly-rock-dwelling"><em>Kojiki</em>, Section XVI</a>
+</p>
+
+<p align="center">
+  <sub>Artwork: Tsukioka Yoshitoshi, 1879 · <a href="https://commons.wikimedia.org/wiki/File:Uzume_dancing.jpg">Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> · reproduced unchanged</sub>
+</p>
+
 Uzume takes its name from **Ame-no-Uzume**, the Japanese goddess whose dance helped draw the sun goddess Amaterasu out of her cave. Her story connects creativity, laughter, and the return of light—an inspiration for a personal editor that helps bring clarity to complex work. See [Kokugakuin University's Encyclopedia of Shinto](https://d-museum.kokugakuin.ac.jp/eos/detail/?id=9422) for the myth behind the name.
 
 ## Project status
