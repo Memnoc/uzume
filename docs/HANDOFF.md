@@ -200,7 +200,7 @@ namespace migration; Rust only where measurements or ownership justify it.
 Implemented separately on `spike/pane-animations`, based on `f286734`, in
 `/Users/matteostara/Code/uzume-pane-animations`. Main retains instant pane behavior.
 Run `/Users/matteostara/Code/uzume-pane-animations/spike-animations` to compare
-Instant, Ease, Pulse and Spring in a disposable three-pane workspace with local output.
+Instant, Ease, Pulse, Spring and Slide in a disposable three-pane workspace with local output.
 Space uA opens the mode list (j/k, Enter); Space uD demonstrates a resize.
 The launcher shares only pinned plugin files read-only, disables automatic tool
 installation, and discards its demo state on exit. Ordinary `uzume` is unaffected.
@@ -224,6 +224,15 @@ Repeated Spring resize keys retarget from the visible position while accumulatin
 the intended destination. Velocity continuity and sub-cell rendering are not
 implemented; whole-cell rounding remains the fundamental visual limit. The
 branch's prototype record contains the details. Main's runtime remains unchanged.
+
+Latest preference refinement: Spring was fluid enough but its bounce was not
+preferred. The experiment now starts in Slide: a restrained 200 ms ease-out,
+with floating panes entering upward at final size, monotonic split/resize
+transitions, and no highlight pulse after atomic tile changes. The probe showed
+no resize overshoot and constant floating width/height during the upward entrance;
+Instant cancellation and exact destinations still worked. Use Space pf to try
+the entrance, Space uD for resize, and Space uA to compare. This remains an
+experiment awaiting visual feedback, with no runtime animation added to main.
 
 The full usage/observation record is on the experiment branch:
 `git show spike/pane-animations:docs/prototypes/0009-pane-animations.md`.
