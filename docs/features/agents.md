@@ -1,9 +1,9 @@
 # Agents and file context
 
-Choose a branch before opening the official Codex or Claude terminal, then write
-your instructions there. New tasks use isolated branches/worktrees; retained
-task branches can be continued in their existing checkouts. No separate task-name
-or task-instruction dialog is needed; tmux is not required.
+Name a new branch, open the official Codex or Claude terminal on it, then write
+your instructions there. New tasks use isolated worktrees; retained task branches
+can be continued in their existing checkouts. The branch name is not an agent
+prompt. tmux is not required.
 
 ## Controls
 
@@ -11,6 +11,7 @@ or task-instruction dialog is needed; tmux is not required.
 | --- | --- |
 | Space ac / Space aC | Codex / Claude with the current file |
 | Space ae / Space aE | Empty Codex / Claude workspace |
+| Space ab / Space aB | Choose an existing starting branch or continue a Codex / Claude task |
 | Space af | Mark the current saved file for an agent |
 | Space aF | Mark multiple files: Tab selects, Enter adds |
 | Space am | Inspect context and delivery status; Enter removes a file |
@@ -28,23 +29,30 @@ for an empty workspace. Instructions belong in the terminal, not this command.
 
 ## Branch selection and preflight
 
-All four launch shortcuts and `:UzumeAgent` open a local branch picker before
-starting a CLI. Rows show saved-change counts; the preview shows checkout paths
-and changed files. The current file's checkout is listed first. Empty launch
-prefers the active task's checkout. The preview wraps long paths and instructions.
-Highlight a branch and press **Ctrl-s** to create a new task directly, or **Enter**
-to open the new/continue action menu. Both paths run the same preflight checks.
-The shortcut hints appear beside the search and at the top of the preview.
-The action menu offers:
+**Space ac / aC** asks for a new branch name, for example `fix/readme`. Press
+**Enter** to start the agent on that exact branch, ready for your prompts, or
+**Esc** to cancel. The current file's checkout supplies the starting state.
+**Space ae / aE** and `:UzumeAgent` also ask for a branch name; empty launch uses
+the active task's checkout or the original project. A notification identifies the
+source branch and how many changed files will be inherited before you submit.
+Invalid or existing names refuse launch; no existing branch is reset or replaced.
 
-- **New isolated task from this branch**: create a separate `uzume/...` branch
-  and worktree. Inherit saved changes when the selected branch has a checkout;
+For a different starting point or a retained task, use **Space ab / aB**.
+Rows show saved-change counts; the wrapped preview shows checkout paths and
+changed files. Highlight a branch and press **Ctrl-s** to name a new task from
+it, or **Enter** to open the new/continue action menu. Shortcut hints sit at the
+bottom of the branch list, not in the preview or search bar. The menu offers:
+
+- **New isolated task from this branch**: name a separate branch and create its
+  worktree. Inherit saved changes when the selected branch has a checkout;
   otherwise use its committed files, without unrelated original-project edits.
 - **Continue this task branch**: reuse its checkout, edits and review baseline.
   A running agent is focused, not duplicated. A stopped task starts the selected
   CLI with a fresh conversation. Current-file launch opens and marks that file's
   counterpart in the retained checkout. Known task windows and retained Uzume
-  branches with recoverable branch-creation reflogs support continuation.
+  branches with recoverable branch-creation reflogs support continuation. Named
+  tasks save their checkout and review baseline in a private local record under
+  the distribution's data directory so closing a window does not lose that link.
 
 Saved edits are disclosed rather than discarded. Unsaved buffers in the selected
 checkout must be saved before launch. Conflicts, unfinished Git operations
@@ -60,7 +68,7 @@ branches; integration and cleanup controls remain a separate increment.
 
 **Current-file launch:** opens the file's counterpart from the new worktree on
 the left, marks it as working context, and focuses the agent. The current file
-must be saved. The new worktree inherits the branch selected in the picker: its HEAD,
+must be saved. The new worktree inherits the source branch: its HEAD,
 saved tracked edits, staged changes as they currently appear on disk, deletions,
 and non-ignored new files. Related changes across that checkout travel together.
 Unsaved editor buffers are not included. The source files, index/staging choices
@@ -93,7 +101,7 @@ Space af or Space aF when ready. Cancel the chooser to leave the left pane empty
 The checkout inherits the selected branch's saved state. "Empty" refers to
 marked context for a new task; continuing a task retains its existing context.
 
-Current-file launch initially suggests the checkout containing that file, even
+Current-file launch starts from the checkout containing that file, even
 when it is displayed in another task's window. A new file need not be committed
 first. Ignored, untracked files are excluded; if the selected file is excluded,
 Uzume explains why and opens the file chooser. Existing task worktrees are never
@@ -214,7 +222,9 @@ index/HEAD, the initial review baseline, and independent nested tasks.
 file search and explorer scope after reading an original file, and preservation
 of the original project's branch and file content.
 
-`python3 tests/branch_launch.py` checks selection before launch, saved-change
+`python3 tests/named_launch.py` drives Space ac / aC through exact branch naming,
+saved-state inheritance, idle CLI startup, invalid/existing names, unsaved-buffer
+refusal and cancellation. `python3 tests/branch_launch.py` checks selection before launch, saved-change
 disclosure, running/closed task continuation, current-file context, review baseline
 retention, branches without checkouts and conflict refusal without index changes.
 

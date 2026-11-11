@@ -201,7 +201,9 @@ function M.start(kind, opts, done)
         .. "Space ap: open the file's own project instead."
     )
   end
-  local label = file and vim.fs.basename(file) or (kind == "codex" and "Codex workspace" or "Claude workspace")
+  local label = opts.branch
+    or (file and vim.fs.basename(file))
+    or (kind == "codex" and "Codex workspace" or "Claude workspace")
   if opts.selection then
     source = opts.selection.cwd or project.root
   end
@@ -263,7 +265,7 @@ function M.start(kind, opts, done)
     if done then
       done(ok and result or nil, not ok and tostring(result) or nil)
     end
-  end, source, opts.selection)
+  end, source, opts.selection, opts.branch)
 end
 
 function M.continue_task(task, kind, relative)
@@ -412,6 +414,12 @@ function M.setup()
     require("uzume.branch_launch").open("claude")
   end, "Claude with Current File")
   map("a", M.pick, "Agents / Attention")
+  map("b", function()
+    require("uzume.branch_launch").choose("codex", { empty = vim.bo.buftype ~= "" or api.nvim_buf_get_name(0) == "" })
+  end, "Codex from Existing Branch")
+  map("B", function()
+    require("uzume.branch_launch").choose("claude", { empty = vim.bo.buftype ~= "" or api.nvim_buf_get_name(0) == "" })
+  end, "Claude from Existing Branch")
   map("e", function()
     require("uzume.branch_launch").open("codex", { empty = true })
   end, "Empty Codex Workspace")

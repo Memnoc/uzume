@@ -10,7 +10,9 @@ _Avoid_: session, project session as a separate entity, distro profile
 
 **Task**:
 A unit of work within a **Project**. Starting an AI task creates a dedicated **Window**, branch, and worktree, with editor and agent panes side by side. Independent tasks remain isolated; deliberate shared-checkout collaboration is a later extension.
-New tasks inherit saved state from the selected checkout. A task-local snapshot
+Interactive launch asks for the exact new branch name and starts an idle CLI on
+that branch. Existing-branch selection/continuation is a separate action.
+New tasks inherit saved state from the source checkout. A task-local snapshot
 commit records inherited edits as its review baseline; the source branch and
 index are unchanged. Subsequent edits remain isolated.
 

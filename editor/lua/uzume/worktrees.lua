@@ -29,14 +29,35 @@ function M.relative_file(project, file)
   end
 end
 
-function M.create(project, label, done, source, selection)
+local function record_path(project, branch)
+  return vim.fn.stdpath("data") .. "/task-branches/" .. vim.fn.sha256(project .. "\n" .. branch) .. ".json"
+end
+
+function M.retained(project, entry)
+  local ok, task = pcall(function()
+    return vim.json.decode(table.concat(vim.fn.readfile(record_path(project, entry.branch)), "\n"))
+  end)
+  if
+    ok
+    and type(task) == "table"
+    and task.project == project
+    and task.branch == entry.branch
+    and task.cwd == entry.cwd
+    and type(task.base) == "string"
+  then
+    return task
+  end
+end
+
+function M.create(project, label, done, source, selection, branch)
   source = source or project
   local slug = label:lower():gsub("[^a-z0-9]+", "-"):gsub("^-", ""):gsub("-$", ""):sub(1, 40)
   slug = slug ~= "" and slug or "task"
   local id = slug .. "-" .. vim.fn.sha256(project .. tostring(vim.uv.hrtime()) .. vim.fn.getpid()):sub(1, 10)
   local parent = vim.fn.stdpath("data") .. "/worktrees/" .. vim.fn.sha256(project):sub(1, 16)
   vim.fn.mkdir(parent, "p", 448)
-  local task = { id = id, label = label, project = project, cwd = parent .. "/" .. id, branch = "uzume/" .. id }
+  local task =
+    { id = id, label = label, project = project, cwd = parent .. "/" .. id, branch = branch or "uzume/" .. id }
   local script = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(debug.getinfo(1, "S").source:sub(2))))
     .. "/agent/create_worktree.py"
   local command = { "python3", script, source, task.cwd, task.branch }
@@ -61,6 +82,12 @@ function M.create(project, label, done, source, selection)
         return done(nil, "Could not read inherited task state; checkout retained at " .. task.cwd)
       end
       task = vim.tbl_extend("force", task, captured)
+      if branch then
+        local path = record_path(project, branch)
+        vim.fn.mkdir(vim.fs.dirname(path), "p", 448)
+        vim.fn.writefile({ vim.json.encode(task) }, path)
+        vim.fn.setfperm(path, "rw-------")
+      end
       done(task)
     end)
   )

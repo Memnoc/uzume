@@ -74,12 +74,14 @@ Smear Cursor is enabled and can be toggled with **Space ua**. Debugging/test
 adapters and remaining language previews/custom extras
 are still separate work.
 
-**Space ac / aC** first offers a branch picker for Codex / Claude, with saved
-changes shown before launch. **Ctrl-s** creates a new task from the highlighted
-branch; **Enter** opens the action menu. Choose **Continue this task branch** for its existing
-checkout and edits, or **New isolated task** for a separate branch from that starting
-point. The current file's counterpart is marked as context. **Space ae / aE** uses
-the same picker for an empty new workspace. Write your
+**Space ac / aC** asks for a new branch name for Codex / Claude. Type the exact
+name and press **Enter**: the editor switches to its isolated checkout and the
+agent is ready for prompts. Saved changes from the current file's checkout are
+disclosed and inherited. The file's counterpart is marked as context.
+**Space ae / aE** asks for a branch name with no marked files.
+**Space ab / aB** opens the existing-branch picker: **Ctrl-s** names a new task
+from the highlighted branch; **Enter** offers new/continue actions. Hints appear
+at the bottom. **Continue this task branch** retains its checkout and edits. Write your
 instructions directly in the terminal. **Space af** marks a saved file,
 **Space aF** marks several, and **Space am** manages the context list. Marked
 paths are supplied by the hook on your next prompt; Codex may require `/hooks`

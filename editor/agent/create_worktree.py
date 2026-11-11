@@ -24,6 +24,16 @@ def create(source, target, branch, selection=None):
             raise ValueError(result.stderr.decode('utf-8', 'replace').strip())
         return result.stdout
 
+    if branch.startswith('-'):
+        raise ValueError('Invalid branch name: ' + branch)
+    try:
+        git('check-ref-format', 'refs/heads/' + branch)
+    except ValueError:
+        raise ValueError('Invalid branch name: ' + branch) from None
+    existing = git('for-each-ref', '--format=%(refname)', 'refs/heads').decode().splitlines()
+    if 'refs/heads/' + branch in existing:
+        raise ValueError('Branch already exists: ' + branch)
+
     if selection:
         selection = json.loads(selection)
         selected = git('rev-parse', '--verify', 'refs/heads/' + selection['branch'] + '^{commit}').decode().strip()

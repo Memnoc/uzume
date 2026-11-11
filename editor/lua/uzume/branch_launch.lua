@@ -32,7 +32,97 @@ local function saved(entry)
     end
   end
 end
+local function name(project, entry, origin, file, opts, kind)
+  assert(not entry.unavailable, "This checkout is unavailable; repair its worktree before launching")
+  assert(
+    not entry.conflicts and not entry.operation,
+    "Resolve conflicts or finish the Git operation before launching on " .. entry.branch
+  )
+  saved(entry)
+  vim.notify(
+    "Starting from: "
+      .. entry.branch
+      .. "\n"
+      .. entry.changes
+      .. " changed files will be copied to the new branch.\n"
+      .. "Your original checkout stays unchanged.",
+    vim.log.levels.INFO,
+    { title = "New task" }
+  )
+  Snacks.input({
+    prompt = "New " .. (kind == "codex" and "Codex" or "Claude") .. " branch",
+    win = {
+      footer = " Enter start · Esc cancel ",
+      footer_pos = "center",
+      keys = {
+        i_esc = { "<Esc>", "cancel", mode = "i", expr = false },
+        i_cr = { "<CR>", "confirm", mode = { "i", "n" }, expr = false },
+      },
+    },
+  }, function(value)
+    if not value or vim.trim(value) == "" then
+      return
+    end
+    local branch = vim.trim(value)
+    read(project, function(entries)
+      local selected
+      for _, candidate in ipairs(entries) do
+        assert(
+          candidate.branch ~= branch,
+          "Branch already exists: " .. branch .. "\nUse Space ab / aB to inspect or continue it."
+        )
+        if candidate.branch == entry.branch then
+          selected = candidate
+        end
+      end
+      assert(
+        selected
+          and selected.head == entry.head
+          and selected.token == entry.token
+          and selected.cwd == entry.cwd
+          and not selected.conflicts
+          and not selected.operation,
+        "The source branch changed while naming the task. Launch again to inspect its latest state."
+      )
+      saved(selected)
+      assert(api.nvim_win_is_valid(origin), "Original editor pane has closed")
+      api.nvim_set_current_win(origin)
+      if file then
+        assert(vim.uv.fs_realpath(api.nvim_buf_get_name(0)) == file, "The selected file changed; launch again")
+      end
+      require("uzume.agents").start(kind, { empty = opts.empty, selection = selected, branch = branch })
+    end)
+  end)
+end
+
 function M.open(kind, opts)
+  opts = opts or {}
+  assert(kind == "codex" or kind == "claude", "Choose Codex or Claude")
+  local project = assert(require("ainvim.projects").current(), "Open a project first: Space ap")
+  local source = (vim.t.uzume_task or {}).cwd or project.root
+  local file
+  if not opts.empty then
+    file = require("uzume.context").file()
+    local relative
+    relative, source = require("uzume.worktrees").relative_file(project, file)
+    assert(
+      relative,
+      "This file is outside this project's checkouts.\nSpace ae / aE: start an empty workspace.\nSpace af: mark it as a reference."
+    )
+  end
+  local origin = api.nvim_get_current_win()
+  read(project, function(entries)
+    assert(api.nvim_get_current_win() == origin, "Focus moved; launch again from the intended pane")
+    for _, entry in ipairs(entries) do
+      if entry.cwd == source then
+        return name(project, entry, origin, file, opts, kind)
+      end
+    end
+    error("This checkout has no local branch. Use Space ab / aB to choose a starting branch.")
+  end)
+end
+
+function M.choose(kind, opts)
   opts = opts or {}
   assert(kind == "codex" or kind == "claude", "Choose Codex or Claude")
   local project = assert(require("ainvim.projects").current(), "Open a project first: Space ap")
@@ -70,17 +160,10 @@ function M.open(kind, opts)
           entry = entry,
           preview = {
             text = table.concat({
-              "Ctrl-s  New task from this branch",
-              "Enter   Choose new task or continue",
-              "Esc     Cancel",
-              "",
               "Branch: " .. entry.branch,
               "Checkout: "
                 .. (entry.cwd and vim.fn.fnamemodify(entry.cwd, ":~") or "No checkout; uses committed files"),
               "Changed files: " .. entry.changes,
-              "",
-              "New task creates a separate branch with these saved files.",
-              "Continue reopens an existing task with its edits.",
               "",
               table.concat(entry.files, "\n"),
             }, "\n"),
@@ -90,14 +173,21 @@ function M.open(kind, opts)
       end, entries),
       format = "text",
       preview = "preview",
-      layout = { preset = "default" },
+      layout = {
+        preset = "default",
+        config = function(layout)
+          layout.layout[1].footer = " Ctrl-s new · Enter actions · Esc cancel "
+          layout.layout[1].footer_pos = "center"
+          return layout
+        end,
+      },
       win = {
         input = {
-          footer = " Ctrl-s new task · Enter actions · Esc cancel ",
-          footer_pos = "center",
           keys = { ["<c-s>"] = { "new_task", mode = { "i", "n" }, desc = "New task from selected branch" } },
         },
-        list = { keys = { ["<c-s>"] = { "new_task", desc = "New task from selected branch" } } },
+        list = {
+          keys = { ["<c-s>"] = { "new_task", desc = "New task from selected branch" } },
+        },
         preview = { wo = { wrap = true, linebreak = true, breakindent = true, number = false, relativenumber = false } },
       },
       actions = {
@@ -127,6 +217,7 @@ function M.open(kind, opts)
                 break
               end
             end
+            task = task or require("uzume.worktrees").retained(project.root, entry)
             if not task and entry.cwd and entry.base then
               task = {
                 id = entry.branch:sub(7),
@@ -175,7 +266,7 @@ function M.open(kind, opts)
                   if choice.task then
                     require("uzume.agents").continue_task(choice.task, kind, relative)
                   else
-                    require("uzume.agents").start(kind, { empty = opts.empty, selection = selected })
+                    name(project, selected, origin, file, opts, kind)
                   end
                 end)
               end)
