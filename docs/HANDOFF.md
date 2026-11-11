@@ -200,7 +200,7 @@ namespace migration; Rust only where measurements or ownership justify it.
 Implemented separately on `spike/pane-animations`, based on `f286734`, in
 `/Users/matteostara/Code/uzume-pane-animations`. Main retains instant pane behavior.
 Run `/Users/matteostara/Code/uzume-pane-animations/spike-animations` to compare
-Instant, Ease and Pulse in a disposable three-pane workspace with local output.
+Instant, Ease, Pulse and Spring in a disposable three-pane workspace with local output.
 Space uA opens the mode list (j/k, Enter); Space uD demonstrates a resize.
 The launcher shares only pinned plugin files read-only, disables automatic tool
 installation, and discards its demo state on exit. Ordinary `uzume` is unaffected.
@@ -214,6 +214,16 @@ Eased mode repeatedly resizes terminals; pulse leaves final geometry immediate.
 Native topology movement stays atomic and receives a cue. Arbitrary native
 commands, mouse arbitration, CPU/battery cost and four live agents remain
 unverified. No motion policy has been accepted for main.
+
+Follow-up `c65ba69` on the experiment branch adds Spring after the maintainer
+liked the initial variants and requested a bouncing desktop-style option.
+The preview starts in Spring; a damped response overshoots and settles in about
+420 ms, with exact final geometry and Instant cancellation. A real editor probe
+observed a 69→87-column resize peak at 90, rebound to 86, and settle at 87.
+Repeated Spring resize keys retarget from the visible position while accumulating
+the intended destination. Velocity continuity and sub-cell rendering are not
+implemented; whole-cell rounding remains the fundamental visual limit. The
+branch's prototype record contains the details. Main's runtime remains unchanged.
 
 The full usage/observation record is on the experiment branch:
 `git show spike/pane-animations:docs/prototypes/0009-pane-animations.md`.
