@@ -70,6 +70,8 @@ otherwise it downloads the declared repository and extracts the pinned commit.
 Rust, Lua, C/C++, and TypeScript/React/HTML/CSS packs now supply language servers,
 completion, diagnostics and formatting. Native Treesitter handles the captured
 language parsers, including TSX; CSS retains native Vim syntax highlighting.
+Pane animations default to Slide. **Space uA** chooses and saves Slide, Instant,
+Pulse or Spring; see [Pane animations](../docs/features/pane-animations.md).
 Smear Cursor is enabled and can be toggled with **Space ua**. Debugging/test
 adapters and remaining language previews/custom extras
 are still separate work.

@@ -59,3 +59,33 @@ Raw artifacts remain in the printed temporary directories on the test machine.
 The consolidated console log for this run is `/tmp/uzume-main-regressions.log`.
 The tests and this record are the durable reproduction path; temporary logs are
 not committed source or a substitute for rerunning after behavior changes.
+
+## Final polish: pane motion and Lua organization
+
+Implementation commit: `6d41634`, compared with the pre-polish main baseline
+`cb8909f`. The regular editor now defaults to Slide; Ease is removed, with Instant,
+Pulse and Spring available. Feature modules are grouped under `agents/`, `review/`,
+`integration/`, `layout/`, `ui/` and `core/`; principal require names and storage
+paths remain stable. Python resources resolve independently of module depth.
+
+`python3 tests/run.py`: **14/14 cases passed**, with the same Neovim and pinned
+bundle as above. The additional `pane_motion.py` case exercises real editor
+controls, anchored monotonic split reveal, persistent mode selection, resize,
+float/fullscreen/dock restoration, input, external geometry changes, theme changes,
+tab switching and close during motion. Agent, review, feedback and integration
+cases all passed against the reorganized module paths.
+
+A second isolated cached-install check installed all 19 packages, repeated the
+installation, verified startup and Python resource resolution, then passed both
+dashboard and pane-motion cases using the fresh bundle. Default `nvim` config and
+`.zshrc` hashes remained unchanged. No live model requests were made. New motion,
+settings and resource-path Lua plus modified pane operations passed StyLua;
+`git diff --check` passed.
+
+Local evidence: `/tmp/uzume-final-regressions.log` and
+`/tmp/uzume-polish-install.log`; fresh-install artifacts:
+`/var/folders/w1/59nwl5mx3q95qfv8nm8p1vg00000gn/T/uzume-polish-install-15oysdcm`.
+These temporary artifacts are not part of the distribution. Previous limitations
+remain, especially busy real-agent performance and a supported Neovim/platform
+matrix. The separate animation experiment and retained user task branches are
+not deletion candidates merely because the accepted behavior ships on main.
