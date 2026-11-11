@@ -154,10 +154,18 @@ function M.open(state)
     end
     api.nvim_buf_set_extmark(actions.buf, highlights, 0, 5, { end_col = 18, hl_group = "Title" })
     window.review_origin = origin
+    local labels = {
+      q = "Close Review Feedback",
+      ["<Esc>"] = "Close Review Feedback",
+      r = "Refresh Feedback Status",
+      ["<C-s>"] = "Queue Review Feedback",
+      x = "Cancel Queued Feedback",
+      a = "Send Review and Focus Agent",
+    }
     local function map(key, fn)
       vim.keymap.set("n", key, function()
         protect(fn)
-      end, { buffer = buf, nowait = true })
+      end, { buffer = buf, nowait = true, desc = labels[key] })
     end
     map("q", M.close)
     map("<Esc>", M.close)

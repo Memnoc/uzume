@@ -25,6 +25,9 @@ records preserve what was actually checked at each increment.
 | Local layout persistence and recovery | [Native navigators](navigators.md) |
 | Full project autosave and release management: planned behavior | [Design record](../design.md) |
 
+The [shortcut coverage guide](shortcuts.md) lists the core controls and explains
+which actions are local to menus or supplied by an active LSP.
+
 Start with the [launch guide](../../editor/README.md). Press **Space** and pause
 for WhichKey, **Space k** (also **Space ?** / **Space sk**) to search and run Normal-mode mappings, or **Space s?** for
 buffer mappings. The home screen's **k · Search Keymaps** opens the same search.

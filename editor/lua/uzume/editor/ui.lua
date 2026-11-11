@@ -151,6 +151,7 @@ require("which-key").setup({
     { "<leader>p", group = "panes" },
     { "<leader>pg", group = "focus" },
     { "<leader>pM", group = "move" },
+    { "<leader>pN", group = "new shell" },
     { "<leader>pR", group = "resize" },
     { "<leader>x", group = "diagnostics/quickfix" },
     { "<leader><tab>", group = "tabs" },

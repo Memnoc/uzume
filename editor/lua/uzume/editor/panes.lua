@@ -556,7 +556,7 @@ function M.setup()
         end
       end)
       return ""
-    end, { expr = true, silent = true })
+    end, { expr = true, silent = true, desc = "Pane Mouse: " .. key })
   end
 end
 return M

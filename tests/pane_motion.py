@@ -115,6 +115,20 @@ try:
     assert js('vim.api.nvim_list_wins()') == remaining, 'Closing an animating pane must not resurrect windows'
     assert lua('vim.v.errmsg') == '', lua('vim.v.errmsg')
     print('PASS: Instant, native resize, typing, theme changes, tab switches and close safely interrupt motion')
+    do('vim.cmd("UzumeMotion instant"); vim.o.shell="/bin/sh"')
+    for key, axis, before in [('h', 1, True), ('j', 0, False), ('k', 0, True), ('l', 1, False)]:
+        source = js('vim.api.nvim_get_current_win()')
+        keys(' pN' + key)
+        wait(lambda: lua('vim.bo.buftype') == 'terminal')
+        job = js('vim.b.terminal_job_id')
+        position = js('vim.api.nvim_win_get_position(0)')
+        origin = js('vim.api.nvim_win_get_position(' + str(source) + ')')
+        assert (position[axis] < origin[axis]) if before else (position[axis] > origin[axis]), (key, position, origin)
+        do('vim.cmd.stopinsert(); require("uzume.editor.panes").close()')
+        wait(lambda: js('vim.fn.jobwait({' + str(job) + '},0)[1]') != -1)
+        do('vim.api.nvim_set_current_win(' + str(source) + ')')
+    print('PASS: shell pane shortcuts open left/down/up/right and closing each stops its job')
+
 finally:
     if proc.poll() is None:
         try: do('vim.cmd("qa!")')

@@ -230,8 +230,15 @@ function M.show(index)
     state.views[#state.views + 1] = win
     vim.wo[win].wrap, vim.wo[win].number, vim.wo[win].cursorline = false, true, true
     vim.bo[buf].filetype = ft or "text"
-    for key, action in pairs({ q = M.close, f = M.files, u = M.toggle, R = M.refresh, C = M.comments, s = M.send }) do
-      vim.keymap.set("n", key, action, { buffer = buf, nowait = true, desc = "Review: " .. key })
+    for key, action in pairs({
+      q = { M.close, "Close Review" },
+      f = { M.files, "Review Changed Files" },
+      u = { M.toggle, "Toggle Unified Diff" },
+      R = { M.refresh, "Refresh Review Snapshot" },
+      C = { M.comments, "Review Comments" },
+      s = { M.send, "Send Review Comments" },
+    }) do
+      vim.keymap.set("n", key, action[1], { buffer = buf, nowait = true, desc = action[2] })
     end
     vim.keymap.set("n", "i", function()
       require("uzume.integration").open()

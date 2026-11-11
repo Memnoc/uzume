@@ -183,11 +183,11 @@ function M.show()
   end
   local function keys(mode)
     return {
-      ["<C-s>"] = { "save_extras", mode = mode },
-      ["<Esc>"] = { "close", mode = mode },
-      ["<C-r>"] = { "install_pack", mode = mode },
-      ["<C-g>"] = { "mason_tools", mode = mode },
-      ["<C-v>"] = { "cycle_view", mode = mode },
+      ["<C-s>"] = { "save_extras", mode = mode, desc = "Save Extras Choices" },
+      ["<Esc>"] = { "close", mode = mode, desc = "Close Extras" },
+      ["<C-r>"] = { "install_pack", mode = mode, desc = "Install / Retry Language Pack" },
+      ["<C-g>"] = { "mason_tools", mode = mode, desc = "Browse Mason Language Tools" },
+      ["<C-v>"] = { "cycle_view", mode = mode, desc = "Cycle Extras Catalog View" },
     }
   end
   local autocmd

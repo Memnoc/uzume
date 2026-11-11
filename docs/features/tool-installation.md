@@ -42,7 +42,7 @@ a new language integration.
 
 ## Catalog controls
 
-Open **Space l**, then:
+**Space cm** opens Mason directly. For bundled packs, open **Space l**, then:
 
 | Key | Action |
 | --- | --- |

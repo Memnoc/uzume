@@ -4,6 +4,48 @@ Use **Space l** to enable or disable packs. All five requested packs start
 enabled; changes apply after saving and restarting. See [Extras](../../editor/EXTRAS.md)
 for menu controls and tool discovery details.
 
+## Install language support
+
+For a bundled language:
+
+1. Open **Space l**, search for its pack, and check the enabled indicator. If it
+   is disabled, press **Enter** to enable it; **Ctrl-s** saves the choice and
+   requests its missing required tools. Do not toggle an already enabled pack off.
+2. Wait for installation to finish. Restart Uzume if the pack was newly enabled,
+   then open a file in the project. For an already active pack, opening a named
+   file automatically installs missing required tools when **Space uI** is on.
+3. Use **Ctrl-r** in Extras to install/retry the selected pack's required tools.
+   **Space cm**, or **Ctrl-g** inside Extras, opens Mason for optional tools and
+   installation output. Restart is not needed just for newly installed tools in
+   a pack that is already active.
+
+This covers editor dependencies: configured language servers, formatters,
+completion and syntax support. Install the language toolchain/runtime and project
+dependencies separately. For example, web tools need Node/npm, Rust projects
+need their Rust toolchain and rustfmt, and C/C++ projects need their compiler and
+build configuration. Mason does not install those project/runtime dependencies.
+See [tool installation](tool-installation.md) for prerequisites and error recovery.
+
+For a language outside the current catalog, there is **no install-everything
+button yet**. Mason can install its packages, but that alone does not configure
+its LSP, formatting, syntax or automatic installation in Uzume. Adding a supported
+pack currently involves maintained configuration changes:
+
+- Add the pack and required/optional tools in `editor/lua/uzume/editor/extras.lua`,
+  including the `languages` activation check.
+- Add package names and filetype triggers in `editor/lua/uzume/editor/installer.lua`
+  and reviewed tool version pins in `editor/tools.lock.json`.
+- Wire the native LSP, formatter and syntax/filetype settings in
+  `editor/lua/uzume/editor/languages.lua`.
+- If Treesitter syntax or an extra plugin is needed, pin its sources in
+  `editor/plugins.lock.json`, adjust package loading if needed, and rerun
+  `python3 setup-editor` to build the updated bundle for the host.
+- Test server attachment, diagnostics, navigation and formatting in a real sample
+  project, plus installation on the supported platforms, before shipping the pack.
+
+A generic user-defined pack interface remains future work. The bundled packs
+below are the supported end-to-end installation path today.
+
 ## Language packs
 
 | Pack | Implementation and behavior |

@@ -8,6 +8,7 @@ a restart and shows required/optional tool availability in its preview.
 The menu border keeps the controls visible: **Ctrl-n/p** moves, **Enter** toggles,
 **Ctrl-s** saves, and one **Esc** cancels. **Ctrl-v** cycles catalog views,
 **Ctrl-r** installs/retries the selected pack, and **Ctrl-g** opens Mason.
+Outside Extras, **Space cm** opens Mason directly.
 Type to filter; arrow keys also move.
 The preview appears beside the list in wide terminals and below it in narrower
 ones. The icon legend stays at the top even when details are out of view.
@@ -39,6 +40,9 @@ draft. [packages.lua](lua/uzume/editor/packages.lua) and
 There is no plugin-manager runtime and no general third-party
 Extras marketplace or custom-pack editor yet. Mason supplies the tool installation
 backend; our catalog and native LSP configuration remain independent.
+
+For enabling a pack or adding an unbundled language, see the
+[language installation walkthrough](../docs/features/languages.md#install-language-support).
 
 ## Available packs
 
@@ -98,17 +102,18 @@ supported file automatically installs missing required tools, then refreshes
 LSP/formatter availability. **Space uI** toggles this behavior persistently.
 Executable detection is not a guarantee of server/project health.
 
-Plugin commits and copied parser/query hashes are in `plugins.lock.json`. Syntax
-resources are copied into uzume's own package bundle and loaded through native
-Neovim Treesitter; the nvim-treesitter plugin is not a runtime dependency. This
-snapshot is for this macOS ARM64 machine. CSS/SCSS/LESS use native Vim syntax;
-their language-server features and Prettier are configured independently.
+Plugin commits, grammar sources and query sources are pinned in
+`plugins.lock.json`. Setup builds parsers locally for the host and loads them
+through native Neovim Treesitter; nvim-treesitter is not a runtime dependency.
+CSS/SCSS/LESS use native Vim syntax; their language-server features and Prettier
+are configured independently. See the [installation guide](../docs/features/installation.md)
+for tested platforms and compiler prerequisites.
 
 External language tools remain user-managed; updating them elsewhere may change
 their behavior. New managed tools use Mason with the registry and top-level
 versions in `tools.lock.json`. Existing installations are not automatically
-upgraded. Portable parser builds, transitive dependency locking and complete
-release migrations remain work. See [Tool installation](../docs/features/tool-installation.md)
+upgraded. Parser builds are host-native; transitive language-tool dependency locking and
+complete release migrations remain work. See [Tool installation](../docs/features/tool-installation.md)
 for the complete workflow, prerequisites, catalog views and retry policy.
 
 Smear mirrors the existing color/target settings, excludes picker/input/menu

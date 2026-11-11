@@ -341,16 +341,16 @@ local function input(label, initial, live, done)
   end
   vim.keymap.set({ "n", "i" }, "<CR>", function()
     finish(false)
-  end, { buffer = buf })
+  end, { buffer = buf, desc = "Confirm Navigator Input" })
   vim.keymap.set({ "n", "i" }, "<Esc>", function()
     finish(true)
-  end, { buffer = buf })
+  end, { buffer = buf, desc = "Cancel Navigator Input" })
   vim.keymap.set({ "n", "i" }, "<C-u>", function()
     api.nvim_buf_set_lines(buf, 0, -1, false, { "" })
     if live then
       live("")
     end
-  end, { buffer = buf })
+  end, { buffer = buf, desc = "Clear Navigator Input" })
   api.nvim_create_autocmd({ "TextChangedI", "TextChanged" }, {
     buffer = buf,
     callback = function()
@@ -407,8 +407,29 @@ function M.open(kind)
       s.selected = item.id
     end
   end
+  local labels = {
+    j = "Next Project / Window",
+    ["<Down>"] = "Next Project / Window",
+    k = "Previous Project / Window",
+    ["<Up>"] = "Previous Project / Window",
+    q = "Close Navigator / Cancel Closing",
+    ["<Esc>"] = "Close Navigator / Cancel Closing",
+    n = "New Shell Window / Cancel Closing",
+    e = "New Editor Window",
+    N = "Open Project Directory",
+    ["<CR>"] = "Open Selected Project / Window",
+    ["/"] = "Filter Projects / Windows",
+    ["<C-u>"] = "Clear Navigator Filter",
+    r = "Rename Project / Window",
+    x = "Close Selected Project / Window",
+    y = "Confirm Closing Project / Window",
+    s = "Save Project Window Layout",
+    ["<LeftMouse>"] = "Select Project / Window",
+    ["<ScrollWheelDown>"] = "Next Project / Window",
+    ["<ScrollWheelUp>"] = "Previous Project / Window",
+  }
   local function map(key, fn)
-    vim.keymap.set("n", key, fn, { buffer = s.buf, silent = true, nowait = true })
+    vim.keymap.set("n", key, fn, { buffer = s.buf, silent = true, nowait = true, desc = labels[key] })
   end
   for _, key in ipairs({ "j", "<Down>" }) do
     map(key, function()

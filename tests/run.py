@@ -11,6 +11,7 @@ CASES = [
     ('installation', ['installation.py'], {}),
     ('dashboard', ['dashboard.py'], {}),
     ('keymaps', ['keymaps.py'], {}),
+    ('shortcut-audit', ['shortcut_audit.py'], {}),
     ('pane-motion', ['pane_motion.py'], {}),
     ('agents', ['agents.py'], {}),
     ('agents-crash', ['agents.py', '--crash'], {}),

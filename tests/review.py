@@ -25,6 +25,9 @@ try:
     texts = js(r'(function() local r={} for _,w in ipairs(vim.api.nvim_list_wins()) do if vim.wo[w].diff then r[#r+1]=table.concat(vim.api.nvim_buf_get_lines(vim.api.nvim_win_get_buf(w),0,-1,false),"\n") end end return r end)()')
     assert sorted(texts) == ['uncommitted source','working change'], texts
     print('PASS: task baseline includes committed, working and untracked changes')
+    missing_desc = js('(function() local r={} for _,m in ipairs(vim.api.nvim_buf_get_keymap(0,"n")) do '
+                      'if not m.desc or m.desc=="" then r[#r+1]=m.lhs end end return r end)()')
+    assert not missing_desc, ('Menu actions need searchable descriptions', missing_desc)
     keys('u')
     assert lua('vim.bo.filetype') == 'diff'
     patch = js('vim.api.nvim_buf_get_lines(0,0,-1,false)')

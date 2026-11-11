@@ -49,6 +49,9 @@ saved Git worktrees, Mason references or histories rely on them. New installatio
 create only `uzume` paths. See [namespace migration](features/namespace-migration.md).
 Historical reports retain old names where they describe evidence from earlier runs.
 
+The [shortcut audit and coverage guide](features/shortcuts.md) records the core
+bindings, context-dependent menus and regression coverage.
+
 ## Architecture and code map
 
 | Entry point / module | Responsibility |

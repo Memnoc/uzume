@@ -198,10 +198,19 @@ function M.show(plan)
     bo = { filetype = "uzume_integration", modifiable = false, bufhidden = "wipe" },
     wo = { wrap = true, linebreak = true, number = false, relativenumber = false },
   })
+  local labels = {
+    q = "Close Integration",
+    ["<Esc>"] = "Close Integration",
+    r = "Refresh Integration Status",
+    a = "Apply Local Integration",
+    f = "Integration Files",
+    c = "Continue Integration",
+    x = "Abort Integration",
+  }
   local function map(key, fn)
     vim.keymap.set("n", key, function()
       protect(fn)
-    end, { buffer = window.buf, nowait = true })
+    end, { buffer = window.buf, nowait = true, desc = labels[key] })
   end
   local function mutate(action)
     guard(plan.task, plan.cwd)

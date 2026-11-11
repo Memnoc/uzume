@@ -42,6 +42,9 @@ try:
     keys('feature/combined'); keys('<CR>')
     wait(lambda: lua('vim.bo.filetype') == 'uzume_integration')
     assert 'feature/combined' in body() and '+task feature' in body()
+    missing_desc = js('(function() local r={} for _,m in ipairs(vim.api.nvim_buf_get_keymap(0,"n")) do '
+                      'if not m.desc or m.desc=="" then r[#r+1]=m.lhs end end return r end)()')
+    assert not missing_desc, ('Menu actions need searchable descriptions', missing_desc)
     assert 'uncommitted source' not in body(), 'Inherited edits leaked into integration preview'
     assert 'feature/combined' not in git('branch','--format=%(refname:short)').splitlines(), 'Preview created a branch'
     keys('a')

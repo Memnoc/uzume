@@ -26,7 +26,7 @@ Restart uzume to load the current increment.
 | r | Rename the selected project/window display label |
 | x, then y | Confirm closing the selected project/window |
 | n or Esc at confirmation | Cancel closing |
-| s | Save the file layout locally |
+| s / Space ws | Save the file layout locally |
 | Esc / q | Close the navigator |
 | Mouse click / wheel | Select a row / move selection when mouse support is enabled |
 
@@ -71,7 +71,7 @@ agent prompts or credentials. Nothing is sent externally.
 
 Dock floating/fullscreen panes and restore managed hidden panes before saving;
 the menu explains this requirement rather than silently losing their state.
-In a fresh uzume dashboard or one empty unnamed window, use:
+In a fresh uzume dashboard or one empty unnamed window, use **Space wR** or:
 
 ```vim
 :AiLayoutRestore

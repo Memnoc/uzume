@@ -78,11 +78,13 @@ The home screen also offers **k · Search Keymaps**.
 | **Space /** | Search project text |
 | **Space ,** | Switch buffers |
 | **Ctrl-s** | Save the current file |
-| **Space l** | Open Extras and language tools |
+| **Space l** / **Space cm** | Open Extras / Mason language tools |
 | **Space ap** | Pick or open a project |
 | **Space ww** / **Space wn** | Pick a window / create an editor window |
+| **Space ws** / **Space wR** | Save / restore the local file layout |
 | **Space ps** / **Space pS** | Split the editor down / up |
 | **Space pv** / **Space pV** | Split the editor right / left |
+| **Space pN h/j/k/l** | Create a shell pane left / down / up / right |
 | **Ctrl-h/j/k/l** | Focus the pane to the left / down / up / right |
 | **Space pf** / **Space pm** | Float or dock a pane / fullscreen or restore it |
 | **Space ac** / **Space aC** | Start a Codex / Claude task on a named branch |
@@ -104,7 +106,8 @@ language servers. **Ctrl-b** toggles buffer mappings; **Ctrl-g** toggles global
 mappings. Search uses literal terms in any order. Examples: `split`, `move pane left`,
 `review`, `inlay`, `Space ac`.
 
-See the [editor walkthrough](editor/README.md#first-walkthrough) for a first tour,
+See the [full shortcut guide](docs/features/shortcuts.md),
+[editor walkthrough](editor/README.md#first-walkthrough) for a first tour,
 [Extras](editor/EXTRAS.md) for language packs, and the
 [AI task guide](docs/features/agents.md) for the agent → review → integration flow.
 

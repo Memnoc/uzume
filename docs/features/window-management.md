@@ -40,11 +40,13 @@ press **Esc** first to leave terminal input; `i` resumes typing into the shell.
 | Space ww | Pick a window (Space aw remains available) |
 | Space wn / wN | New editor window / new shell window in this project |
 | Space w] / w[ | Next / previous window in this project |
+| Space ws / wR | Save local layout / restore from a fresh empty editor |
 | Space wd | Confirm closing the whole window and its terminal jobs |
 | Space ps / pS | Split editor Down / Up |
 | Space pv / pV | Split editor Right / Left |
 | Space - / Space \| | Familiar aliases for editor splits |
-| Space pt / pT | Start a new shell pane Down / Right |
+| Space pN then h/j/k/l | Start a new shell pane Left / Down / Up / Right |
+| Space pt / pT | Existing shell Down / Right aliases |
 | Ctrl-h/j/k/l, or Space pg then h/j/k/l | Focus Left / Down / Up / Right |
 | Space pM then h/j/k/l | Move Left / Down / Up / Right (tile edge or floating position) |
 | Space px | Swap contents/views with the next visible pane |

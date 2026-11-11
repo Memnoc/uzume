@@ -49,6 +49,9 @@ try:
     keys('s')
     wait(lambda: lua('vim.bo.filetype') == 'uzume_review_feedback')
     assert 'Please explain this change.' in text() and 'first changed line' in text()
+    missing_desc = js('(function() local r={} for _,m in ipairs(vim.api.nvim_buf_get_keymap(0,"n")) do '
+                      'if not m.desc or m.desc=="" then r[#r+1]=m.lhs end end return r end)()')
+    assert not missing_desc, ('Menu actions need searchable descriptions', missing_desc)
     assert 'example.txt' in text() and kind in text().lower()
     action_windows = js('(function() local result={} for _,win in ipairs(vim.api.nvim_list_wins()) do if vim.bo[vim.api.nvim_win_get_buf(win)].filetype=="uzume_review_actions" then result[#result+1]=win end end return result end)()')
     assert len(action_windows) == 1, 'Review needs a visible action bar'

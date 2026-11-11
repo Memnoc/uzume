@@ -17,7 +17,8 @@ instant in Slide mode.
 | `:UzumeMotion instant` | Disable motion and settle the active transition |
 | Space pv / pV | Split right / left |
 | Space ps / pS | Split below / above |
-| Space pT / pt | Create a shell pane right / below |
+| Space pN then h/j/k/l | Create a shell pane left / below / above / right |
+| Space pT / pt | Existing shell right / below aliases |
 | Space pf / pm | Float/dock / fullscreen/restore |
 | Space pR | Discover pane resize controls |
 
@@ -62,7 +63,8 @@ demo launcher, generated files and sample processes are not loaded by the editor
 
 `python3 tests/pane_motion.py` drives the regular editor through real controls
 in isolated XDG directories. It checks left/up/right reveals, fixed outer edges,
-file preservation, launching Split Left from searchable shortcuts, and absence of bounce,
+file preservation, launching Split Left from searchable shortcuts, shell creation
+in all four directions with process cleanup, and absence of bounce,
 mode discovery, removal of Ease, persisted Instant across startup, resize,
 float/fullscreen/dock restoration, typing, external resize precedence, mode and
 colorscheme changes, tab switching and closing an animating pane. The consolidated
