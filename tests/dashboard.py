@@ -23,6 +23,10 @@ try:
     keys('Inlay Hints')
     wait(lambda: js('Snacks.picker.get()[1]:items()[1].item.lhs') == ' uh')
     assert js('Snacks.picker.get()[1]:items()[1].item.lhs') == ' uh'
+    rendered = '\n'.join(js('vim.api.nvim_buf_get_lines(Snacks.picker.get()[1].list.win.buf,0,-1,false)'))
+    assert 'Toggle Inlay Hints' in rendered and 'Space uh' in rendered, rendered
+    assert 'callback' not in rendered and '.lua' not in rendered and '<Cmd>' not in rendered, rendered
+    assert js('Snacks.picker.get()[1].list.win:dim().width') <= 90
     keys('<C-u>x<BS>')
     wait(lambda: lua('vim.api.nvim_get_current_line()') == '')
     keys('<Esc>')
@@ -62,12 +66,12 @@ try:
                       'end return r end)()'))
     wait(lambda: fixture_modes() == {'n', 'i'})
     keys('<C-g>')
-    wait(lambda: lua('Snacks.picker.get()[1].title') == 'Search Keymaps · Buffer')
+    wait(lambda: lua('Snacks.picker.get()[1].title') == 'Shortcuts · Buffer')
     wait(lambda: fixture_modes() == {'n', 'i'})
     keys('<C-b>')
     wait(lambda: js('#Snacks.picker.get()[1]:items()') == 0)
     keys('<C-g>')
-    wait(lambda: lua('Snacks.picker.get()[1].title') == 'Search Keymaps · Global')
+    wait(lambda: lua('Snacks.picker.get()[1].title') == 'Shortcuts · Global')
     assert not fixture_modes()
     keys('<C-b>')
     wait(lambda: fixture_modes() == {'n', 'i'})
