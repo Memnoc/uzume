@@ -26,6 +26,7 @@ Keep the checkout: the configuration links to its `editor/` directory. Add
 prints the exact executable path and does not edit shell startup files. It works
 without `nvims`, zsh or a pre-existing `.zshrc`. `--bin-dir PATH` selects another
 launcher directory. Plain `nvim` keeps its existing configuration.
+For zsh, see the [`.zshrc` alias instructions](linux.md#set-up-the-uzume-alias-in-zsh).
 
 Install Codex and/or Claude separately and authenticate using their own login
 flows. Node/npm are needed for Mason's web language tools; Rust projects need

@@ -38,6 +38,28 @@ requirements, including Node/npm for web tooling and Rust for Rust projects;
 see [tool installation](tool-installation.md). Clipboard integration depends on
 Neovim's available provider; `:checkhealth vim.provider` can diagnose the host.
 
+## Set up the `uzume` alias in zsh
+
+After running `python3 setup-editor --register`, add this line to `~/.zshrc`
+(replace an older `uzume` alias or function if you already have one):
+
+```zsh
+alias uzume="$HOME/.local/bin/uzume"
+```
+
+Reload the configuration, then launch the editor:
+
+```zsh
+source ~/.zshrc
+uzume
+```
+
+File and directory arguments work as usual: `uzume README.md` or `uzume ~/Code/my-project`.
+The alias calls the installed launcher, which sets Uzume's app name and XDG paths;
+it does not change ordinary `nvim`. If you used `--bin-dir`, use the executable
+path printed by the installer instead. With `~/.local/bin` already on PATH, the
+installed command also works without an alias. The installer does not edit `.zshrc`.
+
 ## What CI exercises
 
 [The Linux workflow](../../.github/workflows/linux.yml) builds from empty caches
