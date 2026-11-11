@@ -25,6 +25,40 @@ try:
     assert len({f['col'] + f['width'] for f in frames}) == 1, 'Right reveal must keep its outer edge fixed'
     assert all(a['width'] <= b['width'] for a,b in zip(frames,frames[1:])), 'Default slide must not bounce'
     print('PASS: regular editor defaults to a directional Slide without overshoot')
+    for binding, axis, size in [(' pV', 'col', 'width'), (' pS', 'row', 'height')]:
+        source = js('vim.api.nvim_get_current_win()')
+        source_buffer = js('vim.api.nvim_get_current_buf()')
+        do('_G.reverse_frames={}; local source=vim.api.nvim_get_current_win(); '
+           'vim.api.nvim_input(' + json.dumps(binding) + '); '
+           'for i=1,30 do vim.defer_fn(function() local w=vim.api.nvim_get_current_win(); '
+           'if w~=source and vim.api.nvim_win_get_config(w).relative=="" then '
+           'local p=vim.api.nvim_win_get_position(w); '
+           'table.insert(_G.reverse_frames,{row=p[1],col=p[2],width=vim.api.nvim_win_get_width(w),height=vim.api.nvim_win_get_height(w)}) '
+           'end end,i*10) end')
+        time.sleep(.5)
+        frames = js('_G.reverse_frames')
+        assert frames, (binding, 'Split did not open')
+        assert min(f[size] for f in frames) < frames[-1][size], (binding, 'No reveal animation')
+        assert len({f[axis] for f in frames}) == 1, (binding, 'Outer edge moved')
+        assert all(a[size] <= b[size] for a,b in zip(frames,frames[1:])), (binding, 'Slide bounced')
+        position = js('vim.api.nvim_win_get_position(' + str(source) + ')')
+        assert frames[-1][axis] < position[0 if axis == 'row' else 1], (binding, 'Wrong split direction')
+        assert js('vim.api.nvim_get_current_buf()') == source_buffer, 'Editor split must preserve the file'
+        do('vim.api.nvim_win_close(0,true); vim.api.nvim_set_current_win(' + str(source) + ')')
+    print('PASS: split Left and Up preserve the file and animate inward from a fixed outer edge')
+    source = js('vim.api.nvim_get_current_win()')
+    keys(' k')
+    wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
+    keys('split left')
+    wait(lambda: js('Snacks.picker.get()[1]:items()[1].item.lhs') == ' pV')
+    keys('<CR>')
+    wait(lambda: js('vim.api.nvim_get_current_win()') != source and js('vim.api.nvim_win_get_config(0).relative') == '')
+    time.sleep(.3)
+    assert js('vim.api.nvim_win_get_position(0)[2]') < js('vim.api.nvim_win_get_position(' + str(source) + ')[2]')
+    do('vim.api.nvim_win_close(0,true); vim.api.nvim_set_current_win(' + str(source) + ')')
+    print('PASS: Space k finds Split Editor Left and Enter opens it on the left')
+
+
     assert lua('vim.fn.maparg(" uA", "n") ~= ""') == 'true', 'Mode chooser needs the established shortcut'
     keys(' uA')
     wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_list')

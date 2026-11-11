@@ -30,7 +30,7 @@ controls remain primary. Preserve plain `nvim` and its existing configuration.
 | --- | --- | --- |
 | Editor | Rose Pine with scoped mauve accents, Snacks explorer/pickers/notifications, completion, Git signs, native LSP/diagnostics/inlay hints, formatting | Familiar, capable editing before bespoke AI UI; other colorschemes retain their palettes |
 | Extras | Own feature catalog on Space l; Rust, Lua, C/C++, web tooling, Smear Cursor; pinned Mason packages and opt-out automatic missing-tool install | Discoverable tool bundles without importing another distribution |
-| Multiplexing | Project → Windows → Panes; native tabpages, splits and floats; Space w and Space p menus | No tmux requirement, no second renderer, no extra session concept |
+| Multiplexing | Project → Windows → Panes; native tabpages, splits and floats; Space w and Space p menus; ps/pS split down/up, pv/pV right/left | No tmux requirement, no second renderer, no extra session concept |
 | Pane motion | Slide enabled by default; Space uA selects Slide, Instant, Pulse or Spring | Native geometry, interruption handling, no extra renderer or dependency |
 | Tasks | Space ac/aC names a Codex/Claude branch and opens its worktree beside an idle CLI; ae/aE starts without a marked file; ab/aB selects/continues a branch | Separate writable directories prevent independent agents colliding; branch names alone do not |
 | Starting state | Saved source edits/new files inherited via a private index and task baseline commit; original index/HEAD/files unchanged | Prevent the apparent loss of edits on switching into a task |

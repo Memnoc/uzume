@@ -65,7 +65,8 @@ accelerate plugin installation. Syntax parsers are built locally.
    The menus show rename, confirmed close, local
    layout save and filter controls. See [Native navigators](../docs/features/navigators.md)
    for the full workflow and restore limits.
-8. Try **Space pv** for a right-hand editor split, **Space pt** for a shell below,
+8. Try **Space pv** / **Space pV** for a right / left editor split,
+   **Space ps** / **Space pS** for down / up, and **Space pt** for a shell below,
    **Space pf** to float/dock a pane, and **Space pm** to fullscreen/restore it.
    **Space pM** opens Move (Left/Down/Up/Right); **Space pR** opens Resize. **Space pz**
    hides, **Space pr** restores, and **Space pp** picks a pane. **Space pd** closes

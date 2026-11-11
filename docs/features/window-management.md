@@ -41,7 +41,8 @@ press **Esc** first to leave terminal input; `i` resumes typing into the shell.
 | Space wn / wN | New editor window / new shell window in this project |
 | Space w] / w[ | Next / previous window in this project |
 | Space wd | Confirm closing the whole window and its terminal jobs |
-| Space ps / pv | Split editor Down / Right |
+| Space ps / pS | Split editor Down / Up |
+| Space pv / pV | Split editor Right / Left |
 | Space - / Space \| | Familiar aliases for editor splits |
 | Space pt / pT | Start a new shell pane Down / Right |
 | Ctrl-h/j/k/l, or Space pg then h/j/k/l | Focus Left / Down / Up / Right |
@@ -59,6 +60,9 @@ press **Esc** first to leave terminal input; `i` resumes typing into the shell.
 | Space pd | Confirm closing the pane and stopping its terminal job |
 
 Editor splits share the current file buffer, as ordinary Neovim splits do.
+Uppercase **S** and **V** reverse the corresponding down/right splits.
+**Space k**, then `split left` or `split up`, also finds these actions; Enter
+opens the selected split relative to the pane where you opened the menu.
 Splitting from a terminal or home with the editor command creates a new editable
 buffer; use the shell commands when another process is wanted. **Ctrl-s** asks
 for a filename when saving a genuine unnamed file. A project home itself is not

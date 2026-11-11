@@ -154,7 +154,7 @@ local function transition(win, from, to, anchor, direction)
       value.relative = "editor"
       api.nvim_win_set_config(win, value)
     elseif source then
-      if direction == "right" then
+      if direction == "right" or direction == "left" then
         local width = source.width + to.width - math.max(vim.o.winminwidth, value.width)
         if api.nvim_win_get_width(anchor) == width then
           return false
@@ -191,7 +191,7 @@ function M.reveal(source, win, direction)
   end
   local target = M.capture(win)
   local start = vim.deepcopy(target)
-  if direction == "right" then
+  if direction == "right" or direction == "left" then
     start.width = 1
   else
     start.height = 1

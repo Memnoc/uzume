@@ -71,6 +71,10 @@ function M.hidden(tab)
 end
 
 function M.split(direction, shell)
+  assert(
+    direction == "left" or direction == "right" or direction == "above" or direction == "below",
+    "Invalid split direction"
+  )
   motion.finish()
   local project = require("uzume.editor.projects").current()
   assert(project, "Open a project first: Space ap, then N")
@@ -90,7 +94,9 @@ function M.split(direction, shell)
     "Choose an editor pane first"
   )
   local fresh = shell or vim.bo[buf].buftype ~= ""
-  vim.cmd("belowright " .. (direction == "right" and (fresh and "vnew" or "vsplit") or (fresh and "new" or "split")))
+  local vertical = direction == "left" or direction == "right"
+  local placement = (direction == "left" or direction == "above") and "aboveleft " or "belowright "
+  vim.cmd(placement .. (vertical and (fresh and "vnew" or "vsplit") or (fresh and "new" or "split")))
   if shell then
     local created, newbuf = api.nvim_get_current_win(), api.nvim_get_current_buf()
     local ok, job =

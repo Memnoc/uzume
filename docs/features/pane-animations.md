@@ -1,7 +1,8 @@
 # Pane animations
 
-**Slide is enabled by default.** Right splits reveal inward from their right
-edge; bottom splits reveal upward from below. Floating panes rise gently at
+**Slide is enabled by default.** Left/right splits reveal inward from their
+respective outer edges; top/bottom splits reveal downward/upward from theirs.
+Floating panes rise gently at
 their final size. Managed resize and fullscreen transitions settle without
 overshoot. Ordinary focus changes, docking, tile rearrangement and closing stay
 instant in Slide mode.
@@ -14,7 +15,8 @@ instant in Slide mode.
 | `:UzumeMotion` | Show the current mode |
 | `:UzumeMotion slide` | Enable the default directional animation |
 | `:UzumeMotion instant` | Disable motion and settle the active transition |
-| Space pv / ps | Split right / below |
+| Space pv / pV | Split right / left |
+| Space ps / pS | Split below / above |
 | Space pT / pt | Create a shell pane right / below |
 | Space pf / pm | Float/dock / fullscreen/restore |
 | Space pR | Discover pane resize controls |
@@ -59,7 +61,8 @@ calls the module directly at pane operations. The experimental monkeypatch,
 demo launcher, generated files and sample processes are not loaded by the editor.
 
 `python3 tests/pane_motion.py` drives the regular editor through real controls
-in isolated XDG directories. It checks the default reveal and absence of bounce,
+in isolated XDG directories. It checks left/up/right reveals, fixed outer edges,
+file preservation, launching Split Left from searchable shortcuts, and absence of bounce,
 mode discovery, removal of Ease, persisted Instant across startup, resize,
 float/fullscreen/dock restoration, typing, external resize precedence, mode and
 colorscheme changes, tab switching and closing an animating pane. The consolidated

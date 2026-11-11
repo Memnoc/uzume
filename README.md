@@ -81,7 +81,8 @@ The home screen also offers **k · Search Keymaps**.
 | **Space l** | Open Extras and language tools |
 | **Space ap** | Pick or open a project |
 | **Space ww** / **Space wn** | Pick a window / create an editor window |
-| **Space ps** / **Space pv** | Split the editor down / right |
+| **Space ps** / **Space pS** | Split the editor down / up |
+| **Space pv** / **Space pV** | Split the editor right / left |
 | **Ctrl-h/j/k/l** | Focus the pane to the left / down / up / right |
 | **Space pf** / **Space pm** | Float or dock a pane / fullscreen or restore it |
 | **Space ac** / **Space aC** | Start a Codex / Claude task on a named branch |
