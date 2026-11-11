@@ -50,6 +50,12 @@ try:
     wait(lambda: lua('vim.bo.filetype') == 'uzume_review_feedback')
     assert 'Please explain this change.' in text() and 'first changed line' in text()
     assert 'example.txt' in text() and kind in text().lower()
+    action_windows = js('(function() local result={} for _,win in ipairs(vim.api.nvim_list_wins()) do if vim.bo[vim.api.nvim_win_get_buf(win)].filetype=="uzume_review_actions" then result[#result+1]=win end end return result end)()')
+    assert len(action_windows) == 1, 'Review needs a visible action bar'
+    actions = action_windows[0]
+    action_text = lua('table.concat(vim.api.nvim_buf_get_lines(vim.api.nvim_win_get_buf(' + str(actions) + '),0,-1,false),"\\n")')
+    assert '[a] Send to agent' in action_text and '[Ctrl-s] Queue only' in action_text
+    assert js('vim.api.nvim_win_get_position(' + str(actions) + ')[1]') > js('vim.api.nvim_win_get_position(0)[1]')
     assert hook(agent, 'Stop') == {}, 'Preview sent unsent drafts'
     keys('<C-s>')
     wait(lambda: 'QUEUED' in text())
@@ -63,6 +69,7 @@ try:
     wait(lambda: 'SUPPLIED' in text())
     print('PASS: explicit batch preview, queued without terminal input, supplied once at turn end')
     keys('q')
+    assert not js('vim.api.nvim_win_is_valid(' + str(actions) + ')'), 'Action bar remained after closing the preview'
     keys('ggc')
     wait(lambda: lua('vim.bo.filetype') == 'uzume_review_comment')
     wait(lambda: lua('vim.api.nvim_get_mode().mode') == 'i')

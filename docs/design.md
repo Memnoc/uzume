@@ -95,6 +95,18 @@ Verify executable configuration and resolved dependencies against documented pin
 
 ## Next steps and open design work
 
+**2026-11-11 — proposed next increment: task completion and cleanup.** The review
+and feedback loop now needs an editor UI for keeping a task, integrating its
+reviewed changes into a chosen destination, or removing its worktree and local
+branch after an experiment. Show running agents, saved/uncommitted edits, and
+integration status before acting. Preserve the primary checkout; require agents
+to stop before removal and explicit confirmation before discarding unintegrated
+work. Integration should preview the exact changes and check destination edits
+and conflicts. Bulk cleanup of completed tasks can follow once these checks are
+reliable. The user-facing action should be **Remove task**, covering both branch
+and worktree. No deletion or integration is implemented by this design note;
+the integration strategy and cleanup eligibility rules still need agreement.
+
 The first Drudwyn pilot feedback changes the order: agents inside Neovim feel
 more accessible than a separate terminal, but the editor does not yet meet the
 expected appearance or functionality. Establish a solid

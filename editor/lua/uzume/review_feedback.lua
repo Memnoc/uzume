@@ -4,8 +4,10 @@ local api = vim.api
 local store = require("uzume.review_feedback_store")
 local comments = require("uzume.review_comment_store")
 local window
+local layout
+local highlights = api.nvim_create_namespace("uzume_review_actions")
 local labels = {
-  queued = "QUEUED · Next turn end or submitted prompt · x cancels",
+  queued = "QUEUED · Press a to send now; a busy agent receives this at turn end",
   supplied = "SUPPLIED · Hook output emitted; this does not confirm the agent acted on it",
   claimed = "HANDOFF UNCERTAIN · Hook claimed this batch; inspect the agent before retrying",
   cancelled = "CANCELLED · Comments remain local and can be queued again",
@@ -20,7 +22,13 @@ function M.close()
     local old = window
     local focused = old.win == api.nvim_get_current_win()
     window = nil
-    old:close()
+    if layout then
+      local old_layout = layout
+      layout = nil
+      old_layout:close()
+    else
+      old:close()
+    end
     if focused and old.review_origin and api.nvim_win_is_valid(old.review_origin) then
       api.nvim_set_current_win(old.review_origin)
     end
@@ -89,7 +97,7 @@ function M.open(state)
     vim.bo[buf].filetype = "uzume_review_feedback"
     local function render()
       local status = batch and labels[store.status(state.task, batch)]
-        or "PREVIEW · Local until Ctrl-s queues this batch"
+        or "PREVIEW · Press a to send to the agent, or Ctrl-s to queue only"
       if batch and store.status(state.task, batch) == "queued" and store.prompt_requested(batch) then
         status = "REQUEST SUBMITTED · Waiting for the feedback hook · r checks status"
       end
@@ -102,18 +110,49 @@ function M.open(state)
     render()
     window = Snacks.win({
       buf = buf,
-      enter = true,
+      show = false,
       backdrop = false,
-      width = 0.78,
-      height = 0.75,
-      border = "rounded",
-      title = " Send review ",
-      title_pos = "center",
-      zindex = 75,
-      footer = " Ctrl-s queue · a send & focus · x cancel queue · r status · q back ",
-      footer_pos = "center",
+      border = "none",
       wo = { wrap = true, linebreak = true, number = false, relativenumber = false },
     })
+    local actions = Snacks.win({
+      text = {
+        " [a] Send to agent     [Ctrl-s] Queue only",
+        " [x] Cancel queue      [r] Refresh status     [q / Esc] Back",
+      },
+      show = false,
+      enter = false,
+      focusable = false,
+      bo = { filetype = "uzume_review_actions", bufhidden = "wipe" },
+      wo = { wrap = false, number = false, relativenumber = false, cursorline = false },
+    })
+    layout = Snacks.layout.new({
+      show = false,
+      wins = { body = window, actions = actions },
+      layout = {
+        box = "vertical",
+        width = 0.78,
+        height = 0.75,
+        border = "rounded",
+        title = " Send review ",
+        title_pos = "center",
+        zindex = 75,
+        backdrop = false,
+        { win = "body", border = "none" },
+        { win = "actions", height = 2, border = "top" },
+      },
+    })
+    layout:show()
+    window:focus()
+    for row, line in ipairs(api.nvim_buf_get_lines(actions.buf, 0, -1, false)) do
+      for first, key in line:gmatch("()(%b[])") do
+        api.nvim_buf_set_extmark(actions.buf, highlights, row - 1, first - 1, {
+          end_col = first - 1 + #key,
+          hl_group = row == 1 and "DiagnosticOk" or "Special",
+        })
+      end
+    end
+    api.nvim_buf_set_extmark(actions.buf, highlights, 0, 5, { end_col = 18, hl_group = "Title" })
     window.review_origin = origin
     local function map(key, fn)
       vim.keymap.set("n", key, function()

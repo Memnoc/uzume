@@ -100,7 +100,12 @@ supplied feedback batch.
    continuation. **Ctrl-s** remains queue-only: it leaves focus in review and does
    not submit terminal input. Saving a comment or previewing alone sends nothing.
 5. **r** refreshes delivery status. **x** cancels a pending batch. **q** returns to
-   review. These shortcuts also appear in the preview footer.
+   review. A fixed, two-line action bar stays at the bottom while you scroll the
+   preview. Highlighted keys distinguish **a — Send to agent** from
+   **Ctrl-s — Queue only**; cancel, refresh and back sit on the second line.
+   The queued status also points to **a**, so you do not need to type a separate
+   reminder into the agent terminal. Sending feedback does not merge the task's
+   branch into the original checkout.
 
 The explicit **a** action uses bracketed paste and Enter at a confirmed message
 prompt, then focuses that agent. Queue-only and background delivery do not type
