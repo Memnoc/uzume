@@ -38,6 +38,7 @@ vim.cmd.colorscheme("rose-pine")
 
 Snacks.setup({
   styles = {
+    dashboard = { wo = { scrolloff = 0 } },
     notification = {
       border = "rounded",
       wo = { wrap = true, linebreak = true, winblend = 0 },
@@ -109,13 +110,27 @@ Snacks.setup({
         { icon = " ", key = "q", desc = "Quit", action = ":qa" },
       },
     },
-    sections = {
-      require("ainvim.branding").section,
-      { title = "Keymaps", section = "keys", indent = 2, padding = 1 },
-      { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
-      { icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
-    },
+    sections = require("ainvim.branding").home,
   },
+})
+
+-- Neovim can retain a scrolled viewport when a dashboard shrinks on resize.
+vim.api.nvim_create_autocmd("User", {
+  pattern = "SnacksDashboardUpdatePost",
+  group = vim.api.nvim_create_augroup("UzumeDashboardViewport", { clear = true }),
+  callback = function()
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      local buf = vim.api.nvim_win_get_buf(win)
+      if
+        vim.bo[buf].filetype == "snacks_dashboard"
+        and vim.api.nvim_buf_line_count(buf) <= vim.api.nvim_win_get_height(win)
+      then
+        vim.api.nvim_win_call(win, function()
+          vim.fn.winrestview({ topline = 1, leftcol = 0, skipcol = 0 })
+        end)
+      end
+    end
+  end,
 })
 
 require("which-key").setup({

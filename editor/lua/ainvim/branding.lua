@@ -23,6 +23,9 @@ local wordmark = {
 function M.section(dashboard)
   local text = {}
   local height = vim.api.nvim_win_get_height(dashboard.win)
+  local full = height >= 40
+  local show_logo = height >= 30
+  local top = height >= 30 and 3 or 2
   local function row(parts)
     if #text > 0 then
       text[#text + 1] = { "\n" }
@@ -38,20 +41,55 @@ function M.section(dashboard)
     end
     text[#text + 1] = { (" "):rep(31 - width - left) }
   end
-  -- Give the artwork some breathing room on tall home screens.
-  if height >= 40 then
-    row({ "" })
+  if show_logo then
+    for _, parts in ipairs(logo) do
+      row(parts)
+    end
     row({ "" })
   end
-  for _, parts in ipairs(logo) do
-    row(parts)
-  end
-  row({ "" })
-  local compact = height < 30
-  for _, line in ipairs(compact and { "U Z U M E" } or wordmark) do
+  for _, line in ipairs(full and wordmark or { "U Z U M E" }) do
     row({ line })
   end
-  return { text = text, align = "center", padding = 2 }
+  return { text = text, align = "center", padding = { full and 2 or 1, top } }
+end
+
+-- Budget the whole home screen on every resize, including populated history.
+-- Keep navigation and breathing room before spending rows on recent entries.
+function M.home(dashboard)
+  local header = M.section(dashboard)
+  local rows = 1
+  for _, part in ipairs(header.text) do
+    if part[1] == "\n" then
+      rows = rows + 1
+    end
+  end
+  local height = vim.api.nvim_win_get_height(dashboard.win)
+  local keys = #dashboard.opts.preset.keys
+  local remaining = height - rows - header.padding[1] - header.padding[2] - (keys + 2) - 1
+  local limit = math.min(5, math.floor((remaining - 4) / 2))
+  local sections = {
+    header,
+    { title = "Keymaps", section = "keys", indent = 2, padding = 1 },
+  }
+  if limit >= 1 then
+    sections[#sections + 1] = {
+      icon = " ",
+      title = "Recent Files",
+      section = "recent_files",
+      indent = 2,
+      padding = 1,
+      limit = limit,
+    }
+    sections[#sections + 1] = {
+      icon = " ",
+      title = "Projects",
+      section = "projects",
+      indent = 2,
+      padding = 1,
+      limit = limit,
+    }
+  end
+  return sections
 end
 
 return M

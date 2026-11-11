@@ -15,8 +15,12 @@ shows mode, branch, file, diagnostics and position. Snacks supplies file icons,
 indent guides, status-column UI, input prompts and warning/error notifications.
 Indent-guide animation is disabled. WhichKey's Helix-style menu appears after
 pressing Space and pausing; no function-row key is required.
-On home screens at least 40 terminal rows tall, two blank rows above the artwork
-place the logo slightly lower. Shorter windows retain the compact spacing.
+The dashboard budgets its full content height on every resize. It reserves top
+and bottom breathing room, keeps all six navigation shortcuts, and shows up to
+five recent files and projects only when they fit. At 40 rows it uses the full
+wordmark; at 30–39 rows it uses the emblem and compact name; below 30 it keeps
+the compact name. Short windows omit history before sacrificing navigation.
+Resizing resets a stale scrolled viewport when all content fits.
 
 Notifications use Snacks' compact style with a rounded border, a visible title,
 opaque background and wrapped text. They stay for seven seconds without taking
@@ -54,12 +58,13 @@ rounded sun, and baseline using normal text rendering, with no image renderer,
 conversion utility, or graphics-protocol dependency. The arch follows
 `SnacksDashboardHeader`; the sun follows `DiagnosticError` (Rose Pine's love
 color). Both adapt to the active colorscheme. The icon occupies 11 columns and
-6 rows (about 45% smaller than the initial rendering). Windows shorter than
-30 rows use a compact name beneath it instead of
-the five-line ASCII wordmark. File, search, explorer, and quit shortcuts remain
+6 rows (about 45% smaller than the initial rendering). Shorter windows use
+the compact layouts described above. File, search, explorer, and quit shortcuts remain
 below the startup artwork.
-Disposable PTY checks verified the rendered header and shortcuts at 120×36 and
-80×24, the new-file action, and the dashboard shown after closing the last project.
+`python3 tests/dashboard.py` resizes a populated dashboard through 100×34,
+80×24, 150×55, 100×40, 80×18 and back to 100×34, checking visible margins,
+shortcuts, history and the new-file action. The six-action home screen needs
+roughly 14 rows; extremely short terminals cannot display the complete menu.
 
 | Control | Action |
 | --- | --- |

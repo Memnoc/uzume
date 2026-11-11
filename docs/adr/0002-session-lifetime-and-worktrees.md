@@ -7,6 +7,10 @@ approved-by: project maintainer
 
 # ADR-0002: Isolate independent tasks and terminate agents with their session
 
+The current named-launch and saved-state inheritance policy is consolidated in
+[ADR-0006](0006-named-tasks-and-inherited-state.md). It replaces the original
+committed-only starting policy; task isolation and process lifetime remain accepted.
+
 Terminology refinement, 2026-11-08: the current model uses **Project → Windows →
 Panes**, with no separate user-facing session entity. See the [design update](../design.md#projects-windows-panes-and-concurrent-work).
 The isolation and stop-on-close requirements below remain. The accepted mapping

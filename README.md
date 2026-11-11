@@ -34,7 +34,7 @@ Uzume takes its name from **Ame-no-Uzume**, the Japanese goddess whose dance hel
 
 ## Project status
 
-Design and prototype stage. This branch, `spike/editor-baseline`, provides the first independent editor preview. There is no production distribution yet; the full specification remains open.
+The main development baseline contains the independent editor, project/window/pane management, isolated agent tasks, stable review and feedback, and local task integration. This is a working prototype, not a production release; the full production specification remains open.
 
 Run `uzume`, or `uzume path/to/file` to open a file directly. The existing `nvims` → **ai-nvim** entry also works. See the [editor guide](editor/README.md) for setup, familiar controls, and the current boundaries. Plain `nvim` keeps your default configuration.
 
@@ -49,6 +49,7 @@ covers catalog views, manual installation, disabling automation and retries.
 in its own branch/worktree window under the current project. **Space aa** shows
 agent attention. See the [AI task guide](docs/features/agents.md).
 
+- [Maintainer handoff](docs/HANDOFF.md): architecture, verification, decisions, and prioritized next work.
 - [Design record](docs/design.md): agreed behavior, deferred features, and open questions.
 - [Feature guide](docs/features/README.md): available features, shortcuts, implementation and limits.
 - [Domain glossary](CONTEXT.md): the meaning of projects, windows, panes, tasks, and reviews.

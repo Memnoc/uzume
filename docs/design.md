@@ -19,7 +19,7 @@ Updated on 2026-11-08: the product hierarchy is **Project → Windows → Panes*
 
 The workflow is to create/open a project at a directory, create the windows and panes needed there, switch among them, and close the whole project workspace when finished. Switching projects or windows preserves their background processes. Closing a project ends its windows, panes, agents and owned spawned processes by default. Optional keep-running behavior remains deferred.
 
-Independent features still require separate worktrees and branches; branches alone do not isolate simultaneous edits in one directory. Joining a task's checkout represents deliberate collaboration. **Accepted, 2026-11-08:** starting an AI task creates a dedicated window, branch, and worktree beneath its existing project, with editor and agent panes side by side. Project identity is separate from window checkout. The initial checkout starts from the project's committed HEAD; uncommitted changes are not copied. Worktree creation, switching, and cleanup should be easy to discover.
+Independent features still require separate worktrees and branches; branches alone do not isolate simultaneous edits in one directory. Joining a task's checkout represents deliberate collaboration. **Accepted, 2026-11-08:** starting an AI task creates a dedicated window, branch, and worktree beneath its existing project, with editor and agent panes side by side. Project identity is separate from window checkout. The original committed-HEAD-only policy was replaced by saved-state inheritance; see [ADR-0006](adr/0006-named-tasks-and-inherited-state.md). Worktree creation, switching, and cleanup should be easy to discover.
 
 Closing/removing the project workspace is distinct from deleting its directory or worktrees. Checkout files and locally saved layout/review state are retained. Worktree cleanup is a separate, explicit action. Drudwyn's refusal to remove primary, dirty, or unintegrated worktrees is a useful reference to refine before implementation; exact cleanup and integration rules remain open.
 
@@ -111,8 +111,8 @@ to stop before removal and explicit confirmation before discarding unintegrated
 work. Integration should preview the exact changes and check destination edits
 and conflicts. Bulk cleanup of completed tasks can follow once these checks are
 reliable. The user-facing action should be **Remove task**, covering both branch
-and worktree. No deletion or integration is implemented by this design note;
-the integration strategy and cleanup eligibility rules still need agreement.
+and worktree. Integration is now implemented as described above. Removal is not implemented;
+cleanup eligibility and discard confirmation still need a focused design pass.
 
 The first Drudwyn pilot feedback changes the order: agents inside Neovim feel
 more accessible than a separate terminal, but the editor does not yet meet the
@@ -128,3 +128,11 @@ editor experience before expanding agent features. The distribution remains inde
 7. Set up canonical repository guidance and the ticket tracker, then produce the spec and incremental implementation tickets.
 
 These steps are proposed sequencing, not an approved implementation ticket list.
+
+## Current continuation point
+
+The [maintainer handoff](HANDOFF.md) records the consolidated prototype baseline,
+module map, verification commands, and prioritized remaining work. Historical
+trial steps above describe the development sequence, not a fresh implementation
+plan. A separate `spike/pane-animations` experiment will explore tiling/resize
+motion; no animation behavior is accepted for the main editor yet.

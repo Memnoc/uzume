@@ -6,7 +6,7 @@ function M.load()
   local path = vim.fn.stdpath("data") .. "/releases/" .. release
   assert(
     vim.fn.filereadable(path .. "/.complete") == 1,
-    "ai-nvim packages missing. Run ./setup-editor from the ai-nvim-editor checkout."
+    "Uzume packages missing. Run ./setup-editor from the Uzume checkout."
   )
   vim.opt.packpath:prepend(path)
   -- Native opt packages, installed from exact commits. Startup never updates.
