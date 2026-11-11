@@ -1,7 +1,7 @@
-# ai-nvim pilot: clear the workspace navigator filter
+# uzume pilot: clear the workspace navigator filter
 
 Implement this small real task in the current worktree and branch
-`ai-nvim/clear-filter-workspaces`.
+`uzume/clear-filter-workspaces`.
 
 Read CONTRIBUTING.md and relevant context first. Your only implementation file
 is `src/navigator.rs`; add meaningful regression coverage in its existing test

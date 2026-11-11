@@ -19,7 +19,7 @@ import time
 
 REPO = Path(__file__).resolve().parents[1]
 NVIM = os.environ.get('UZUME_TEST_NVIM', shutil.which('nvim'))
-BUNDLE = Path(os.environ.get('XDG_DATA_HOME', Path.home() / '.local/share')) / 'ai-nvim/releases'
+BUNDLE = Path(os.environ.get('XDG_DATA_HOME', Path.home() / '.local/share')) / 'uzume/releases'
 root = Path(tempfile.mkdtemp(prefix='uzume-agents-')).resolve()
 project = root / 'project with spaces'
 project.mkdir()
@@ -31,10 +31,10 @@ git('init', '-q')
 git('add', '.')
 git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'base')
 (project / 'example.txt').write_text('uncommitted source\n')
-config = root / 'config/ai-nvim'
+config = root / 'config/uzume'
 config.parent.mkdir()
 config.symlink_to(REPO / 'editor')
-data = root / 'data/ai-nvim'
+data = root / 'data/uzume'
 data.mkdir(parents=True)
 (data / 'releases').symlink_to(BUNDLE)
 fixtures = root / 'bin'
@@ -43,7 +43,7 @@ for name in ('codex', 'claude'):
     path = fixtures / name
     shutil.copy(REPO / 'tests/agent_fixture.py', path)
     path.chmod(0o755)
-env = dict(os.environ, NVIM_APPNAME='ai-nvim', TERM='xterm-256color',
+env = dict(os.environ, NVIM_APPNAME='uzume', TERM='xterm-256color',
            XDG_CONFIG_HOME=str(root / 'config'), XDG_DATA_HOME=str(root / 'data'),
            XDG_STATE_HOME=str(root / 'state'), XDG_CACHE_HOME=str(root / 'cache'),
            PATH=str(fixtures) + os.pathsep + os.environ['PATH'])

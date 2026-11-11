@@ -1,15 +1,15 @@
 local function map(mode, lhs, rhs, desc, extra)
   vim.keymap.set(mode, lhs, rhs, vim.tbl_extend("force", { silent = true, desc = desc }, extra or {}))
 end
-local root = require("ainvim.project").root
+local root = require("uzume.editor.project").root
 map("n", "<leader>aw", function()
-  require("ainvim.navigator").open("workspaces")
+  require("uzume.editor.navigator").open("workspaces")
 end, "Window Navigator")
 map("n", "<leader>as", function()
-  require("ainvim.navigator").open("sessions")
+  require("uzume.editor.navigator").open("sessions")
 end, "Project Navigator (Alias)")
 map("n", "<leader>ap", function()
-  require("ainvim.navigator").open("projects")
+  require("uzume.editor.navigator").open("projects")
 end, "Project Navigator")
 local function pick(source, project)
   return function()
@@ -92,8 +92,8 @@ local directions = { h = "Left", j = "Down", k = "Up", l = "Right" }
 for key, direction in pairs(directions) do
   map({ "n", "t" }, "<C-" .. key .. ">", "<cmd>wincmd " .. key .. "<cr>", "Focus " .. direction)
 end
-local panes = require("ainvim.panes")
-local projects = require("ainvim.projects")
+local panes = require("uzume.editor.panes")
+local projects = require("uzume.editor.projects")
 local function layout_map(key, fn, desc)
   map("n", key, function()
     panes.run(fn)
@@ -118,7 +118,7 @@ layout_map("<leader>pT", function()
   panes.split("right", true)
 end, "Shell Right")
 map("n", "<leader>ww", function()
-  require("ainvim.navigator").open("windows")
+  require("uzume.editor.navigator").open("windows")
 end, "Pick Window")
 layout_map("<leader>wn", function()
   projects.new_window(nil, false)
@@ -177,7 +177,7 @@ map({ "n", "t" }, "<C-Right>", "<cmd>vertical resize +5<cr>", "Increase Width")
 map("n", "<C-Up>", "<cmd>resize +2<cr>", "Increase Height")
 map("n", "<C-Down>", "<cmd>resize -2<cr>", "Decrease Height")
 map({ "n", "i", "x", "s" }, "<C-s>", function()
-  require("ainvim.save").file()
+  require("uzume.editor.save").file()
 end, "Save File")
 map("n", "<Esc>", "<cmd>nohlsearch<cr>", "Clear Search Highlight")
 map("x", "<", "<gv", "Indent Left")
@@ -191,7 +191,7 @@ end, "Flash")
 local function terminal(position, cwd)
   Snacks.terminal(nil, {
     cwd = cwd,
-    env = { AINVIM_TERMINAL_STYLE = position }, -- Separate right/float terminal identities.
+    env = { UZUME_TERMINAL_STYLE = position }, -- Separate right/float terminal identities.
     win = {
       position = position,
       keys = {

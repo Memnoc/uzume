@@ -26,7 +26,7 @@ function M.file()
     vim.cmd.stopinsert()
     return
   end
-  local directory = require("ainvim.project").root(buf)
+  local directory = require("uzume.editor.project").root(buf)
   Snacks.input({
     prompt = "Save file as · Enter save · Esc cancel",
     default = directory .. "/",

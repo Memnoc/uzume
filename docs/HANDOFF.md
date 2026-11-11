@@ -41,19 +41,21 @@ controls remain primary. Preserve plain `nvim` and its existing configuration.
 | Integration | Preview reviewed task delta, select local destination, apply one commit; labeled conflict resolver, continue/abort, saved operation history | Combine several tasks into a feature branch without importing inherited starting edits or publishing remotely |
 | Home | Responsive cave/sun artwork and history list budgeting, visible shortcuts | Populated history must fit too; padding alone hid the bottom of the dashboard |
 
-Names in old prototype reports are historical. `ainvim` modules and the
-`ai-nvim` app/data namespace remain compatibility identifiers, not alternative
-product names. Changing them requires a planned migration for plugins, tools,
-worktrees, snapshots and saved records. Do not do a blind string replacement.
+The active code and app namespace are now `uzume`. Existing storage can be renamed
+using `setup-editor --migrate --register` after closing Uzume. Legacy absolute
+paths remain valid through compatibility symlinks; do not delete them while
+saved Git worktrees, Mason references or histories rely on them. New installations
+create only `uzume` paths. See [namespace migration](features/namespace-migration.md).
+Historical reports retain old names where they describe evidence from earlier runs.
 
 ## Architecture and code map
 
 | Entry point / module | Responsibility |
 | --- | --- |
-| `editor/init.lua`, `editor/lua/ainvim/` | Bootstrap, native package load, editor options, Extras/languages/tools, UI/keymaps |
+| `editor/init.lua`, `editor/lua/uzume/editor/` | Bootstrap, native package load, editor options, Extras/languages/tools, UI/keymaps |
 | `setup-editor`, `editor/plugins.lock.json`, `editor/tools.lock.json` | Exact plugin bundle installation, pinned grammar/query sources, selected tool versions; optional standalone launcher registration |
-| `ainvim/projects.lua`, `sessions.lua`, `panes.lua`, `navigator.lua` | Product grouping, layout persistence, pane operations and pickers; native window terminology differs from product Window |
-| `ainvim/branding.lua`, `ui.lua` | Logo and whole-dashboard size budget; dashboard-only viewport correction |
+| `uzume/editor/projects.lua`, `sessions.lua`, `panes.lua`, `navigator.lua` | Product grouping, layout persistence, pane operations and pickers; native window terminology differs from product Window |
+| `uzume/editor/branding.lua`, `ui.lua` | Logo and whole-dashboard size budget; dashboard-only viewport correction |
 | `uzume/agents/init.lua`, `views.lua`, `input.lua`, `context.lua` | Agent lifecycle/UI, meaningful labels/icons, terminal routing and explicit file context |
 | `uzume/agents/branches.lua`, `worktrees.lua`, `editor.lua`, `buffers.lua` | Named or existing task launch, checkout/baseline identity, left editor pane and buffer scoping |
 | `editor/agent/branches.py`, `create_worktree.py` | Git preflight, task creation and inherited-state capture using argument arrays/private index |
@@ -95,7 +97,7 @@ buffer tabs should display the agent name/icon instead of `python3`.
 
 ## Local state and recovery
 
-Paths are relative to Neovim's `stdpath` for `NVIM_APPNAME=ai-nvim`:
+Paths are relative to Neovim's `stdpath` for `NVIM_APPNAME=uzume`:
 
 | Location | Contents |
 | --- | --- |
@@ -149,8 +151,8 @@ inspect the remote and verification record for the completed publication state.
 
 ## Verification and how to continue safely
 
-Run `python3 tests/run.py` from the repository root. It runs 15 cases sequentially:
-installer registration and conflict refusal; dashboard resizing; pane motion, restoration and interruption; normal and forced-exit agent cleanup; saved-state inheritance;
+Run `python3 tests/run.py` from the repository root. It runs 16 cases sequentially:
+namespace migration; installer registration and conflict refusal; dashboard resizing; pane motion, restoration and interruption; normal and forced-exit agent cleanup; saved-state inheritance;
 task navigation; named and existing-branch launch; review; comments; Codex and
 Claude feedback; normal and diff3 conflict integration. Each uses real Neovim/PTY
 and real disposable Git repositories, with mock external CLIs and isolated XDG

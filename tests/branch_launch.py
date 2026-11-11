@@ -4,7 +4,7 @@ from agent_harness import *
 
 try:
     wait(lambda: lua('vim.fn.exists(":UzumeAgent")') == '2')
-    do('require("smear_cursor").enabled=false; require("ainvim.sessions").adopt()')
+    do('require("smear_cursor").enabled=false; require("uzume.editor.sessions").adopt()')
     initial = git('branch','--show-current')
     original_tab = js('vim.api.nvim_get_current_tabpage()')
     # Another local branch with content different from the original checkout.
@@ -46,7 +46,7 @@ try:
     wait(lambda: js('vim.api.nvim_get_current_tabpage()') == agent['tab'])
     assert js('#require("uzume.agents").list()') == 1
     assert item(1)['job'] == agent['job'] and js('vim.fn.getcwd()') == str(task_root)
-    editor = next(p for p in js('require("ainvim.sessions").windows(0)') if not p['terminal'])
+    editor = next(p for p in js('require("uzume.editor.sessions").windows(0)') if not p['terminal'])
     assert js('vim.api.nvim_buf_get_lines(' + str(editor['buf']) + ',0,-1,false)') == ['latest edits in the retained task']
     print('PASS: continuing a task reuses its exact checkout, edits and running CLI')
     do('vim.cmd.stopinsert(); vim.api.nvim_set_current_tabpage(' + str(original_tab) + '); vim.cmd.edit(' + json.dumps(str(project/'z-extra.txt')) + ')')
@@ -56,13 +56,17 @@ try:
     wait(lambda: 'saved changes' in lua('vim.inspect(Snacks.picker.get()[1].opts.title)'))
     keys('Continue'); keys('<CR>')
     wait(lambda: js('vim.api.nvim_get_current_tabpage()') == agent['tab'])
-    editor = next(p for p in js('require("ainvim.sessions").windows(0)') if not p['terminal'])
+    editor = next(p for p in js('require("uzume.editor.sessions").windows(0)') if not p['terminal'])
     assert js('vim.api.nvim_buf_get_name(' + str(editor['buf']) + ')') == str(task_root/'z-extra.txt')
     assert any(file['path'] == str(task_root/'z-extra.txt') for file in item(1)['task']['context']['files'])
     wait(lambda: (Path(agent['directory'])/'fixture.json').exists())
     (Path(agent['directory'])/'exit').write_text('0')
     wait(lambda: item(1).get('exited'))
     do('vim.cmd.stopinsert(); vim.cmd.tabclose()')
+    # Emulate a directory rename with the old absolute path retained as a link.
+    moved_task = task_root.with_name(task_root.name + '-moved')
+    task_root.rename(moved_task)
+    task_root.symlink_to(moved_task.name, target_is_directory=True)
     keys(' aB')
     wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
     keys(agent['task']['branch']); keys('<CR>')
@@ -73,7 +77,7 @@ try:
     assert resumed['kind'] == 'claude' and resumed['task']['cwd'] == str(task_root)
     assert resumed['task']['base'] == agent['task']['base']
     assert (task_root/'example.txt').read_text() == 'latest edits in the retained task\n'
-    print('PASS: closed task is reopened on the same branch with its original review baseline')
+    print('PASS: closed task reopens through a compatibility path with its original review baseline')
     do('vim.cmd.stopinsert(); vim.api.nvim_set_current_tabpage(' + str(original_tab) + ')')
     git('branch','committed-only')
     keys(' ab')

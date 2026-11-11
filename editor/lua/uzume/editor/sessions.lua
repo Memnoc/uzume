@@ -15,7 +15,7 @@ local function editable(win)
   return vim.bo[buf].buftype == ""
     or vim.bo[buf].buftype == "terminal"
     or vim.bo[buf].filetype == "snacks_dashboard"
-    or vim.bo[buf].filetype == "ainvim_session"
+    or vim.bo[buf].filetype == "uzume_session"
     or vim.bo[buf].filetype == "uzume_task"
 end
 local function tiled_windows(tab)
@@ -36,14 +36,14 @@ function M.windows(tab)
         buf = buf,
         tab = tab,
         terminal = terminal,
-        name = vim.w[win].ainvim_name
+        name = vim.w[win].uzume_name
           or (
             terminal and (vim.b[buf].term_title or "terminal")
             or (vim.bo[buf].filetype == "snacks_dashboard" and "Dashboard")
-            or (vim.bo[buf].filetype == "ainvim_session" and "Project home")
+            or (vim.bo[buf].filetype == "uzume_session" and "Project home")
             or (file ~= "" and vim.fs.basename(file) or "[New file]")
           ),
-        agent = vim.b[buf].ainvim_agent,
+        agent = vim.b[buf].uzume_agent,
       }
     end
   end
@@ -53,11 +53,11 @@ function M.list()
   local result = {}
   for _, tab in ipairs(api.nvim_list_tabpages()) do
     local number = api.nvim_tabpage_get_number(tab)
-    local root = tabvar(tab, "ainvim_root") or vim.fn.getcwd(-1, number)
+    local root = tabvar(tab, "uzume_root") or vim.fn.getcwd(-1, number)
     result[#result + 1] = {
       tab = tab,
       root = root,
-      name = tabvar(tab, "ainvim_name") or vim.fs.basename(root),
+      name = tabvar(tab, "uzume_name") or vim.fs.basename(root),
       current = tab == api.nvim_get_current_tabpage(),
       windows = M.windows(tab),
     }
@@ -66,32 +66,32 @@ function M.list()
 end
 function M.adopt()
   local tab = api.nvim_get_current_tabpage()
-  if vim.t[tab].ainvim_unassigned then
+  if vim.t[tab].uzume_unassigned then
     if vim.bo.buftype == "" and api.nvim_buf_get_name(0) ~= "" then
-      vim.t[tab].ainvim_unassigned = nil
+      vim.t[tab].uzume_unassigned = nil
     else
       return
     end
   end
-  if not tabvar(tab, "ainvim_root") then
-    local root = require("ainvim.project").root()
-    api.nvim_tabpage_set_var(tab, "ainvim_root", root)
+  if not tabvar(tab, "uzume_root") then
+    local root = require("uzume.editor.project").root()
+    api.nvim_tabpage_set_var(tab, "uzume_root", root)
     vim.cmd.tcd(vim.fn.fnameescape(root))
   end
-  vim.t[tab].ainvim_project_name = vim.t[tab].ainvim_project_name or vim.fs.basename(vim.t[tab].ainvim_root)
-  vim.t[tab].ainvim_name = vim.t[tab].ainvim_name or "Editor"
+  vim.t[tab].uzume_project_name = vim.t[tab].uzume_project_name or vim.fs.basename(vim.t[tab].uzume_root)
+  vim.t[tab].uzume_name = vim.t[tab].uzume_name or "Editor"
 end
 function M.home()
   local tab, win, previous = api.nvim_get_current_tabpage(), api.nvim_get_current_win(), api.nvim_get_current_buf()
-  local root = tabvar(tab, "ainvim_root") or vim.fn.getcwd()
-  local name = tabvar(tab, "ainvim_name") or vim.fs.basename(root)
+  local root = tabvar(tab, "uzume_root") or vim.fn.getcwd()
+  local name = tabvar(tab, "uzume_name") or vim.fs.basename(root)
   local buf = api.nvim_create_buf(false, true)
   vim.bo[buf].bufhidden = "wipe"
-  vim.bo[buf].filetype = "ainvim_session"
+  vim.bo[buf].filetype = "uzume_session"
   vim.b[buf].snacks_main = true
   api.nvim_buf_set_lines(buf, 0, -1, false, {
     "",
-    "  Project: " .. (vim.t[tab].ainvim_project_name or vim.fs.basename(root)),
+    "  Project: " .. (vim.t[tab].uzume_project_name or vim.fs.basename(root)),
     "  Directory: " .. root,
     "",
     "  Window: " .. name,
@@ -107,9 +107,9 @@ function M.home()
     "",
   })
   vim.bo[buf].modifiable = false
-  api.nvim_buf_set_extmark(buf, api.nvim_create_namespace("ainvim.session_home"), 1, 2, {
+  api.nvim_buf_set_extmark(buf, api.nvim_create_namespace("uzume.editor.session_home"), 1, 2, {
     end_row = 1,
-    end_col = #("  Project: " .. (vim.t[tab].ainvim_project_name or vim.fs.basename(root))),
+    end_col = #("  Project: " .. (vim.t[tab].uzume_project_name or vim.fs.basename(root))),
     hl_group = "Title",
   })
   api.nvim_win_set_buf(win, buf)
@@ -148,10 +148,10 @@ function M.home()
 end
 function M.refresh_home(tab)
   for _, pane in ipairs(M.windows(tab)) do
-    if vim.bo[pane.buf].filetype == "ainvim_session" then
+    if vim.bo[pane.buf].filetype == "uzume_session" then
       vim.bo[pane.buf].modifiable = true
-      api.nvim_buf_set_lines(pane.buf, 1, 2, false, { "  Project: " .. (vim.t[tab].ainvim_project_name or "") })
-      api.nvim_buf_set_lines(pane.buf, 4, 5, false, { "  Window: " .. (vim.t[tab].ainvim_name or "") })
+      api.nvim_buf_set_lines(pane.buf, 1, 2, false, { "  Project: " .. (vim.t[tab].uzume_project_name or "") })
+      api.nvim_buf_set_lines(pane.buf, 4, 5, false, { "  Window: " .. (vim.t[tab].uzume_name or "") })
       vim.bo[pane.buf].modifiable = false
     end
   end
@@ -163,11 +163,11 @@ function M.create(path, opts)
   vim.cmd.tabnew()
   require("uzume.agents.buffers").reset(api.nvim_get_current_tabpage())
   vim.cmd.tcd(vim.fn.fnameescape(path))
-  api.nvim_tabpage_set_var(0, "ainvim_root", path)
+  api.nvim_tabpage_set_var(0, "uzume_root", path)
   vim.t.uzume_project_root = opts.project_root or path
   vim.t.uzume_task = opts.task
-  api.nvim_tabpage_set_var(0, "ainvim_name", opts.name or "Editor")
-  vim.t.ainvim_project_name = opts.project_name or vim.fs.basename(path)
+  api.nvim_tabpage_set_var(0, "uzume_name", opts.name or "Editor")
+  vim.t.uzume_project_name = opts.project_name or vim.fs.basename(path)
   if opts.shell then
     local ok, job = pcall(vim.fn.jobstart, vim.fn.split(vim.o.shell), { term = true, cwd = path })
     if not ok or job <= 0 then
@@ -187,7 +187,7 @@ function M.jump(item)
     assert(api.nvim_win_is_valid(item.win), "Window has closed")
     api.nvim_set_current_win(item.win)
   else
-    local focused = tabvar(item.tab, "ainvim_focus")
+    local focused = tabvar(item.tab, "uzume_focus")
     if focused and api.nvim_win_is_valid(focused) then
       api.nvim_set_current_win(focused)
     end
@@ -198,9 +198,9 @@ function M.rename(item, name)
   assert(name ~= "", "A name cannot be empty")
   if item.win then
     assert(api.nvim_win_is_valid(item.win), "Window has closed")
-    vim.w[item.win].ainvim_name = name
+    vim.w[item.win].uzume_name = name
   else
-    api.nvim_tabpage_set_var(item.tab, "ainvim_name", name)
+    api.nvim_tabpage_set_var(item.tab, "uzume_name", name)
   end
 end
 local function stop_terminal(buf)
@@ -212,8 +212,8 @@ end
 -- Native mksession preserves editor layout/cursors; terminal/options/globals are
 -- excluded so restoring never launches a shell, agent, or captured option code.
 function M.save()
-  require("ainvim.panes").prepare_save()
-  assert(#require("ainvim.projects").list() > 0, "Open a project before saving its layout")
+  require("uzume.editor.panes").prepare_save()
+  assert(#require("uzume.editor.projects").list() > 0, "Open a project before saving its layout")
   if M.restoring then
     return
   end
@@ -235,9 +235,9 @@ function M.save()
     local titles = {}
     local home = false
     for _, item in ipairs(session.windows) do
-      home = home or vim.bo[item.buf].filetype == "ainvim_session"
+      home = home or vim.bo[item.buf].filetype == "uzume_session"
       if not item.terminal then
-        titles[api.nvim_buf_get_name(item.buf)] = vim.w[item.win].ainvim_name
+        titles[api.nvim_buf_get_name(item.buf)] = vim.w[item.win].uzume_name
       end
     end
     metadata[#metadata + 1] = {
@@ -245,7 +245,7 @@ function M.save()
       root = session.root,
       titles = titles,
       home = home,
-      project_name = vim.t[session.tab].ainvim_project_name,
+      project_name = vim.t[session.tab].uzume_project_name,
       project_root = vim.t[session.tab].uzume_project_root,
       task = vim.t[session.tab].uzume_task,
     }
@@ -292,14 +292,14 @@ function M.restore()
     for index, tab in ipairs(api.nvim_list_tabpages()) do
       local session = saved.sessions[index]
       if session then
-        vim.t[tab].ainvim_unassigned = nil
-        api.nvim_tabpage_set_var(tab, "ainvim_name", session.project_name and session.name or "Editor")
-        vim.t[tab].ainvim_project_name = session.project_name or session.name
-        api.nvim_tabpage_set_var(tab, "ainvim_root", session.root)
+        vim.t[tab].uzume_unassigned = nil
+        api.nvim_tabpage_set_var(tab, "uzume_name", session.project_name and session.name or "Editor")
+        vim.t[tab].uzume_project_name = session.project_name or session.name
+        api.nvim_tabpage_set_var(tab, "uzume_root", session.root)
         vim.t[tab].uzume_project_root = session.project_root or session.root
         vim.t[tab].uzume_task = session.task
         for _, win in ipairs(M.windows(tab)) do
-          vim.w[win.win].ainvim_name = session.titles[api.nvim_buf_get_name(win.buf)]
+          vim.w[win.win].uzume_name = session.titles[api.nvim_buf_get_name(win.buf)]
         end
         local windows = M.windows(tab)
         local blank = #windows > 0
@@ -322,20 +322,20 @@ function M.restore()
   assert(ok, err)
 end
 function M.setup()
-  local group = api.nvim_create_augroup("ainvim_sessions", { clear = true })
+  local group = api.nvim_create_augroup("uzume_sessions", { clear = true })
   api.nvim_create_autocmd("WinEnter", {
     group = group,
     callback = function()
       local win = api.nvim_get_current_win()
       if editable(win) then
-        api.nvim_tabpage_set_var(0, "ainvim_focus", win)
+        api.nvim_tabpage_set_var(0, "uzume_focus", win)
       end
     end,
   })
   api.nvim_create_autocmd("TermOpen", {
     group = group,
     callback = function(event)
-      vim.b[event.buf].ainvim_owner = api.nvim_get_current_tabpage()
+      vim.b[event.buf].uzume_owner = api.nvim_get_current_tabpage()
     end,
   })
   api.nvim_create_autocmd("TabClosed", {
@@ -343,17 +343,17 @@ function M.setup()
     callback = function()
       vim.schedule(function()
         for _, buf in ipairs(api.nvim_list_bufs()) do
-          local owner = vim.b[buf].ainvim_owner
+          local owner = vim.b[buf].uzume_owner
           if owner and not api.nvim_tabpage_is_valid(owner) then
             stop_terminal(buf)
-            vim.b[buf].ainvim_owner = nil
+            vim.b[buf].uzume_owner = nil
           end
         end
       end)
     end,
   })
   api.nvim_create_user_command("AiSession", function(args)
-    local ok, err = pcall(require("ainvim.projects").open, args.args ~= "" and args.args or vim.fn.getcwd())
+    local ok, err = pcall(require("uzume.editor.projects").open, args.args ~= "" and args.args or vim.fn.getcwd())
     if not ok then
       vim.notify(tostring(err), vim.log.levels.ERROR)
     end

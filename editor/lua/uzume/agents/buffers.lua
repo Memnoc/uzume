@@ -15,7 +15,7 @@ end
 function M.contains(buf)
   local tab = api.nvim_get_current_tabpage()
   if vim.bo[buf].buftype == "terminal" then
-    return vim.b[buf].ainvim_owner == tab
+    return vim.b[buf].uzume_owner == tab
   end
   return (M.seen[tab] or {})[buf] == true
 end

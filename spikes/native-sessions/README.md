@@ -18,7 +18,7 @@ From the repository root on branch `spike/native-sessions`:
 Or from any directory:
 
 ```sh
-~/Code/ai-nvim/spike
+~/Code/uzume/spike
 ```
 
 Requires Neovim 0.11+ and Python 3 on PATH. The tested executable is this machine's Neovim 0.12 development build; the production distro's pinned Neovim installer is not part of the spike. Start with a reasonably wide terminal, around 120 columns by 36 rows, so the editor and two terminals are readable.

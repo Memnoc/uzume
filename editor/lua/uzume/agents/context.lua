@@ -98,7 +98,7 @@ function M.mark()
 end
 
 function M.select()
-  local cwd = require("ainvim.project").root()
+  local cwd = require("uzume.editor.project").root()
   M.target(function(item)
     Snacks.picker.files({
       cwd = cwd,

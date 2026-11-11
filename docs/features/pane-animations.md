@@ -54,7 +54,7 @@ the prior window highlight on completion, interruption or colorscheme change.
 
 [`layout/motion.lua`](../../editor/lua/uzume/layout/motion.lua) contains geometry
 animation and interruption handling; [`layout/settings.lua`](../../editor/lua/uzume/layout/settings.lua)
-owns validated local preferences. [`ainvim/panes.lua`](../../editor/lua/ainvim/panes.lua)
+owns validated local preferences. [`uzume/editor/panes.lua`](../../editor/lua/uzume/editor/panes.lua)
 calls the module directly at pane operations. The experimental monkeypatch,
 demo launcher, generated files and sample processes are not loaded by the editor.
 

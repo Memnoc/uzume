@@ -10,12 +10,12 @@ def sessions():
     common = subprocess.check_output(["git", "-C", str(repo), "rev-parse", "--path-format=absolute", "--git-common-dir"], text=True).strip()
     result = []
     for suffix, kind, file in (("sessions", "codex", "session_navigator.rs"), ("workspaces", "claude", "navigator.rs")):
-        cwd = code / "ai-nvim-worktrees" / ("drudwyn-" + suffix)
+        cwd = code / "uzume-worktrees" / ("drudwyn-" + suffix)
         actual = subprocess.check_output(["git", "-C", str(cwd), "rev-parse", "--path-format=absolute", "--git-common-dir"], text=True).strip()
         branch = subprocess.check_output(["git", "-C", str(cwd), "branch", "--show-current"], text=True).strip()
-        if Path(actual).resolve() != Path(common).resolve() or branch != "ai-nvim/clear-filter-" + suffix:
+        if Path(actual).resolve() != Path(common).resolve() or branch != "uzume/clear-filter-" + suffix:
             raise RuntimeError("Pilot worktree identity changed: " + str(cwd))
-        if not (cwd / ".ai-nvim-task.md").exists():
+        if not (cwd / ".uzume-task.md").exists():
             raise RuntimeError("Pilot task is missing: " + str(cwd))
         executable = shutil.which(kind)
         if not executable:

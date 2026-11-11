@@ -4,7 +4,7 @@ from agent_harness import *
 
 try:
     wait(lambda: lua('vim.fn.exists(":UzumeAgent")') == '2')
-    do('require("smear_cursor").enabled=false; require("ainvim.sessions").adopt(); require("uzume.agents").start("codex")')
+    do('require("smear_cursor").enabled=false; require("uzume.editor.sessions").adopt(); require("uzume.agents").start("codex")')
     wait(lambda: js('#require("uzume.agents").list()') == 1)
     agent = item(1)
     checkout = Path(agent['task']['cwd'])
@@ -13,7 +13,7 @@ try:
     subprocess.run(['git','-C',str(checkout),'-c','user.name=Fixture','-c','user.email=fixture@example.test','commit','-qm','agent change'],check=True)
     (checkout/'example.txt').write_text('working change\n')
     (checkout/'new file.txt').write_text('new content\n')
-    editor_view = next(p for p in js('require("ainvim.sessions").windows(0)') if not p['terminal'])['win']
+    editor_view = next(p for p in js('require("uzume.editor.sessions").windows(0)') if not p['terminal'])['win']
     do('vim.api.nvim_win_call(' + str(editor_view) + ',function() vim.cmd.diffthis() end)')
     do('vim.cmd.stopinsert(); vim.cmd("UzumeReview")')
     wait(lambda: lua('vim.bo.filetype') == 'snacks_picker_input')
@@ -40,7 +40,7 @@ try:
     assert js('vim.api.nvim_buf_get_lines(0,0,-1,false)') == ['newer agent edit']
     keys('q')
     assert js('vim.fn.jobwait({' + str(agent['job']) + '},0)[1]') == -1
-    assert len(js('require("ainvim.sessions").windows(0)')) == 2
+    assert len(js('require("uzume.editor.sessions").windows(0)')) == 2
     assert js('vim.wo[' + str(editor_view) + '].diff'), 'Existing editor diff was not restored'
     do('vim.api.nvim_win_call(' + str(editor_view) + ',function() vim.cmd.diffoff() end)')
     print('PASS: stable review, explicit refresh, unified toggle and layout restoration')

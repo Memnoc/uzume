@@ -1,7 +1,7 @@
 # Tool catalog and automatic installation
 
 The editor now uses **Mason** to install language servers and formatters into
-ai-nvim's own data directory. Our Extras catalog owns pack choices, versions,
+uzume's own data directory. Our Extras catalog owns pack choices, versions,
 filetype triggers and retry policy. Native Neovim still configures and starts
 language servers; Mason is the installer. Language integrations are configured
 directly, without mason-lspconfig or a separate automatic-tool-installer plugin.
@@ -25,7 +25,7 @@ another one.
 | CSS / SCSS / LESS | CSS language server, Prettier |
 | JSON / JSONC | JSON language server, Prettier |
 
-An existing usable executable satisfies automatic installation. Managed ai-nvim
+An existing usable executable satisfies automatic installation. Managed uzume
 binaries take priority, followed by previously discovered external paths and
 PATH. Prettier uses the project's local executable first; that also prevents an
 unnecessary automatic global download. Existing binaries are not automatically
@@ -50,11 +50,11 @@ Open **Space l**, then:
 | Ctrl-v | Cycle All → Available → Installed → Enabled |
 | Enter | Toggle a draft pack choice |
 | Ctrl-s | Save choices; newly enabled packs start installing missing required tools |
-| Ctrl-r | Install/retry the selected pack's required tools in ai-nvim storage, even if external copies exist |
+| Ctrl-r | Install/retry the selected pack's required tools in uzume storage, even if external copies exist |
 | Ctrl-g | Open Mason's package browser, installation output and optional tools |
 | Esc | Close and discard unsaved pack choices |
 
-**Available** includes packs whose required tools are not all managed by ai-nvim.
+**Available** includes packs whose required tools are not all managed by uzume.
 **Installed** means their Mason-managed required tools are present (with rustfmt
 allowed from the Rust toolchain); Smear needs no external tools. **Enabled**
 shows the current draft selection. Optional integrations do not determine pack
@@ -87,16 +87,16 @@ the existing project-detection rules.
 
 ## Implementation and version boundary
 
-- [installer.lua](../../editor/lua/ainvim/installer.lua) maps filetypes to required
+- [installer.lua](../../editor/lua/uzume/editor/installer.lua) maps filetypes to required
   tools, configures Mason, tracks pending/failure state, schedules installation
   and exposes catalog status. It validates the pinned registry JSON hash before
   managed installation and uses Mason's asynchronous install API with an exact
   package version.
-- [tools.lua](../../editor/lua/ainvim/tools.lua) resolves managed, external and
-  project-local executables. [languages.lua](../../editor/lua/ainvim/languages.lua)
+- [tools.lua](../../editor/lua/uzume/editor/tools.lua) resolves managed, external and
+  project-local executables. [languages.lua](../../editor/lua/uzume/editor/languages.lua)
   refreshes LSP configuration after installation and resolves formatter paths
   when formatting is requested.
-- [extras.lua](../../editor/lua/ainvim/extras.lua) renders pack/tool details and
+- [extras.lua](../../editor/lua/uzume/editor/extras.lua) renders pack/tool details and
   refreshes the open picker as installation status changes. Its draft choices
   remain independent from installation state.
 - [plugins.lock.json](../../editor/plugins.lock.json) pins Mason itself;
@@ -104,7 +104,7 @@ the existing project-detection rules.
   its JSON checksum and the selected top-level tool versions. No periodic registry
   refresh, automatic upgrade, or version check on opening Mason is enabled.
 
-Files under `~/.local/share/ai-nvim/` (or the equivalent XDG directory):
+Files under `~/.local/share/uzume/` (or the equivalent XDG directory):
 
 | Location | Contents |
 | --- | --- |
@@ -126,7 +126,7 @@ not send source buffers, project contents or credentials. Downloaded tools and
 package installation scripts have their own behavior; this is ordinary local
 package installation, not a sandbox for those programs. An existing external Mason
 installation is only read when resolving previously discovered external tools.
-New managed installs use ai-nvim's directory.
+New managed installs use uzume's directory.
 
 ## Verification
 

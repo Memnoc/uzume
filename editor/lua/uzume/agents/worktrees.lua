@@ -1,3 +1,4 @@
+local paths = require("uzume.core.paths")
 -- Git owns checkout creation. Uzume never removes task files or branches on close.
 local M = {}
 
@@ -42,7 +43,7 @@ function M.retained(project, entry)
     and type(task) == "table"
     and task.project == project
     and task.branch == entry.branch
-    and task.cwd == entry.cwd
+    and paths.same(task.cwd, entry.cwd)
     and type(task.base) == "string"
   then
     return task

@@ -5,7 +5,7 @@ from agent_harness import *
 try:
     wait(lambda: lua('vim.fn.exists(":UzumeAgent")') == '2')
     assert lua('vim.fn.exists(":UzumeMotion")') == '2', 'Pane motion must be available in regular Uzume'
-    do('require("smear_cursor").enabled=false; require("ainvim.sessions").adopt()')
+    do('require("smear_cursor").enabled=false; require("uzume.editor.sessions").adopt()')
     # Observe actual pane geometry while a user invokes the split binding.
     do('''
       _G.motion_frames = {}
@@ -52,30 +52,30 @@ try:
     assert js('vim.api.nvim_win_get_config(0).relative') == ''
     print('PASS: resize animates and floating/fullscreen/docking preserve geometry')
     before = js('vim.api.nvim_win_get_width(0)')
-    do('vim.cmd("UzumeMotion spring"); require("ainvim.panes").resize(8,0); vim.cmd("UzumeMotion instant")')
+    do('vim.cmd("UzumeMotion spring"); require("uzume.editor.panes").resize(8,0); vim.cmd("UzumeMotion instant")')
     time.sleep(.5)
     assert js('vim.api.nvim_win_get_width(0)') == before + 8, 'Instant must settle the requested target'
-    do('vim.cmd("UzumeMotion slide"); require("ainvim.panes").resize(-10,0); vim.api.nvim_win_set_width(0,25)')
+    do('vim.cmd("UzumeMotion slide"); require("uzume.editor.panes").resize(-10,0); vim.api.nvim_win_set_width(0,25)')
     time.sleep(.4)
     assert js('vim.api.nvim_win_get_width(0)') == 25, 'A later native resize must win'
-    do('require("ainvim.panes").resize(10,0); vim.api.nvim_input("ihello<Esc>")')
+    do('require("uzume.editor.panes").resize(10,0); vim.api.nvim_input("ihello<Esc>")')
     time.sleep(.4)
     assert 'hello' in lua('vim.api.nvim_get_current_line()'), 'Motion must not consume typing'
     assert js('vim.api.nvim_win_get_width(0)') == 35
     do('vim.cmd("undo")')
     # Mode switching and colorscheme changes must restore window-local tint.
     original_highlight = lua('vim.wo.winhighlight')
-    do('vim.cmd("UzumeMotion pulse"); require("ainvim.panes").resize(1,0)')
+    do('vim.cmd("UzumeMotion pulse"); require("uzume.editor.panes").resize(1,0)')
     assert 'UzumePanePulse' in lua('vim.wo.winhighlight')
     do('vim.cmd("UzumeMotion instant")')
     assert lua('vim.wo.winhighlight') == original_highlight
-    do('vim.cmd("UzumeMotion pulse"); require("ainvim.panes").resize(-1,0); vim.cmd.colorscheme("habamax")')
+    do('vim.cmd("UzumeMotion pulse"); require("uzume.editor.panes").resize(-1,0); vim.cmd.colorscheme("habamax")')
     assert lua('vim.wo.winhighlight') == original_highlight
-    do('vim.cmd("UzumeMotion spring"); require("ainvim.panes").resize(5,0); vim.cmd("tabnew")')
+    do('vim.cmd("UzumeMotion spring"); require("uzume.editor.panes").resize(5,0); vim.cmd("tabnew")')
     other_tab = js('vim.api.nvim_get_current_tabpage()')
     time.sleep(.5)
     assert js('vim.api.nvim_get_current_tabpage()') == other_tab, 'Motion must not steal focus'
-    do('vim.cmd("tabclose"); vim.cmd("UzumeMotion slide"); require("ainvim.panes").split("below",false); vim.api.nvim_win_close(0,true)')
+    do('vim.cmd("tabclose"); vim.cmd("UzumeMotion slide"); require("uzume.editor.panes").split("below",false); vim.api.nvim_win_close(0,true)')
     remaining = js('vim.api.nvim_list_wins()')
     time.sleep(.4)
     assert js('vim.api.nvim_list_wins()') == remaining, 'Closing an animating pane must not resurrect windows'

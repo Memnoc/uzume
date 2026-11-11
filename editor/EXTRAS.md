@@ -1,7 +1,7 @@
 # Extras
 
 Open **Space l** or `:Extras`. Type to filter, press **Enter** to toggle a pack,
-then **Ctrl-s** to save. Restart ai-nvim to apply saved changes. Closing with
+then **Ctrl-s** to save. Restart uzume to apply saved changes. Closing with
 Escape discards changes that were not saved. The menu marks changes that require
 a restart and shows required/optional tool availability in its preview.
 
@@ -18,7 +18,7 @@ ones. The icon legend stays at the top even when details are out of view.
 | ○ | Selected to be disabled |
 | * unsaved | Different from the last saved choice; Ctrl-s commits it |
 | ↻ restart | Different from the currently running configuration |
-| available / external | Required tools are missing / usable outside ai-nvim storage |
+| available / external | Required tools are missing / usable outside uzume storage |
 | installing / installed / failed | Managed installation state; details show versions and errors |
 
 Icons have different shapes as well as colors. The preview spells out both
@@ -30,12 +30,12 @@ tool for an active pack does not.
 ## How it is built
 
 This is our own small manager inspired by LazyExtras, not LazyExtras itself.
-[extras.lua](lua/ainvim/extras.lua) owns the catalog, preferences and Snacks picker.
+[extras.lua](lua/uzume/editor/extras.lua) owns the catalog, preferences and Snacks picker.
 It separates the startup state, saved choices for the next launch, and a draft
 copy for the open menu. Enter edits only the draft. Ctrl-s validates all catalog
 choices and atomically renames a temporary JSON file into place; Esc drops the
-draft. [packages.lua](lua/ainvim/packages.lua) and
-[languages.lua](lua/ainvim/languages.lua) use startup choices to load features.
+draft. [packages.lua](lua/uzume/editor/packages.lua) and
+[languages.lua](lua/uzume/editor/languages.lua) use startup choices to load features.
 There is no plugin-manager runtime and no general third-party
 Extras marketplace or custom-pack editor yet. Mason supplies the tool installation
 backend; our catalog and native LSP configuration remain independent.
@@ -56,7 +56,7 @@ Disabling a pack stops loading its optional plugins and language servers on the
 next launch. The small local catalog's dependencies are installed together at
 setup and pinned. Saving a newly enabled pack installs its missing required
 tools through Mason; toggling the draft alone does not start a download.
-Preferences live in `~/.local/share/ai-nvim/extras.json`, outside the source
+Preferences live in `~/.local/share/uzume/extras.json`, outside the source
 checkout, and are written atomically. No editor restart is forced.
 
 ## Editing
@@ -87,19 +87,19 @@ managed by this pack.
 ## Tools and pins
 
 The installer records usable existing executables in
-`~/.local/share/ai-nvim/tool-paths.json`. It checks the supplied Mason cache before
+`~/.local/share/uzume/tool-paths.json`. It checks the supplied Mason cache before
 PATH; this machine's rustup rust-analyzer shim is broken, while its Mason binary
 works. HTML/CSS servers are present inside the existing eslint-lsp package even
 though Mason exposes only some binaries in its top-level bin directory. These
 are read-only references: the installer does not update or write into the supplied
 Mason installation. PATH is a runtime fallback if a recorded executable vanishes.
-Managed binaries in ai-nvim’s own `mason/bin` now take precedence. Opening a
+Managed binaries in uzume’s own `mason/bin` now take precedence. Opening a
 supported file automatically installs missing required tools, then refreshes
 LSP/formatter availability. **Space uI** toggles this behavior persistently.
 Executable detection is not a guarantee of server/project health.
 
 Plugin commits and copied parser/query hashes are in `plugins.lock.json`. Syntax
-resources are copied into ai-nvim's own package bundle and loaded through native
+resources are copied into uzume's own package bundle and loaded through native
 Neovim Treesitter; the nvim-treesitter plugin is not a runtime dependency. This
 snapshot is for this macOS ARM64 machine. CSS/SCSS/LESS use native Vim syntax;
 their language-server features and Prettier are configured independently.

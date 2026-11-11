@@ -29,6 +29,8 @@ roots and forwards editor arguments. Caches are optional read-only accelerators,
 never prerequisites. Source installation is for macOS and Linux; verification
 status must distinguish tested systems from implementation targets.
 
+**Namespace follow-up:** ADR-0009 supersedes this temporary retention decision.
+
 Keep the `ai-nvim` app/data namespace and current Lua module names for existing
 settings, task worktrees and recovery data. The old spike is historical source,
 not part of the installed runtime. Namespace migration is separate work.

@@ -1,3 +1,4 @@
+local paths = require("uzume.core.paths")
 -- Integration is explicit and local. Git owns commit creation and conflict state.
 local M = {}
 local api = vim.api
@@ -29,11 +30,7 @@ local function saved(root)
   end
   for _, buf in ipairs(api.nvim_list_bufs()) do
     assert(
-      not (
-          vim.bo[buf].buftype == ""
-          and vim.bo[buf].modified
-          and vim.startswith(api.nvim_buf_get_name(buf), root .. "/")
-        ),
+      not (vim.bo[buf].buftype == "" and vim.bo[buf].modified and paths.contains(root, api.nvim_buf_get_name(buf))),
       "Save modified files before integrating: " .. api.nvim_buf_get_name(buf)
     )
   end
@@ -43,8 +40,11 @@ local function guard(task, destination)
   saved(destination)
   for _, item in ipairs(require("uzume.agents").list()) do
     if not item.exited then
-      assert(item.task.cwd ~= destination, "Destination belongs to a running agent. Choose a feature branch instead.")
-      if item.task.cwd == task.cwd then
+      assert(
+        not paths.same(item.task.cwd, destination),
+        "Destination belongs to a running agent. Choose a feature branch instead."
+      )
+      if paths.same(item.task.cwd, task.cwd) then
         local status = require("uzume.agents.input").status(item)
         assert(
           status.state == "ready" or status.state == "review",
@@ -66,14 +66,14 @@ local function edit(plan, path)
   require("uzume.review").close()
   local tab
   for _, candidate in ipairs(api.nvim_list_tabpages()) do
-    if vim.t[candidate].uzume_integration and vim.t[candidate].ainvim_root == plan.cwd then
+    if vim.t[candidate].uzume_integration and paths.same(vim.t[candidate].uzume_root, plan.cwd) then
       tab = candidate
     end
   end
   if tab then
     api.nvim_set_current_tabpage(tab)
   else
-    require("ainvim.sessions").create(plan.cwd, {
+    require("uzume.editor.sessions").create(plan.cwd, {
       name = plan.branch,
       project_root = plan.project,
       project_name = vim.fs.basename(plan.project),
@@ -315,7 +315,7 @@ function M.open()
   end)
 end
 function M.history()
-  local project = require("ainvim.projects").current()
+  local project = require("uzume.editor.projects").current()
   local entries = {}
   for _, path in ipairs(vim.fn.glob(storage .. "/*.json", false, true)) do
     local ok, value = pcall(function()

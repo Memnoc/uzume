@@ -58,33 +58,33 @@ def main():
         arguments.remove("--drudwyn")
         from pilot import sessions
         configuration = {"sessions": sessions()}
-    root = Path(tempfile.mkdtemp(prefix="ai-nvim-spike-"))
+    root = Path(tempfile.mkdtemp(prefix="uzume-spike-"))
     token = root.name
     env = dict(os.environ)
     for key in ("XDG_CONFIG_HOME", "XDG_DATA_HOME", "XDG_STATE_HOME", "XDG_CACHE_HOME", "NVIM_APPNAME"):
-        env.pop("AINVIM_ORIGINAL_" + key, None)
+        env.pop("UZUME_ORIGINAL_" + key, None)
         if key in env:
-            env["AINVIM_ORIGINAL_" + key] = env[key]
-    env.pop("AINVIM_REAL_CONFIG", None)
+            env["UZUME_ORIGINAL_" + key] = env[key]
+    env.pop("UZUME_REAL_CONFIG", None)
     if configuration:
         config_path = root / "pilot.json"
         config_path.write_text(json.dumps(configuration))
-        env["AINVIM_REAL_CONFIG"] = str(config_path)
+        env["UZUME_REAL_CONFIG"] = str(config_path)
     for key in ("CONFIG", "DATA", "STATE", "CACHE"):
         path = root / key.lower()
         path.mkdir()
         env[f"XDG_{key}_HOME"] = str(path)
     env.update(
-        NVIM_APPNAME="ai-nvim-spike",
-        AINVIM_SPIKE_ROOT=str(root),
-        AINVIM_SPIKE_SOURCE=str(source),
-        AINVIM_SPIKE_PYTHON=sys.executable,
-        AINVIM_SPIKE_TOKEN=token,
+        NVIM_APPNAME="uzume-spike",
+        UZUME_SPIKE_ROOT=str(root),
+        UZUME_SPIKE_SOURCE=str(source),
+        UZUME_SPIKE_PYTHON=sys.executable,
+        UZUME_SPIKE_TOKEN=token,
         NVIM_LOG_FILE=str(root / "nvim.log"),
     )
     for key in ("NVIM", "NVIM_LISTEN_ADDRESS", "VIMINIT", "EXINIT", "LUA_INIT"):
         env.pop(key, None)
-    print(f"THROWAWAY ai-nvim spike · scratch: {root}", flush=True)
+    print(f"THROWAWAY uzume spike · scratch: {root}", flush=True)
     if live:
         print("REAL Drudwyn worktrees · Space o opens CLI · Space t starts task · files persist", flush=True)
     command = [nvim, "-u", str(source / "init.lua"), "-i", "NONE", "--noplugin", *arguments]

@@ -1,6 +1,6 @@
 -- EDITOR SPIKE: file-triggered, curated tool installation through pinned Mason.
 local M = { pending = {}, failures = {} }
-local tools = require("ainvim.tools")
+local tools = require("uzume.editor.tools")
 local data = vim.fn.stdpath("data")
 local function read(path, fallback)
   local ok, value = pcall(function()
@@ -49,7 +49,7 @@ M.filetypes = {
   jsonc = { "web", "vscode-json-language-server", "prettier" },
 }
 local function changed()
-  vim.api.nvim_exec_autocmds("User", { pattern = "AiNvimToolsChanged", modeline = false })
+  vim.api.nvim_exec_autocmds("User", { pattern = "UzumeToolsChanged", modeline = false })
 end
 local function notice(message, level)
   Snacks.notify(message, { title = "Extras", level = level or vim.log.levels.INFO })
@@ -125,7 +125,7 @@ function M.ensure(name, explicit)
     M.failures[name] = not ok and tostring(err) or nil
     write(data .. "/tool-failures.json", M.failures)
     if ok then
-      require("ainvim.languages").refresh()
+      require("uzume.editor.languages").refresh()
       notice(name .. " installed; available to open files.")
     else
       notice(
@@ -184,7 +184,7 @@ function M.for_buffer(buf)
     return
   end
   local spec = M.filetypes[vim.bo[buf].filetype]
-  local extras = require("ainvim.extras")
+  local extras = require("uzume.editor.extras")
   if not spec or not extras.enabled(spec[1]) or not extras.desired[spec[1]] then
     return
   end
@@ -238,12 +238,12 @@ function M.setup()
   vim.api.nvim_create_user_command("ExtrasAutoInstall", function()
     set_auto(not M.auto)
   end, { desc = "Toggle automatic tool installation" })
-  local group = vim.api.nvim_create_augroup("ainvim_tool_install", { clear = true })
+  local group = vim.api.nvim_create_augroup("uzume_tool_install", { clear = true })
   vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
     group = group,
     callback = function(event)
       vim.schedule(function()
-        require("ainvim.languages").refresh()
+        require("uzume.editor.languages").refresh()
         M.for_buffer(event.buf)
       end)
     end,
@@ -258,7 +258,7 @@ function M.setup()
         end
       end
       write(data .. "/tool-failures.json", M.failures)
-      require("ainvim.languages").refresh()
+      require("uzume.editor.languages").refresh()
       changed()
     end)
   )

@@ -7,7 +7,7 @@ import time
 
 
 def main():
-    folder = os.environ.get("AINVIM_EVENTS")
+    folder = os.environ.get("UZUME_EVENTS")
     if not folder or not Path(folder).is_dir():
         return
     # Payloads may contain prompts or tool input. Inspect only the fields below;

@@ -4,7 +4,7 @@ from agent_harness import *
 
 try:
     wait(lambda: lua('vim.fn.exists(":UzumeAgent")') == '2')
-    do('require("smear_cursor").enabled=false; require("ainvim.sessions").adopt(); require("uzume.agents").start("codex")')
+    do('require("smear_cursor").enabled=false; require("uzume.editor.sessions").adopt(); require("uzume.agents").start("codex")')
     wait(lambda: js('#require("uzume.agents").list()') == 1)
     agent = item(1)
     checkout = Path(agent['task']['cwd'])
@@ -93,7 +93,7 @@ try:
     detail = '\n'.join(js('vim.api.nvim_buf_get_lines(0,0,-1,false)'))
     assert 'Base L1 → Task L1–2' in detail and '\nuncommitted source\n' in detail and 'newer first line' in detail, detail
     assert not (Path(agent['directory'])/'input.bin').exists()
-    records = list((root/'state/ai-nvim/review-comments').glob('*.json'))
+    records = list((root/'state/uzume/review-comments').glob('*.json'))
     assert len(records) == 1 and records[0].stat().st_mode & 0o777 == 0o600
     assert records[0].parent.stat().st_mode & 0o777 == 0o700
     print('PASS: unified old/new anchors and private local storage')

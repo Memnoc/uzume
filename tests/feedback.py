@@ -30,7 +30,7 @@ def review_comment(body):
 try:
     wait(lambda: lua('vim.fn.exists(":UzumeAgent")') == '2')
     kind = sys.argv[1] if len(sys.argv) > 1 else 'codex'
-    do('require("smear_cursor").enabled=false; require("ainvim.sessions").adopt(); require("uzume.agents").start(' + json.dumps(kind) + ')')
+    do('require("smear_cursor").enabled=false; require("uzume.editor.sessions").adopt(); require("uzume.agents").start(' + json.dumps(kind) + ')')
     wait(lambda: js('#require("uzume.agents").list()') == 1)
     agent = item(1)
     wait(lambda: (Path(agent['directory'])/'fixture.json').exists())
@@ -142,7 +142,7 @@ try:
     output = hook(restarted, 'Stop')
     assert 'Revised request after review.' in output['reason']
     assert not (Path(restarted['directory'])/'input.bin').exists()
-    records = list((root/'state/ai-nvim/review-feedback').glob('*/*.json'))
+    records = list((root/'state/uzume/review-feedback').glob('*/*.json'))
     assert records and all(path.stat().st_mode & 0o777 == 0o600 for path in records)
     print('PASS: edited comments can be sent anew; restart requires explicit requeue; previous run cannot replay')
     keys('q'); keys('ggc')

@@ -2,26 +2,26 @@
 assert(vim.fn.has("nvim-0.11") == 1, "Uzume needs Neovim 0.11+")
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
-require("ainvim.options")
-require("ainvim.packages").load()
-require("ainvim.ui")
-require("ainvim.keymaps")
-require("ainvim.autocmds")
+require("uzume.editor.options")
+require("uzume.editor.packages").load()
+require("uzume.editor.ui")
+require("uzume.editor.keymaps")
+require("uzume.editor.autocmds")
 require("uzume.ui.input").setup()
-require("ainvim.extras").setup()
-require("ainvim.languages").setup()
-require("ainvim.installer").setup()
+require("uzume.editor.extras").setup()
+require("uzume.editor.languages").setup()
+require("uzume.editor.installer").setup()
 require("uzume.agents.buffers").setup()
-require("ainvim.navigator").setup()
+require("uzume.editor.navigator").setup()
 require("uzume.agents").setup()
 require("uzume.review").setup()
 require("uzume.integration").setup()
-if require("ainvim.extras").enabled("smear") then
+if require("uzume.editor.extras").enabled("smear") then
   require("smear_cursor").setup({
     hide_target_hack = true,
     cursor_color = "none",
     smear_terminal_mode = false,
-    filetypes_disabled = { "snacks_picker_input", "snacks_picker_list", "snacks_input", "wk", "ainvim_navigator" },
+    filetypes_disabled = { "snacks_picker_input", "snacks_picker_list", "snacks_input", "wk", "uzume_navigator" },
   })
   Snacks.toggle({
     name = "Smear Cursor",

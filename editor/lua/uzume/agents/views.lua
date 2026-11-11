@@ -3,7 +3,7 @@ local M = {}
 local api = vim.api
 
 local function pane(win)
-  local panes = package.loaded["ainvim.panes"]
+  local panes = package.loaded["uzume.editor.panes"]
   return api.nvim_win_get_config(win).relative == "" or (panes and panes.floats[win] ~= nil)
 end
 

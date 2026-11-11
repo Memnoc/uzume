@@ -37,3 +37,5 @@ For every feature change, update its write-up with what changed, how to use it,
 how it works, dependencies and stored state, what was verified, and known limits.
 Add the feature here if it is new. Keep planned behavior separate from available
 behavior; implementation detail belongs in these guides, not in everyday menus.
+
+[Namespace migration](namespace-migration.md) covers upgrades from the old app name without losing retained work.

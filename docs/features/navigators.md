@@ -8,7 +8,7 @@ selects a complete pane layout, not one split. No tmux dependency is required.
 
 ## Controls
 
-Restart ai-nvim to load the current increment.
+Restart uzume to load the current increment.
 
 | Control | Action |
 | --- | --- |
@@ -63,7 +63,7 @@ first save. The project home is not a file that needs saving.
 
 ## Local save and restore
 
-`s` saves manually to `stdpath("state")/navigator/snapshot.json` in ai-nvim's
+`s` saves manually to `stdpath("state")/navigator/snapshot.json` in uzume's
 state directory. There is one latest snapshot, written atomically with file
 permissions 0600 in a 0700 directory. It holds native file layout/cursor
 references and project/window labels, not source contents, terminal transcripts,
@@ -71,7 +71,7 @@ agent prompts or credentials. Nothing is sent externally.
 
 Dock floating/fullscreen panes and restore managed hidden panes before saving;
 the menu explains this requirement rather than silently losing their state.
-In a fresh ai-nvim dashboard or one empty unnamed window, use:
+In a fresh uzume dashboard or one empty unnamed window, use:
 
 ```vim
 :AiLayoutRestore
@@ -96,7 +96,7 @@ forget the saved layout; Neovim undo/recovery is separate.
 
 ## Implementation and evidence
 
-[navigator.lua](../../editor/lua/ainvim/navigator.lua) renders native floats and
+[navigator.lua](../../editor/lua/uzume/editor/navigator.lua) renders native floats and
 handles navigation, filtering, inline prompts and confirmation. The project/window
 model and operations are described in [Window management](window-management.md).
 No extra plugin or multiplexer is involved. Lists refresh without stealing focus;

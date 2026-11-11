@@ -110,7 +110,7 @@ Snacks.setup({
         { icon = " ", key = "q", desc = "Quit", action = ":qa" },
       },
     },
-    sections = require("ainvim.branding").home,
+    sections = require("uzume.editor.branding").home,
   },
 })
 
@@ -200,15 +200,15 @@ require("lualine").setup({
     lualine_a = { "mode" },
     lualine_b = {
       function()
-        if vim.t.ainvim_unassigned then
+        if vim.t.uzume_unassigned then
           return "No project"
         end
-        if not vim.t.ainvim_root then
+        if not vim.t.uzume_root then
           return ""
         end
-        return (vim.t.ainvim_project_name or vim.fs.basename(vim.t.ainvim_root))
+        return (vim.t.uzume_project_name or vim.fs.basename(vim.t.uzume_root))
           .. " / "
-          .. (vim.t.ainvim_name or "Editor")
+          .. (vim.t.uzume_name or "Editor")
       end,
       "branch",
     },
@@ -221,7 +221,7 @@ require("lualine").setup({
           if vim.b.uzume_agent_label then
             return vim.b.uzume_agent_label
           end
-          return vim.bo.filetype == "ainvim_session" and "Project home" or name
+          return vim.bo.filetype == "uzume_session" and "Project home" or name
         end,
       },
     },
@@ -233,7 +233,7 @@ require("lualine").setup({
       {
         "filetype",
         fmt = function(name)
-          return name == "ainvim_session" and "Project home" or name
+          return name == "uzume_session" and "Project home" or name
         end,
       },
     },

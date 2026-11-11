@@ -13,8 +13,10 @@ language; [docs/adr/](docs/adr/README.md) records accepted tradeoffs.
   Product integration is a local delta operation; publishing and cleanup are
   separate actions. Do not assume a squashed task is safe to delete by ancestry.
 - Plain `nvim` and its configuration belong to the user. The `uzume` launcher uses
-  the compatibility `ai-nvim` app namespace. Do not rename storage paths without
-  migration design, or modify the shell/default editor as a side effect of tests.
+  the `uzume` app namespace. Existing legacy storage is migrated by
+  `setup-editor --migrate` with compatibility links; never manually delete those
+  links while retained worktrees/history depend on them. Do not modify the
+  shell/default editor as a side effect of tests.
 
 ## Implementation and verification
 

@@ -19,7 +19,7 @@ framework versions still determine the available completion/diagnostics.
 Native Treesitter parsers cover JS/TS/JSX/TSX, HTML and JSON; CSS/SCSS/LESS retain
 Vim syntax highlighting. TSX and JSX filetype aliases are registered explicitly.
 
-[languages.lua](../../editor/lua/ainvim/languages.lua) is the integration point:
+[languages.lua](../../editor/lua/uzume/editor/languages.lua) is the integration point:
 Neovim's native LSP configuration and activation use pinned nvim-lspconfig
 server definitions. nvim-cmp adds the completion UI and sources, using native
 Neovim snippets. Completion is restricted to ordinary file buffers. Conform

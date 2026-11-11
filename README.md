@@ -51,9 +51,11 @@ Uzume takes its name from **Ame-no-Uzume**, the Japanese goddess whose dance hel
 
 The main development baseline contains the independent editor, project/window/pane management, isolated agent tasks, stable review and feedback, and local task integration. This is a working prototype, not a production release; the full production specification remains open.
 
-Run `uzume`, or `uzume path/to/file` to open a file directly. The existing `nvims` → **ai-nvim** entry also works. See the [editor guide](editor/README.md) for setup, familiar controls, and the current boundaries. Plain `nvim` keeps your default configuration.
+Run `uzume`, or `uzume path/to/file` to open a file directly. The existing `nvims` → **uzume** entry also works. See the [editor guide](editor/README.md) for setup, familiar controls, and the current boundaries. Plain `nvim` keeps your default configuration.
 
-The project is now named **Uzume**. The preview retains its original `ai-nvim` installation name and `ainvim` Lua namespace so existing settings, tools, and saved state continue to work. Renaming those identifiers will need a migration.
+The code, launcher and config/data directories use **Uzume** consistently. Existing
+preview installations can migrate safely with `python3 setup-editor --migrate --register`;
+see the [migration guide](docs/features/namespace-migration.md).
 
 **Space l** opens [Extras](editor/EXTRAS.md): Rust, Lua, C/C++, TypeScript/React/HTML/CSS, and Smear Cursor. Save choices with Ctrl-s and restart to apply pack-loading changes. Missing
 language tools now install automatically through isolated, pinned Mason when you
@@ -94,7 +96,7 @@ The Uzume name and cave-and-sun logo are established. Rust component boundaries 
 - `tests/`: regression tests; `docs/`: features, architecture decisions and handoff.
 - `spikes/` and `spike`: historical experiments, never loaded by the installed editor.
 
-`editor/lua/ainvim/` is active core code under the original module namespace.
-It does not load another distribution or your old config. The similarly named
-`ai-nvim` config/data directories preserve existing user state; renaming them
-requires a separate migration. See the [Lua map](editor/lua/README.md).
+`editor/lua/uzume/editor/` contains the editor's core modules. Agent, review,
+integration and layout modules live beside it under `uzume/`. See the
+[Lua map](editor/lua/README.md). Compatibility links may remain at old storage
+paths after migration so existing worktrees and saved records keep working.

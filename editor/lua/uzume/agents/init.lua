@@ -1,3 +1,4 @@
+local paths = require("uzume.core.paths")
 -- Task ownership and UI live here; process supervision stays outside Neovim.
 local M = { instances = {} }
 local api = vim.api
@@ -65,9 +66,9 @@ end
 function M.focus(item)
   assert(api.nvim_tabpage_is_valid(item.tab), "Task window has closed")
   api.nvim_set_current_tabpage(item.tab)
-  for _, pane in ipairs(require("ainvim.panes").hidden(item.tab)) do
+  for _, pane in ipairs(require("uzume.editor.panes").hidden(item.tab)) do
     if pane.buf == item.buf then
-      require("ainvim.panes").restore(pane)
+      require("uzume.editor.panes").restore(pane)
       return
     end
   end
@@ -101,7 +102,7 @@ function M.pick()
     end,
   }, function(item)
     if item then
-      require("ainvim.panes").run(function()
+      require("uzume.editor.panes").run(function()
         M.focus(item)
       end)
     end
@@ -159,7 +160,7 @@ local function launch(task, tab, project_name, kind)
         if item.status.state == "failed" and api.nvim_tabpage_is_valid(tab) then
           notify(item.task.label .. ": agent exited with an error; inspect its terminal", vim.log.levels.WARN)
         elseif item.status.state == "stopped" and vim.v.exiting == vim.NIL then
-          require("ainvim.panes").remove_exited_terminal(buf)
+          require("uzume.editor.panes").remove_exited_terminal(buf)
         end
       end)
     end,
@@ -170,9 +171,9 @@ local function launch(task, tab, project_name, kind)
   vim.b[buf].uzume_agent_id = task.id
   vim.b[buf].uzume_agent_kind = kind
   vim.b[buf].uzume_agent_label = (kind == "codex" and "Codex" or "Claude") .. " · " .. task.label
-  vim.b[buf].ainvim_owner = tab
+  vim.b[buf].uzume_owner = tab
   vim.bo[buf].bufhidden = "hide"
-  vim.w.ainvim_name = kind .. " · " .. task.label
+  vim.w.uzume_name = kind .. " · " .. task.label
   -- Single Escape/jk/C-w belong to the CLI. Double Escape enters editor mode.
   for _, key in ipairs({ "<Esc>", "jk", "<C-w>" }) do
     vim.keymap.set("t", key, key, { buffer = buf, nowait = key ~= "<Esc>" })
@@ -186,7 +187,7 @@ function M.start(kind, opts, done)
   dependencies(kind)
   opts = opts or {}
   assert(type(opts) == "table", "Use :UzumeAgent codex or :UzumeAgent codex empty; enter instructions in the CLI")
-  local project = assert(require("ainvim.projects").current(), "Open a project first: Space ap")
+  local project = assert(require("uzume.editor.projects").current(), "Open a project first: Space ap")
   local file, relative
   local source = (vim.t.uzume_task or {}).cwd or project.root
   if not opts.empty then
@@ -216,7 +217,7 @@ function M.start(kind, opts, done)
       return
     end
     local present = false
-    for _, candidate in ipairs(require("ainvim.projects").list()) do
+    for _, candidate in ipairs(require("uzume.editor.projects").list()) do
       present = present or candidate.id == project.id
     end
     if not present then
@@ -230,7 +231,7 @@ function M.start(kind, opts, done)
     task.kind = kind
     local previous = api.nvim_get_current_win()
     local ok, result = pcall(function()
-      local tab = require("ainvim.sessions").create(task.cwd, {
+      local tab = require("uzume.editor.sessions").create(task.cwd, {
         name = label,
         project_name = project.name,
         project_root = project.root,
@@ -297,18 +298,18 @@ function M.continue_task(task, kind, relative)
     require("uzume.agents.context").add(item, { path })
   end
   for _, item in pairs(M.instances) do
-    if item.task.cwd == task.cwd and alive(item) then
+    if paths.same(item.task.cwd, task.cwd) and alive(item) then
       select_file(item)
       M.focus(item)
       vim.cmd.startinsert()
       return item
     end
   end
-  local project = assert(require("ainvim.projects").current(), "Open a project first")
+  local project = assert(require("uzume.editor.projects").current(), "Open a project first")
   local tab
   for _, candidate in ipairs(project.windows) do
     local known = vim.t[candidate.tab].uzume_task
-    if known and known.cwd == task.cwd then
+    if known and paths.same(known.cwd, task.cwd) then
       tab, task = candidate.tab, known
       break
     end
@@ -323,7 +324,7 @@ function M.continue_task(task, kind, relative)
     vim.cmd.startinsert()
     return item
   end
-  tab = require("ainvim.sessions").create(task.cwd, {
+  tab = require("uzume.editor.sessions").create(task.cwd, {
     name = task.label,
     project_name = project.name,
     project_root = project.root,
@@ -352,12 +353,12 @@ function M.restart()
     for _, win in ipairs(api.nvim_tabpage_list_wins(0)) do
       if api.nvim_win_get_buf(win) == previous.buf then
         api.nvim_set_current_win(win)
-        require("ainvim.panes").close(win)
+        require("uzume.editor.panes").close(win)
         break
       end
     end
   end
-  return launch(task, api.nvim_get_current_tabpage(), vim.t.ainvim_project_name, task.kind)
+  return launch(task, api.nvim_get_current_tabpage(), vim.t.uzume_project_name, task.kind)
 end
 
 local function poll()
@@ -417,7 +418,10 @@ function M.setup()
     require("uzume.agents.branches").choose("codex", { empty = vim.bo.buftype ~= "" or api.nvim_buf_get_name(0) == "" })
   end, "Codex from Existing Branch")
   map("B", function()
-    require("uzume.agents.branches").choose("claude", { empty = vim.bo.buftype ~= "" or api.nvim_buf_get_name(0) == "" })
+    require("uzume.agents.branches").choose(
+      "claude",
+      { empty = vim.bo.buftype ~= "" or api.nvim_buf_get_name(0) == "" }
+    )
   end, "Claude from Existing Branch")
   map("e", function()
     require("uzume.agents.branches").open("codex", { empty = true })

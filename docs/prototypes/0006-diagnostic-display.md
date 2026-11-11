@@ -37,7 +37,7 @@ rust-analyzer itself was already producing the diagnostic.
 
 ## Fix and controls
 
-`editor/lua/ainvim/options.lua` now explicitly configures native inline messages,
+`editor/lua/uzume/editor/options.lua` now explicitly configures native inline messages,
 underlines, four-space spacing, dot prefixes, conditional source labels, severity
 sorting and familiar error/warning/hint/info gutter icons. Diagnostics do not
 update during Insert mode. Rounded diagnostic floats remain available.

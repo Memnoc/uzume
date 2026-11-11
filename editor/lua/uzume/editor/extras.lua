@@ -84,7 +84,7 @@ function M.apply(values)
 end
 
 function M.show()
-  local installer = require("ainvim.installer")
+  local installer = require("uzume.editor.installer")
   local draft = vim.deepcopy(M.desired)
   local views, view = { "All", "Available", "Installed", "Enabled" }, 1
   local lock = vim.json.decode(table.concat(vim.fn.readfile(vim.fn.stdpath("config") .. "/plugins.lock.json"), "\n"))
@@ -269,7 +269,7 @@ function M.show()
     },
     on_show = function(picker)
       autocmd = vim.api.nvim_create_autocmd("User", {
-        pattern = "AiNvimToolsChanged",
+        pattern = "UzumeToolsChanged",
         callback = function()
           vim.schedule(function()
             if not picker.closed then

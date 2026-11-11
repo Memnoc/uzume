@@ -2,7 +2,7 @@
 -- Floats keep a placeholder in their original tile so docking/zoom restores the layout.
 local M = { floats = {}, hidden_by_tab = {}, serial = 0 }
 local api = vim.api
-local native = require("ainvim.sessions")
+local native = require("uzume.editor.sessions")
 local motion = require("uzume.layout.motion")
 
 local function view(win)
@@ -24,7 +24,7 @@ local function current()
   return win, buf
 end
 local function name(win, buf)
-  return vim.w[win].ainvim_name
+  return vim.w[win].uzume_name
     or (
       vim.bo[buf].buftype == "terminal" and (vim.b[buf].term_title or "Shell")
       or (api.nvim_buf_get_name(buf) ~= "" and vim.fs.basename(api.nvim_buf_get_name(buf)) or "New file")
@@ -33,7 +33,7 @@ end
 local function placeholder(text)
   local buf = api.nvim_create_buf(false, true)
   vim.bo[buf].bufhidden = "wipe"
-  vim.bo[buf].filetype = "ainvim_slot"
+  vim.bo[buf].filetype = "uzume_slot"
   api.nvim_buf_set_lines(buf, 0, -1, false, { "", "  " .. text, "  Space pp: panes · Space pr: restore hidden pane" })
   vim.bo[buf].modifiable = false
   return buf
@@ -72,7 +72,7 @@ end
 
 function M.split(direction, shell)
   motion.finish()
-  local project = require("ainvim.projects").current()
+  local project = require("uzume.editor.projects").current()
   assert(project, "Open a project first: Space ap, then N")
   local win, buf = api.nvim_get_current_win(), api.nvim_get_current_buf()
   if M.floats[win] then
@@ -84,8 +84,8 @@ function M.split(direction, shell)
   assert(
     vim.bo[buf].buftype == ""
       or vim.bo[buf].buftype == "terminal"
-      or vim.bo[buf].filetype == "ainvim_session"
-      or vim.bo[buf].filetype == "ainvim_slot"
+      or vim.bo[buf].filetype == "uzume_session"
+      or vim.bo[buf].filetype == "uzume_slot"
       or vim.bo[buf].filetype == "uzume_task",
     "Choose an editor pane first"
   )
@@ -94,7 +94,7 @@ function M.split(direction, shell)
   if shell then
     local created, newbuf = api.nvim_get_current_win(), api.nvim_get_current_buf()
     local ok, job =
-      pcall(vim.fn.jobstart, vim.fn.split(vim.o.shell), { term = true, cwd = vim.t.ainvim_root or project.root })
+      pcall(vim.fn.jobstart, vim.fn.split(vim.o.shell), { term = true, cwd = vim.t.uzume_root or project.root })
     if not ok or job <= 0 then
       api.nvim_win_close(created, true)
       api.nvim_buf_delete(newbuf, { force = true })
@@ -123,7 +123,7 @@ function M.float()
   config.title = " " .. title .. " · drag top / resize bottom-right "
   local floating = api.nvim_open_win(buf, true, config)
   vim.wo[floating].number, vim.wo[floating].relativenumber = old.number, old.relativenumber
-  vim.w[floating].ainvim_name = vim.w[win].ainvim_name
+  vim.w[floating].uzume_name = vim.w[win].uzume_name
   M.floats[floating] = { slot = win, tab = api.nvim_get_current_tabpage(), options = old }
   restore_view(floating, saved)
   motion.change(floating, before, true)
@@ -141,7 +141,7 @@ function M.dock(win)
   else
     api.nvim_win_set_buf(slot, buf)
   end
-  vim.w[slot].ainvim_name = vim.w[win].ainvim_name
+  vim.w[slot].uzume_name = vim.w[win].uzume_name
   for option, value in pairs(state.options) do
     vim.wo[slot][option] = value
   end
@@ -228,10 +228,10 @@ function M.swap()
   assert(next_win, "Select a managed pane")
   local other, first_view, second_view = api.nvim_win_get_buf(next_win), view(win), view(next_win)
   vim.bo[buf].bufhidden, vim.bo[other].bufhidden = "hide", "hide"
-  local title = vim.w[win].ainvim_name
+  local title = vim.w[win].uzume_name
   api.nvim_win_set_buf(win, other)
   api.nvim_win_set_buf(next_win, buf)
-  vim.w[win].ainvim_name, vim.w[next_win].ainvim_name = vim.w[next_win].ainvim_name, title
+  vim.w[win].uzume_name, vim.w[next_win].uzume_name = vim.w[next_win].uzume_name, title
   restore_view(win, second_view)
   restore_view(next_win, first_view)
 end
@@ -275,12 +275,12 @@ function M.restore(pane)
   pane = pane or hidden[#hidden]
   assert(pane and api.nvim_buf_is_valid(pane.buf), "No hidden pane in this window")
   local win = pane.slot
-  if win and api.nvim_win_is_valid(win) and vim.bo[api.nvim_win_get_buf(win)].filetype == "ainvim_slot" then
+  if win and api.nvim_win_is_valid(win) and vim.bo[api.nvim_win_get_buf(win)].filetype == "uzume_slot" then
     api.nvim_win_set_buf(win, pane.buf)
   else
     win = api.nvim_open_win(pane.buf, false, { split = "right", win = tiled(tab)[1] })
   end
-  vim.w[win].ainvim_name = pane.name
+  vim.w[win].uzume_name = pane.name
   M.hidden_by_tab[tab] = vim.tbl_filter(function(item)
     return item.id ~= pane.id
   end, hidden)
@@ -359,7 +359,7 @@ function M.remove_exited_terminal(buf)
     if api.nvim_win_get_config(win).relative == "" and #tiled(tab) == 1 then
       -- Neovim needs a tiled editor window even if the agent was its last pane.
       api.nvim_win_set_buf(win, api.nvim_create_buf(true, false))
-      vim.w[win].ainvim_name = nil
+      vim.w[win].uzume_name = nil
     else
       api.nvim_win_close(win, true)
     end
@@ -368,7 +368,7 @@ function M.remove_exited_terminal(buf)
     remove(win)
   end
   for _, win in ipairs(slots) do
-    if api.nvim_win_is_valid(win) and vim.bo[api.nvim_win_get_buf(win)].filetype == "ainvim_slot" then
+    if api.nvim_win_is_valid(win) and vim.bo[api.nvim_win_get_buf(win)].filetype == "uzume_slot" then
       remove(win)
     end
   end
@@ -404,7 +404,7 @@ function M.transfer()
   motion.finish()
   local win, buf = current()
   assert(not vim.b[buf].uzume_agent_id, "Agent panes belong to their task window; move or float them within it")
-  local project = require("ainvim.projects").current()
+  local project = require("uzume.editor.projects").current()
   local choices = vim.tbl_filter(function(window)
     return not window.current
   end, project.windows)
@@ -433,9 +433,9 @@ function M.transfer()
       vim.bo[buf].bufhidden = "hide"
       api.nvim_set_current_tabpage(target.tab)
       local destination = api.nvim_open_win(buf, true, { split = "right", win = tiled(target.tab)[1] })
-      vim.w[destination].ainvim_name = title
+      vim.w[destination].uzume_name = title
       if vim.bo[buf].buftype == "terminal" then
-        vim.b[buf].ainvim_owner = target.tab
+        vim.b[buf].uzume_owner = target.tab
       end
       if #native.windows(origin_tab) == 1 then
         api.nvim_win_set_buf(win, placeholder("Pane moved to " .. target.name))
@@ -479,7 +479,7 @@ end
 
 function M.setup()
   motion.setup()
-  local group = api.nvim_create_augroup("ainvim_panes", { clear = true })
+  local group = api.nvim_create_augroup("uzume_panes", { clear = true })
   api.nvim_create_autocmd("VimResized", {
     group = group,
     callback = function()

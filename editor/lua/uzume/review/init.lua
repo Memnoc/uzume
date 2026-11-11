@@ -463,7 +463,7 @@ function M.open()
   if task then
     return start(task)
   end
-  local project = require("ainvim.projects").current()
+  local project = require("uzume.editor.projects").current()
   local tasks = {}
   for _, window in ipairs(project and project.windows or {}) do
     if vim.t[window.tab].uzume_task then

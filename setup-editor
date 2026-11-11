@@ -12,11 +12,12 @@ import shlex
 import sys
 import tempfile
 from installer.registration import preflight, register
+from installer.migration import legacy_present, migrate, roots, LEGACY
 from installer.sources import export
 from installer.syntax import build, host, validate
 
 SOURCE = Path(__file__).resolve().parent / "editor"
-APP = "ai-nvim"
+APP = "uzume"
 
 
 def install(cache, compiler):
@@ -46,7 +47,7 @@ def install(cache, compiler):
         syntax = bundle / "pack" / APP / "opt" / "syntax"
         build(spec["syntax"], syntax, staging, compiler)
         validate(syntax, spec["syntax"], "nvim", staging)
-        docs = sorted(bundle.glob("pack/ai-nvim/opt/*/doc"))
+        docs = sorted(bundle.glob("pack/uzume/opt/*/doc"))
         lua = "for _, p in ipairs({" + ",".join(json.dumps(str(p), ensure_ascii=False) for p in docs) + "}) do vim.cmd('helptags ' .. vim.fn.fnameescape(p)) end"
         env = dict(os.environ, NVIM_APPNAME=APP, NVIM_LOG_FILE=str(staging / "nvim.log"))
         subprocess.run(["nvim", "--headless", "-u", "NONE", "-i", "NONE", "-c", "lua " + lua, "-c", "qa!"], env=env, check=True)
@@ -113,10 +114,23 @@ def main():
     parser.add_argument("--no-cache", action="store_true", help="ignore supplied plugin/tool caches; fetch pinned sources")
     parser.add_argument("--cc", default=os.environ.get("CC", "cc"), help="C compiler command (default: CC or cc)")
     parser.add_argument("--bin-dir", type=Path, default=Path.home() / ".local/bin", help="launcher directory (default: ~/.local/bin)")
+    parser.add_argument("--migrate", action="store_true", help="move legacy app directories to uzume before installation")
+    parser.add_argument("--migrate-only", action="store_true", help="only migrate app directories; no downloads or registration")
     args = parser.parse_args()
+    if args.migrate_only:
+        migrate()
+        return
+    if legacy_present() and not args.migrate:
+        raise RuntimeError("Legacy ai-nvim data exists. Close Uzume, then run setup-editor --migrate --register")
+    if args.migrate and args.register:
+        old = roots()["CONFIG"] / LEGACY
+        if old.exists() and (not old.is_symlink() or old.resolve() != SOURCE.resolve()):
+            raise RuntimeError("Run migration from the checkout referenced by the existing config, or migrate separately with --migrate-only")
     if args.register:
         preflight(SOURCE, args.bin_dir)
     prerequisites(args.cc)
+    if args.migrate:
+        migrate()
     install(None if args.no_cache else args.plugin_cache, args.cc)
     discover_tools(None if args.no_cache else args.tool_cache)
     if args.register:

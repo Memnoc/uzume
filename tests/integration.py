@@ -21,7 +21,7 @@ try:
     (project/'multi.txt').write_text('base alpha\n' + middle + 'base omega\n')
     git('add','multi.txt'); git('commit','-qm','two-conflict fixture')
     original_tab = js('vim.api.nvim_get_current_tabpage()')
-    do('require("smear_cursor").enabled=false; require("ainvim.sessions").adopt(); require("uzume.agents").start("codex")')
+    do('require("smear_cursor").enabled=false; require("uzume.editor.sessions").adopt(); require("uzume.agents").start("codex")')
     wait(lambda: js('#require("uzume.agents").list()') == 1)
     agent = item(1)
     checkout = Path(agent['task']['cwd'])

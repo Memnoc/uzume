@@ -4,7 +4,7 @@ from agent_harness import *
 
 try:
     wait(lambda: lua('vim.fn.exists(":UzumeAgent")') == '2')
-    do('require("smear_cursor").enabled=false; require("ainvim.sessions").adopt()')
+    do('require("smear_cursor").enabled=false; require("uzume.editor.sessions").adopt()')
     original_tab = js('vim.api.nvim_get_current_tabpage()')
     original_branch = git('branch', '--show-current')
     keys(' ac')
@@ -15,7 +15,7 @@ try:
     assert js('vim.api.nvim_get_current_tabpage()') == agent['tab']
     assert js('vim.fn.getcwd()') == str(checkout)
     assert subprocess.check_output(['git','-C',str(checkout),'branch','--show-current'],text=True).strip() == agent['task']['branch']
-    editor = next(p for p in js('require("ainvim.sessions").windows(0)') if not p['terminal'])['win']
+    editor = next(p for p in js('require("uzume.editor.sessions").windows(0)') if not p['terminal'])['win']
     # Reading a source/reference file must not silently move task navigation back.
     do('vim.cmd.stopinsert(); vim.api.nvim_set_current_win(' + str(editor) + '); vim.cmd.edit(' + json.dumps(str(project/'example.txt')) + ')')
     (checkout/'example.txt').write_text('agent edited this copy\n')

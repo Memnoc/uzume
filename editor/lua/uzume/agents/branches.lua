@@ -1,3 +1,4 @@
+local paths = require("uzume.core.paths")
 -- Choose an explicit starting branch and inspect saved-state advisories before launch.
 local M = {}
 local api = vim.api
@@ -22,11 +23,7 @@ local function saved(entry)
     return
   end
   for _, buf in ipairs(api.nvim_list_bufs()) do
-    if
-      vim.bo[buf].buftype == ""
-      and vim.bo[buf].modified
-      and vim.startswith(api.nvim_buf_get_name(buf), entry.cwd .. "/")
-    then
+    if vim.bo[buf].buftype == "" and vim.bo[buf].modified and paths.contains(entry.cwd, api.nvim_buf_get_name(buf)) then
       error("Save the modified buffer before launching: " .. api.nvim_buf_get_name(buf))
     end
   end
@@ -78,7 +75,7 @@ local function name(project, entry, origin, file, opts, kind)
         selected
           and selected.head == entry.head
           and selected.token == entry.token
-          and selected.cwd == entry.cwd
+          and paths.same(selected.cwd, entry.cwd)
           and not selected.conflicts
           and not selected.operation,
         "The source branch changed while naming the task. Launch again to inspect its latest state."
@@ -97,7 +94,7 @@ end
 function M.open(kind, opts)
   opts = opts or {}
   assert(kind == "codex" or kind == "claude", "Choose Codex or Claude")
-  local project = assert(require("ainvim.projects").current(), "Open a project first: Space ap")
+  local project = assert(require("uzume.editor.projects").current(), "Open a project first: Space ap")
   local source = (vim.t.uzume_task or {}).cwd or project.root
   local file
   if not opts.empty then
@@ -113,7 +110,7 @@ function M.open(kind, opts)
   read(project, function(entries)
     assert(api.nvim_get_current_win() == origin, "Focus moved; launch again from the intended pane")
     for _, entry in ipairs(entries) do
-      if entry.cwd == source then
+      if paths.same(entry.cwd, source) then
         return name(project, entry, origin, file, opts, kind)
       end
     end
@@ -124,7 +121,7 @@ end
 function M.choose(kind, opts)
   opts = opts or {}
   assert(kind == "codex" or kind == "claude", "Choose Codex or Claude")
-  local project = assert(require("ainvim.projects").current(), "Open a project first: Space ap")
+  local project = assert(require("uzume.editor.projects").current(), "Open a project first: Space ap")
   local file, relative, source
   if not opts.empty then
     file = require("uzume.agents.context").file()
@@ -145,8 +142,8 @@ function M.choose(kind, opts)
       )
     end
     table.sort(entries, function(a, b)
-      if (a.cwd == source) ~= (b.cwd == source) then
-        return a.cwd == source
+      if (paths.same(a.cwd, source)) ~= (paths.same(b.cwd, source)) then
+        return paths.same(a.cwd, source)
       end
       return a.branch < b.branch
     end)
@@ -211,7 +208,7 @@ function M.choose(kind, opts)
             local task
             for _, window in ipairs(project.windows) do
               local known = vim.t[window.tab].uzume_task
-              if known and known.branch == entry.branch and known.cwd == entry.cwd then
+              if known and known.branch == entry.branch and paths.same(known.cwd, entry.cwd) then
                 task = known
                 break
               end
@@ -249,7 +246,7 @@ function M.choose(kind, opts)
                     selected
                       and selected.head == entry.head
                       and selected.token == entry.token
-                      and selected.cwd == entry.cwd
+                      and paths.same(selected.cwd, entry.cwd)
                       and not selected.conflicts
                       and not selected.operation,
                     "The branch changed during selection. Choose it again to inspect the latest state."

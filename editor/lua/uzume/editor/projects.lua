@@ -1,7 +1,7 @@
 -- EDITOR SPIKE: projects group native tabs (product windows); native windows are panes.
 local M = { last = {} }
 local api = vim.api
-local native = require("ainvim.sessions")
+local native = require("uzume.editor.sessions")
 
 local function canonical(path)
   path = vim.fs.normalize(vim.fn.fnamemodify(vim.fn.expand(path), ":p"))
@@ -11,14 +11,14 @@ end
 function M.list()
   local projects, by_root = {}, {}
   for _, window in ipairs(native.list()) do
-    if not vim.t[window.tab].ainvim_unassigned then
+    if not vim.t[window.tab].uzume_unassigned then
       local root = canonical(vim.t[window.tab].uzume_project_root or window.root)
       local project = by_root[root]
       if not project then
         project = {
           id = root,
           root = root,
-          name = vim.t[window.tab].ainvim_project_name or vim.fs.basename(root),
+          name = vim.t[window.tab].uzume_project_name or vim.fs.basename(root),
           windows = {},
           current = false,
         }
@@ -79,7 +79,7 @@ function M.open(path)
       return project.tab
     end
   end
-  local empty = vim.t.ainvim_unassigned and api.nvim_get_current_tabpage() or nil
+  local empty = vim.t.uzume_unassigned and api.nvim_get_current_tabpage() or nil
   local tab = native.create(path, { name = "Editor", project_name = vim.fs.basename(path) })
   if empty and api.nvim_tabpage_is_valid(empty) then
     vim.cmd.tabclose(tostring(api.nvim_tabpage_get_number(empty)))
@@ -122,7 +122,7 @@ function M.rename(item, name)
     for _, project in ipairs(M.list()) do
       if project.id == item.project then
         for _, window in ipairs(project.windows) do
-          vim.t[window.tab].ainvim_project_name = name
+          vim.t[window.tab].uzume_project_name = name
           native.refresh_home(window.tab)
         end
       end
@@ -152,12 +152,12 @@ function M.close(item)
   local terminals = {}
   for tab in pairs(tabs) do
     local panes = native.windows(tab)
-    vim.list_extend(panes, require("ainvim.panes").hidden(tab))
+    vim.list_extend(panes, require("uzume.editor.panes").hidden(tab))
     for _, pane in ipairs(panes) do
       assert(not vim.bo[pane.buf].modified or pane.terminal, "Save modified files before closing this target")
     end
     for _, buf in ipairs(api.nvim_list_bufs()) do
-      if vim.bo[buf].buftype == "terminal" and tabs[vim.b[buf].ainvim_owner] then
+      if vim.bo[buf].buftype == "terminal" and tabs[vim.b[buf].uzume_owner] then
         terminals[buf] = true
       end
     end
@@ -180,10 +180,10 @@ function M.close(item)
   end
   if not survivors then
     vim.cmd.tabnew()
-    vim.t.ainvim_unassigned = true
+    vim.t.uzume_unassigned = true
   end
   for tab in pairs(tabs) do
-    require("ainvim.panes").forget(tab)
+    require("uzume.editor.panes").forget(tab)
     vim.cmd.tabclose(tostring(api.nvim_tabpage_get_number(tab)))
   end
   for buf in pairs(terminals) do
@@ -201,14 +201,14 @@ function M.close(item)
             key = "p",
             desc = "Open project · N in navigator",
             action = function()
-              require("ainvim.navigator").open("projects")
+              require("uzume.editor.navigator").open("projects")
             end,
           },
           { key = "q", desc = "Quit", action = ":qa" },
         },
       },
       sections = {
-        require("ainvim.branding").section,
+        require("uzume.editor.branding").section,
         { text = "No project open", align = "center", padding = 2 },
         { section = "keys" },
       },
@@ -229,10 +229,10 @@ end
 
 function M.setup()
   api.nvim_create_autocmd("TabEnter", {
-    group = api.nvim_create_augroup("ainvim_projects", { clear = true }),
+    group = api.nvim_create_augroup("uzume_projects", { clear = true }),
     callback = function()
-      local root = vim.t.uzume_project_root or vim.t.ainvim_root
-      if root and not vim.t.ainvim_unassigned then
+      local root = vim.t.uzume_project_root or vim.t.uzume_root
+      if root and not vim.t.uzume_unassigned then
         M.last[canonical(root)] = api.nvim_get_current_tabpage()
       end
     end,

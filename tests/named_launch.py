@@ -4,7 +4,7 @@ from agent_harness import *
 
 try:
     wait(lambda: lua('vim.fn.exists(":UzumeAgent")') == '2')
-    do('require("smear_cursor").enabled=false; require("ainvim.sessions").adopt()')
+    do('require("smear_cursor").enabled=false; require("uzume.editor.sessions").adopt()')
     original_tab = js('vim.api.nvim_get_current_tabpage()')
     initial = git('branch', '--show-current')
     keys(' ac')

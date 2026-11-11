@@ -1,6 +1,6 @@
 # Design record
 
-Date: 2026-11-06. Project: Uzume (name selected 2026-11-08; formerly ai-nvim).
+Date: 2026-11-06. Project: Uzume (name selected 2026-11-08; formerly uzume).
 
 This records the design interview, not a completed implementation specification. Agreed product behavior is separated from proposed experiments and unresolved mechanisms.
 
@@ -75,7 +75,7 @@ Project window/pane layouts, open-file references, review progress, and unsent c
 
 Source-file saves remain explicit as the initial design direction, with local recovery for unsaved edits. Source autosave, if added, is a separate setting because it can trigger formatters/watchers and alter the files agents read. Autosave never authorizes uploading data or handing drafts to an agent.
 
-Use the installed official Codex/Claude CLIs and their existing authentication. The CLI owns browser login, organizational SSO such as Okta, and any credential persistence. ai-nvim collects no keys, implements no login flow, and copies no credentials or agent transcripts into its session snapshots. An explicitly launched agent's own permissions and data handling remain its responsibility; this is not a promise that the distro provides network isolation.
+Use the installed official Codex/Claude CLIs and their existing authentication. The CLI owns browser login, organizational SSO such as Okta, and any credential persistence. uzume collects no keys, implements no login flow, and copies no credentials or agent transcripts into its session snapshots. An explicitly launched agent's own permissions and data handling remain its responsibility; this is not a promise that the distro provides network isolation.
 
 Review snapshots and draft comments can contain source code, even though stored locally. Storage location, permissions, retention, recovery, and deletion behavior must be defined before production persistence. Snapshot file capture and the boundary between automatic local capture and explicit agent sharing remain part of the pre-spec review.
 

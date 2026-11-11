@@ -1,6 +1,6 @@
 local M = {}
-local extras = require("ainvim.extras")
-local tools = require("ainvim.tools")
+local extras = require("uzume.editor.extras")
+local tools = require("uzume.editor.tools")
 M.servers = {}
 
 local function server(name, executable, args, config)
@@ -148,7 +148,7 @@ function M.setup()
     require("nvim-ts-autotag").setup()
   end
 
-  vim.g.ainvim_autoformat = true
+  vim.g.uzume_autoformat = true
   require("conform").setup({
     formatters_by_ft = formatters,
     formatters = {
@@ -169,7 +169,7 @@ function M.setup()
       },
     },
     format_on_save = function(buf)
-      if vim.g.ainvim_autoformat and vim.b[buf].ainvim_autoformat ~= false then
+      if vim.g.uzume_autoformat and vim.b[buf].uzume_autoformat ~= false then
         return { timeout_ms = 2000, lsp_format = "fallback" }
       end
     end,
@@ -180,22 +180,22 @@ function M.setup()
   Snacks.toggle({
     name = "Format on Save",
     get = function()
-      return vim.g.ainvim_autoformat
+      return vim.g.uzume_autoformat
     end,
     set = function(value)
-      vim.g.ainvim_autoformat = value
+      vim.g.uzume_autoformat = value
     end,
   }):map("<leader>uf")
   Snacks.toggle({
     name = "Format on Save (buffer)",
     get = function()
-      return vim.b.ainvim_autoformat ~= false
+      return vim.b.uzume_autoformat ~= false
     end,
     set = function(value)
-      vim.b.ainvim_autoformat = value
+      vim.b.uzume_autoformat = value
     end,
   }):map("<leader>uF")
-  local group = vim.api.nvim_create_augroup("ainvim_languages", { clear = true })
+  local group = vim.api.nvim_create_augroup("uzume_languages", { clear = true })
   vim.api.nvim_create_autocmd("FileType", {
     group = group,
     callback = function(event)

@@ -1,9 +1,9 @@
 -- EDITOR SPIKE: reproduce the supplied Drudwyn navigator surfaces with native floats.
 local M = {}
 local api = vim.api
-local projects = require("ainvim.projects")
-local native = require("ainvim.sessions")
-local ns = api.nvim_create_namespace("ainvim.navigator")
+local projects = require("uzume.editor.projects")
+local native = require("uzume.editor.sessions")
+local ns = api.nvim_create_namespace("uzume.editor.navigator")
 local groups = {
   Normal = { fg = "#e0def4", bg = "#191724" },
   Muted = { fg = "#6e6a86", bg = "#191724" },
@@ -82,7 +82,7 @@ local function snapshot(kind)
           kind = "window",
           index = index,
           session = project.name,
-          count = #window.panes + #require("ainvim.panes").hidden(window.tab),
+          count = #window.panes + #require("uzume.editor.panes").hidden(window.tab),
         })
       end
     end
@@ -308,7 +308,7 @@ local function input(label, initial, live, done)
   end
   local buf = api.nvim_create_buf(false, true)
   vim.bo[buf].bufhidden = "wipe"
-  vim.bo[buf].filetype = "ainvim_navigator"
+  vim.bo[buf].filetype = "uzume_navigator"
   s.input_label = label:lower()
   api.nvim_buf_set_lines(buf, 0, -1, false, { initial or "" })
   s.input = api.nvim_open_win(buf, true, {
@@ -397,7 +397,7 @@ function M.open(kind)
   configure(s.backdrop)
   s.buf = api.nvim_create_buf(false, true)
   vim.bo[s.buf].bufhidden = "wipe"
-  vim.bo[s.buf].filetype = "ainvim_navigator"
+  vim.bo[s.buf].filetype = "uzume_navigator"
   s.win = api.nvim_open_win(s.buf, true, geometry(kind))
   configure(s.win)
   M.current = s
@@ -580,7 +580,7 @@ end
 function M.setup()
   native.setup()
   projects.setup()
-  require("ainvim.panes").setup()
+  require("uzume.editor.panes").setup()
   api.nvim_create_user_command("AiSessions", function()
     M.open("projects")
   end, { desc = "Project navigator (compatibility alias)" })

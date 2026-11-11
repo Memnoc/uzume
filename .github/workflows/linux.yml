@@ -1,0 +1,54 @@
+name: Linux installation and workflows
+on:
+  push:
+    branches: [main, 'feat/**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: linux-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - neovim: v0.11.0
+            sha256: fe0a5bc79e64c5e4d9f844cd96157ebd3919ef1343b329e9ebc3f455924cc7d6
+          - neovim: v0.12.6
+            sha256: 474430d53e6264f6d6dd18db42d6dc9df3a1b56ca9e88a325bbf860e1a811d87
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: System prerequisites
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y build-essential python3 git ripgrep fd-find
+      - name: Pinned Neovim for testing
+        env:
+          NEOVIM_VERSION: ${{ matrix.neovim }}
+          NEOVIM_SHA256: ${{ matrix.sha256 }}
+        run: |
+          curl --fail --location --retry 3 "https://github.com/neovim/neovim/releases/download/${NEOVIM_VERSION}/nvim-linux-x86_64.tar.gz" -o "$RUNNER_TEMP/neovim.tar.gz"
+          printf '%s  %s\n' "$NEOVIM_SHA256" "$RUNNER_TEMP/neovim.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/neovim.tar.gz" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/nvim-linux-x86_64/bin" >> "$GITHUB_PATH"
+      - name: Cache-free install and syntax validation
+        run: |
+          python3 -u tests/install_clean.py | tee "$RUNNER_TEMP/uzume-install.log"
+          sed -n '/^XDG_DATA_HOME=/p' "$RUNNER_TEMP/uzume-install.log" >> "$GITHUB_ENV"
+      - name: Real editor, Git, migration and process-lifetime regressions
+        run: python3 -u tests/run.py | tee "$RUNNER_TEMP/uzume-regressions.log"
+      - name: Retain diagnostic logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: linux-${{ matrix.neovim }}-logs
+          path: |
+            ${{ runner.temp }}/uzume-*.log
+            /tmp/uzume-clean-install-*/install.log
+            /tmp/uzume-agents-*/editor.log
+          retention-days: 7

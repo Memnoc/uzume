@@ -13,7 +13,7 @@ live `package.loaded` entries are not migrated in place.
 | `uzume/layout/` | Pane animation and saved mode preference |
 | `uzume/ui/` | Shared UI input behavior |
 | `uzume/core/` | Shared resource location, independent of module nesting |
-| `ainvim/` | Existing editor configuration, tools/languages, projects, navigation and native pane operations |
+| `uzume/editor/` | Existing editor configuration, tools/languages, projects, navigation and native pane operations |
 
 The principal entry points `uzume.agents`, `uzume.review` and `uzume.integration`
 are unchanged. Internal helpers have moved beneath their owning feature. Imports,
@@ -21,10 +21,11 @@ tests and documentation links are updated together. Python helpers remain in
 `editor/agent/` and `editor/review/`; `uzume.core.paths` resolves them from the
 editor's `plugins.lock.json` marker rather than counting parent directories.
 
-The legacy `ainvim` namespace and `ai-nvim` data/config names remain deliberately
-stable. This organization change does not move user worktrees, comments, saved
-layouts, tool installations or credentials. A namespace/storage migration is a
-separate project, not a folder tidy-up.
+Core modules formerly in the old namespace now live under `uzume/editor/`, with
+all imports, events, buffer types and internal variables renamed consistently.
+Persistent app directories use `uzume`. Existing installations use the explicit
+[migration](../../docs/features/namespace-migration.md), preserving files and old
+absolute paths through compatibility links; new installations have no legacy dirs.
 
 See [the handoff](../../docs/HANDOFF.md) for architecture and next work, and
 [feature guides](../../docs/features/README.md) for behavior and controls.

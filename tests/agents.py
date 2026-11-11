@@ -4,7 +4,7 @@ from agent_harness import *
 
 try:
     wait(lambda: lua('vim.fn.exists(":UzumeAgent")') == '2')
-    do('require("smear_cursor").enabled=false; require("ainvim.sessions").adopt()')
+    do('require("smear_cursor").enabled=false; require("uzume.editor.sessions").adopt()')
     # Search and naming fields must allow deleting the first character too.
     for opener, filetype in (
         ('Snacks.picker.files({cwd=vim.fn.getcwd()})', 'snacks_picker_input'),
@@ -67,7 +67,7 @@ try:
             task = js('vim.t.uzume_task')
             assert len(task['context']['files']) == 1
             assert task['context']['files'][0]['path'] == task['cwd'] + '/example.txt'
-            views = js('require("ainvim.sessions").windows(0)')
+            views = js('require("uzume.editor.sessions").windows(0)')
             editor = next(x for x in views if not x['terminal'])
             assert lua('vim.api.nvim_buf_get_name(' + str(editor['buf']) + ')') == task['cwd'] + '/example.txt'
         else:
@@ -106,10 +106,10 @@ try:
                 assert js('#require("uzume.agents").list()') == 1, route
             # Swapping also briefly duplicates a buffer while assigning panes;
             # routing must wait for the operation rather than undo that layout.
-            do('require("ainvim.panes").swap()')
+            do('require("uzume.editor.panes").swap()')
             wait(lambda: js('vim.api.nvim_win_get_buf(' + str(editor['win']) + ')') == agent['buf'])
             assert js('vim.api.nvim_win_get_buf(' + str(terminal['win']) + ')') == editor['buf']
-            do('require("ainvim.panes").swap()')
+            do('require("uzume.editor.panes").swap()')
             wait(lambda: js('vim.api.nvim_win_get_buf(' + str(editor['win']) + ')') == editor['buf'])
             assert js('vim.fn.win_findbuf(' + str(agent['buf']) + ')') == [terminal['win']]
 
@@ -122,8 +122,8 @@ try:
     entries = js('require("uzume.agents").list()')
     a, b = entries[:2]
     assert a['task']['cwd'] != b['task']['cwd'] and a['task']['branch'] != b['task']['branch']
-    assert js('#require("ainvim.projects").list()') == 1
-    assert js('#require("ainvim.projects").list()[1].windows') == 5
+    assert js('#require("uzume.editor.projects").list()') == 1
+    assert js('#require("uzume.editor.projects").list()[1].windows') == 5
     for entry in entries:
         wait(lambda: (Path(entry['directory']) / 'fixture.json').exists())
         record = json.loads((Path(entry['directory']) / 'fixture.json').read_text())
@@ -131,12 +131,12 @@ try:
         assert '--' not in record['args'], 'Launch submitted a prompt'
         assert 'prompt' not in json.loads((Path(entry['directory']) / 'launch.json').read_text())
         assert (Path(record['cwd']) / 'example.txt').read_text() == 'uncommitted source\n'
-        assert len(js('require("ainvim.sessions").windows(' + str(entry['tab']) + ')')) == 2
+        assert len(js('require("uzume.editor.sessions").windows(' + str(entry['tab']) + ')')) == 2
     assert (project / 'example.txt').read_text() == 'uncommitted source\n'
     # Marking is local, idempotent and allowed while the agent is working.
     current_task = js('vim.t.uzume_task')
     current = next(x for x in entries if x['task']['id'] == current_task['id'])
-    do('vim.cmd.stopinsert(); vim.api.nvim_set_current_win(vim.fn.win_findbuf(vim.fn.bufnr(vim.t.ainvim_root .. "/example.txt"))[1])')
+    do('vim.cmd.stopinsert(); vim.api.nvim_set_current_win(vim.fn.win_findbuf(vim.fn.bufnr(vim.t.uzume_root .. "/example.txt"))[1])')
     keys(' af'); keys(' af')
     current = js('require("uzume.agents").instances[' + json.dumps(current_task['id']) + ']')
     assert len(current['task']['context']['files']) == 1
@@ -144,7 +144,7 @@ try:
     reference.write_text('PRIVATE_REFERENCE_CONTENT')
     do('vim.cmd.edit(' + json.dumps(str(reference)) + ')')
     keys(' af')
-    do('vim.cmd.edit(vim.t.ainvim_root .. "/example.txt")')
+    do('vim.cmd.edit(vim.t.uzume_root .. "/example.txt")')
     current = js('require("uzume.agents").instances[' + json.dumps(current_task['id']) + ']')
     assert current['task']['context']['files'][1]['role'] == 'reference'
     assert not (Path(current['directory']) / 'input.bin').exists(), 'Marking typed into the CLI'
@@ -181,13 +181,13 @@ try:
     emit(a, 'Stop')
     wait(lambda: js('require("uzume.agents").window_status(' + str(a['tab']) + ').state') == 'review')
     assert not any('PRIVATE_SENTINEL' in p.read_text() for p in Path(a['directory']).rglob('*.json'))
-    do('require("ainvim.navigator").open("windows")')
-    assert 'REVIEW' in '\n'.join(js('vim.api.nvim_buf_get_lines(require("ainvim.navigator").current.buf,0,-1,false)'))
-    do('require("ainvim.navigator").close()')
+    do('require("uzume.editor.navigator").open("windows")')
+    assert 'REVIEW' in '\n'.join(js('vim.api.nvim_buf_get_lines(require("uzume.editor.navigator").current.buf,0,-1,false)'))
+    do('require("uzume.editor.navigator").close()')
     # Hide/restore/float retain the exact same running job; focus restores hidden panes.
-    do('require("uzume.agents").focus(require("uzume.agents").instances[' + json.dumps(a['task']['id']) + ']); require("ainvim.panes").hide()')
-    do('require("uzume.agents").focus(require("uzume.agents").instances[' + json.dumps(a['task']['id']) + ']); require("ainvim.panes").float(); require("ainvim.panes").zoom(); require("ainvim.panes").zoom(); require("ainvim.panes").dock()')
-    panes = js('require("ainvim.sessions").windows(0)')
+    do('require("uzume.agents").focus(require("uzume.agents").instances[' + json.dumps(a['task']['id']) + ']); require("uzume.editor.panes").hide()')
+    do('require("uzume.agents").focus(require("uzume.agents").instances[' + json.dumps(a['task']['id']) + ']); require("uzume.editor.panes").float(); require("uzume.editor.panes").zoom(); require("uzume.editor.panes").zoom(); require("uzume.editor.panes").dock()')
+    panes = js('require("uzume.editor.sessions").windows(0)')
     assert len(panes) == 2 and sum(p['buf'] == a['buf'] for p in panes) == 1
     assert js('vim.api.nvim_get_current_buf()') == a['buf']
     assert lua('vim.api.nvim_buf_get_name(' + str(next(p['buf'] for p in panes if not p['terminal'])) + ')') == a['task']['cwd'] + '/example.txt'
@@ -199,15 +199,15 @@ try:
     wait(lambda: (Path(a['directory']) / 'interrupted').exists())
     assert living(record_a['pid'])
     # Task shell cwd follows worktree, not primary project.
-    do('require("ainvim.panes").split("below",true); vim.cmd.stopinsert()')
+    do('require("uzume.editor.panes").split("below",true); vim.cmd.stopinsert()')
     assert lua('vim.fn.getcwd()') == a['task']['cwd']
-    do('require("ainvim.panes").close()')
+    do('require("uzume.editor.panes").close()')
     # Closing one task kills its owned child while preserving another task and files.
-    do('require("ainvim.projects").close({kind="window",tab=' + str(a['tab']) + '})')
+    do('require("uzume.editor.projects").close({kind="window",tab=' + str(a['tab']) + '})')
     wait(lambda: not living(record_a['pid']) and not living(record_a['child']))
     assert living(record_b['pid']) and Path(a['task']['cwd']).is_dir()
     # Closing the agent pane stops the task process; restart retains its checkout.
-    do('require("uzume.agents").focus(require("uzume.agents").instances[' + json.dumps(b['task']['id']) + ']); require("ainvim.panes").close()')
+    do('require("uzume.agents").focus(require("uzume.agents").instances[' + json.dumps(b['task']['id']) + ']); require("uzume.editor.panes").close()')
     wait(lambda: not living(record_b['pid']) and not living(record_b['child']))
     do('require("uzume.agents").restart(); vim.cmd.stopinsert()')
     b = js('require("uzume.agents").instances[' + json.dumps(b['task']['id']) + ']')
@@ -219,9 +219,9 @@ try:
         if entry['task']['id'] == b['task']['id']:
             assert '--' not in record['args'], 'Restart replayed the initial task'
         do('require("uzume.agents").focus(require("uzume.agents").instances[' + json.dumps(entry['task']['id']) + ']); vim.cmd.stopinsert()')
-        if style != 'tiled': do('require("ainvim.panes").' + ('float' if style == 'float' else 'hide') + '()')
+        if style != 'tiled': do('require("uzume.editor.panes").' + ('float' if style == 'float' else 'hide') + '()')
         if style == 'tiled':
-            focused = js('(function() for _,p in ipairs(require("ainvim.sessions").windows(0)) do if not p.terminal then return p.win end end end)()')
+            focused = js('(function() for _,p in ipairs(require("uzume.editor.sessions").windows(0)) do if not p.terminal then return p.win end end end)()')
             do('vim.cmd.startinsert()')
         else:
             do('vim.api.nvim_set_current_tabpage(' + str(origin) + ')')
@@ -229,15 +229,15 @@ try:
         (Path(entry['directory']) / 'exit').write_text('0')
         wait(lambda: not js('vim.api.nvim_buf_is_valid(' + str(entry['buf']) + ')'))
         assert js('vim.api.nvim_get_current_win()') == focused
-        assert len(js('require("ainvim.sessions").windows(' + str(entry['tab']) + ')')) == 1
-        assert js('#require("ainvim.panes").hidden(' + str(entry['tab']) + ')') == 0
+        assert len(js('require("uzume.editor.sessions").windows(' + str(entry['tab']) + ')')) == 1
+        assert js('#require("uzume.editor.panes").hidden(' + str(entry['tab']) + ')') == 0
         assert Path(entry['task']['cwd']).is_dir()
         wait(lambda: not living(record['child']))
         do('vim.api.nvim_set_current_tabpage(' + str(entry['tab']) + '); require("uzume.agents").restart(); vim.cmd.stopinsert()')
         refreshed = js('require("uzume.agents").instances[' + json.dumps(entry['task']['id']) + ']')
         wait(lambda: (Path(refreshed['directory']) / 'fixture.json').exists())
-    do('require("ainvim.sessions").save()')
-    saved = json.loads((root / 'state/ai-nvim/navigator/snapshot.json').read_text())
+    do('require("uzume.editor.sessions").save()')
+    saved = json.loads((root / 'state/uzume/navigator/snapshot.json').read_text())
     tasks = [x for x in saved['sessions'] if x.get('task')]
     assert len(tasks) == 3
     assert all(x['project_root'] == str(project) for x in tasks)
@@ -245,15 +245,15 @@ try:
                for x in js('require("uzume.agents").list()')]
     # Modified source preflight must reject closing the entire project atomically.
     do('vim.api.nvim_set_current_tabpage(' + str(origin) + '); vim.api.nvim_buf_set_lines(0,0,1,false,{"unsaved"})')
-    result = js('(function() local ok = pcall(require("ainvim.projects").close,{kind="project",project=' + json.dumps(str(project)) + '}); return ok end)()')
-    assert result is False and all(living(x['pid']) for x in records), {'closed':result,'alive':[(x['pid'],living(x['pid'])) for x in records], 'buffer':js('{name=vim.api.nvim_buf_get_name(0),type=vim.bo.buftype,modified=vim.bo.modified}'), 'project':js('require("ainvim.projects").list()')}
-    do('vim.bo.modified=false; require("ainvim.projects").close({kind="project",project=' + json.dumps(str(project)) + '})')
+    result = js('(function() local ok = pcall(require("uzume.editor.projects").close,{kind="project",project=' + json.dumps(str(project)) + '}); return ok end)()')
+    assert result is False and all(living(x['pid']) for x in records), {'closed':result,'alive':[(x['pid'],living(x['pid'])) for x in records], 'buffer':js('{name=vim.api.nvim_buf_get_name(0),type=vim.bo.buftype,modified=vim.bo.modified}'), 'project':js('require("uzume.editor.projects").list()')}
+    do('vim.bo.modified=false; require("uzume.editor.projects").close({kind="project",project=' + json.dumps(str(project)) + '})')
     wait(lambda: all(not living(x['pid']) and not living(x['child']) for x in records))
     assert all(Path(x['task']['cwd']).is_dir() for x in entries)
     # Restoring retains project/task identity but never launches an agent.
-    do('require("ainvim.sessions").restore()')
-    assert js('#require("ainvim.projects").list()') == 1
-    assert js('#require("ainvim.projects").list()[1].windows') == 4
+    do('require("uzume.editor.sessions").restore()')
+    assert js('#require("uzume.editor.projects").list()') == 1
+    assert js('#require("uzume.editor.projects").list()[1].windows') == 4
     assert js('#require("uzume.agents").list()') == 0
     do('for _,tab in ipairs(vim.api.nvim_list_tabpages()) do if vim.t[tab].uzume_task then vim.api.nvim_set_current_tabpage(tab); break end end; require("uzume.agents").restart(); vim.cmd.stopinsert()')
     final = item(1)

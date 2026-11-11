@@ -1,9 +1,9 @@
 -- THROWAWAY: native Neovim session/pane interaction, not production config.
 local api, fn = vim.api, vim.fn
-local source = assert(vim.env.AINVIM_SPIKE_SOURCE, "Launch this prototype with ./spike")
-local root = assert(vim.env.AINVIM_SPIKE_ROOT)
+local source = assert(vim.env.UZUME_SPIKE_SOURCE, "Launch this prototype with ./spike")
+local root = assert(vim.env.UZUME_SPIKE_ROOT)
 local model = dofile(source .. "/model.lua")
-local live = vim.env.AINVIM_REAL_CONFIG and vim.json.decode(table.concat(fn.readfile(vim.env.AINVIM_REAL_CONFIG), "\n"))
+local live = vim.env.UZUME_REAL_CONFIG and vim.json.decode(table.concat(fn.readfile(vim.env.UZUME_REAL_CONFIG), "\n"))
 assert(fn.has("nvim-0.11") == 1, "The native-session spike needs Neovim 0.11+")
 
 vim.g.mapleader = " "
@@ -71,7 +71,7 @@ end
 function app.statusline()
   local win = tonumber(vim.g.statusline_winid) or api.nvim_get_current_win()
   local p = pane_at(win)
-  if not p then return " ai-nvim · throwaway spike" end
+  if not p then return " uzume · throwaway spike" end
   local s = session()
   local mode = s.zoom and s.zoom.pane == p and "ZOOM" or (p.floating and "FLOAT" or "TILE")
   if p.kind == "agent" then
@@ -87,7 +87,7 @@ function app.statusline()
 end
 
 local function redraw()
-  local parts = { "%#TabLineFill# ai-nvim / " .. (live and "PILOT" or "SPIKE") .. "  " }
+  local parts = { "%#TabLineFill# uzume / " .. (live and "PILOT" or "SPIKE") .. "  " }
   for index, s in ipairs(app.sessions) do
     if s.alive and api.nvim_tabpage_is_valid(s.tab) then
       local group = index == app.current and "TabLineSel" or "TabLine"
@@ -298,8 +298,8 @@ function app.help()
       " DRUDWYN PILOT · real CLIs · separate persistent worktrees",
       "",
       " Space o opens the current CLI without submitting a task",
-      " Space t starts it with the prepared .ai-nvim-task.md task",
-      " If already running, type: Read .ai-nvim-task.md and do the task",
+      " Space t starts it with the prepared .uzume-task.md task",
+      " If already running, type: Read .uzume-task.md and do the task",
       " Codex: review/enable these session status hooks via /hooks",
       " Authentication and permissions remain in the official CLI",
       "",
@@ -319,7 +319,7 @@ function app.help()
       " Hidden sessions continue. Terminating stops owned processes.",
       " Worktree files persist; save editor changes with :w.",
       " This pilot has no autosave, review snapshots, or feedback queue.",
-    }, "ai-nvim · Drudwyn pilot", 82)
+    }, "uzume · Drudwyn pilot", 82)
     return
   end
   popup({
@@ -349,7 +349,7 @@ function app.help()
     " Status shows real PIDs, a worker PID, and heartbeat ticks",
     " Hidden sessions keep ticking; closing stops their fixtures",
     " All sample files and state are deleted when this run exits",
-  }, "ai-nvim · native sessions experiment", 76)
+  }, "uzume · native sessions experiment", 76)
 end
 
 function app.close(index, confirmed)
@@ -513,7 +513,7 @@ local function create_session(index, name, task)
   vim.cmd("tcd " .. fn.fnameescape(cwd))
   local file = cwd .. "/example.lua"
   fn.writefile({
-    "-- ai-nvim / " .. name .. " / " .. task,
+    "-- uzume / " .. name .. " / " .. task,
     "-- THROWAWAY SAMPLE. Nothing here touches your projects.",
     "-- Space ? help | Space p pane | Space f float | Space z zoom",
     "-- Space a attention | Space s session | Space b background need",
@@ -540,7 +540,7 @@ local function create_session(index, name, task)
       buf = api.nvim_get_current_buf(), win = api.nvim_get_current_win(), floating = false,
       statefile = root .. "/agent-" .. index .. "-" .. agent .. ".json", state = { state = "starting" } }
     s.panes[#s.panes + 1] = p
-    p.job = fn.jobstart({ vim.env.AINVIM_SPIKE_PYTHON, source .. "/fixture.py", "--token", vim.env.AINVIM_SPIKE_TOKEN,
+    p.job = fn.jobstart({ vim.env.UZUME_SPIKE_PYTHON, source .. "/fixture.py", "--token", vim.env.UZUME_SPIKE_TOKEN,
       "--state", p.statefile, "--name", name .. "/" .. (agent == 1 and "codex" or "claude") }, {
       term = true, cwd = cwd,
       on_exit = function(_, code)
@@ -568,7 +568,7 @@ function app.start_agent(action)
   app.unzoom()
   focus(p)
   if p.job and not p.exited then
-    vim.notify("Agent already running. Press i and ask it to read .ai-nvim-task.md.")
+    vim.notify("Agent already running. Press i and ask it to read .uzume-task.md.")
     return
   end
   local old = p.buf
@@ -578,7 +578,7 @@ function app.start_agent(action)
   p.exited = false
   p.state = { state = "starting", evidence = "process" }
   fn.delete(p.statefile)
-  p.job = fn.jobstart({ vim.env.AINVIM_SPIKE_PYTHON, source .. "/agent.py", vim.env.AINVIM_REAL_CONFIG, s.spec.id, action }, {
+  p.job = fn.jobstart({ vim.env.UZUME_SPIKE_PYTHON, source .. "/agent.py", vim.env.UZUME_REAL_CONFIG, s.spec.id, action }, {
     term = true, cwd = s.cwd,
     on_exit = function(_, code)
       p.exited = true
@@ -610,10 +610,10 @@ local function create_live_session(index, spec)
   s.panes[2] = p
   vim.bo[p.buf].buftype = "nofile"
   api.nvim_buf_set_lines(p.buf, 0, -1, false, {
-    "ai-nvim · Drudwyn pilot · " .. spec.agent, "", "Branch: " .. spec.branch,
+    "uzume · Drudwyn pilot · " .. spec.agent, "", "Branch: " .. spec.branch,
     "Worktree: " .. spec.cwd, "", "Space o: open CLI (login and hook setup first)",
     "Space t: launch CLI with the prepared task", "", "Task: add Ctrl-u to clear this navigator's filter",
-    "Read .ai-nvim-task.md for scope and acceptance criteria.", "", "No agent starts until you choose.",
+    "Read .uzume-task.md for scope and acceptance criteria.", "", "No agent starts until you choose.",
     "Space ? shows controls. Worktree files persist after exit.",
   })
   vim.bo[p.buf].modified = false

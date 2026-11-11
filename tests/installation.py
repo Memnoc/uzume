@@ -13,9 +13,9 @@ env = dict(os.environ, **{f'XDG_{key}_HOME': str(root / value) for key, value in
                         [('CONFIG', 'config'), ('DATA', 'data'), ('STATE', 'state'), ('CACHE', 'cache')]})
 # This case tests registration against an installed bundle, not network delivery.
 release = hashlib.sha256((REPO / 'editor/plugins.lock.json').read_bytes()).hexdigest()[:12]
-installed = Path(os.environ.get('XDG_DATA_HOME', Path.home() / '.local/share')) / 'ai-nvim/releases' / release
+installed = Path(os.environ.get('XDG_DATA_HOME', Path.home() / '.local/share')) / 'uzume/releases' / release
 assert (installed / '.complete').is_file(), 'Install this lockfile before the registration regression'
-local = root / 'data/ai-nvim/releases' / release
+local = root / 'data/uzume/releases' / release
 local.parent.mkdir(parents=True)
 local.symlink_to(installed)
 launcher = root / 'bin with spaces/uzume'
@@ -37,7 +37,7 @@ tool = tool_cache / 'bin/stylua'
 tool.write_text('#!/bin/sh\nexit 0\n'); tool.chmod(0o755)
 subprocess.run(command + ['--tool-cache', str(tool_cache)], env=env, check=True, capture_output=True)
 subprocess.run(command, env=env, check=True, capture_output=True)
-record = json.loads((root / 'data/ai-nvim/tool-paths.json').read_text())
+record = json.loads((root / 'data/uzume/tool-paths.json').read_text())
 assert record.get('stylua') == str(tool), 'Repeat installation must preserve working external tools'
 first = launcher.read_bytes()
 subprocess.run(command, env=env, check=True, capture_output=True)
@@ -47,7 +47,7 @@ result = subprocess.run(command, env=env, capture_output=True, text=True)
 assert result.returncode != 0 and 'unrelated launcher' in result.stderr
 assert launcher.read_text() == '#!/bin/sh\nprintf unrelated\n'
 launcher.unlink()
-config = root / 'config/ai-nvim'
+config = root / 'config/uzume'
 config.unlink()
 config.mkdir()
 (config / 'init.lua').write_text('-- unrelated config\n')

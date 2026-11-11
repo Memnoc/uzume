@@ -37,7 +37,7 @@ def command_for(config, root, start_task):
         atomic(settings, {"hooks": hooks(kind)})
         command = [config["executable"], "--settings", str(settings)]
     if start_task:
-        command.append("Read .ai-nvim-task.md in this worktree and carry out that task. Keep all work on this branch.")
+        command.append("Read .uzume-task.md in this worktree and carry out that task. Keep all work on this branch.")
     return command
 
 
@@ -45,7 +45,7 @@ def main():
     config_path, agent_id, action = sys.argv[1:4]
     configuration = json.loads(Path(config_path).read_text())
     config = next(s for s in configuration["sessions"] if s["id"] == agent_id)
-    root = Path(os.environ["AINVIM_SPIKE_ROOT"])
+    root = Path(os.environ["UZUME_SPIKE_ROOT"])
     state_path = root / ("agent-" + agent_id + ".json")
     events = root / ("events-" + agent_id)
     events.mkdir(exist_ok=True)
@@ -53,7 +53,7 @@ def main():
         old.unlink()
     env = dict(os.environ)
     for key in ("XDG_CONFIG_HOME", "XDG_DATA_HOME", "XDG_STATE_HOME", "XDG_CACHE_HOME", "NVIM_APPNAME"):
-        original = env.pop("AINVIM_ORIGINAL_" + key, None)
+        original = env.pop("UZUME_ORIGINAL_" + key, None)
         if original is None:
             env.pop(key, None)
         else:
@@ -62,8 +62,8 @@ def main():
     # hooks to another running Drudwyn session. HOME and agent auth homes stay put.
     for key in ("TMUX", "TMUX_PANE", "NVIM", "NVIM_LISTEN_ADDRESS", "CODEX_THREAD_ID", "CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT"):
         env.pop(key, None)
-    env["AINVIM_EVENTS"] = str(events)
-    env["AINVIM_AGENT_OWNER"] = str(os.getpid())
+    env["UZUME_EVENTS"] = str(events)
+    env["UZUME_AGENT_OWNER"] = str(os.getpid())
     running = True
 
     def interrupted(_sig, _frame):
@@ -79,10 +79,10 @@ def main():
     owned = {os.getpid(): rows[os.getpid()]["started"]}
     owned_path = root / ("owned-" + agent_id + ".json")
     atomic(owned_path, owned)
-    print(f"ai-nvim pilot · {config['agent']} · {config['cwd']}", flush=True)
+    print(f"uzume pilot · {config['agent']} · {config['cwd']}", flush=True)
     print("Esc Esc, then Space ? for workspace controls. Worktree files persist.", flush=True)
     if config["agent"] == "codex":
-        print("Use /hooks to review the session's ai-nvim status hooks if Codex requests it.", flush=True)
+        print("Use /hooks to review the session's uzume status hooks if Codex requests it.", flush=True)
     child = None
     known = {}
     try:

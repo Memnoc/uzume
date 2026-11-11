@@ -15,7 +15,8 @@ group, its implementation, shortcuts, stored state and known limits.
 
 ## Launch
 
-Uzume currently uses the original `ai-nvim` installation name to preserve the preview's existing settings and state.
+The launcher uses `NVIM_APPNAME=uzume`. For an older installation, follow the
+[namespace migration guide](../docs/features/namespace-migration.md) before restarting.
 
 After `python3 setup-editor --register`, run `~/.local/bin/uzume`, or just `uzume`
 if `~/.local/bin` is on PATH. The executable forwards all arguments to Neovim.
@@ -29,8 +30,8 @@ uzume path/to/project/src/main.rs
 ```
 
 Configuration lives in this checkout's `editor/` directory, linked as
-`~/.config/ai-nvim`.
-Neovim uses its own `ai-nvim` data, cache, and state directories. It never loads
+`~/.config/uzume`.
+Neovim uses its own `uzume` data, cache, and state directories. It never loads
 your default Neovim configuration or shares its plugin installation. The initial
 setup downloads exact source commits; an explicitly supplied local Git cache can
 accelerate plugin installation. Syntax parsers are built locally.
@@ -154,4 +155,5 @@ Neovim itself is still user-installed, and release/rollback management is pendin
 
 Keep this checkout while its config link is installed. Re-run the installer after
 updates that change pins, before restarting the editor. Existing task worktrees,
-settings and state remain under the compatible `ai-nvim` namespace.
+settings and state live under the `uzume` namespace. Legacy storage is moved
+through the explicit migration command, with compatibility links for old paths.

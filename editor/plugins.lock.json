@@ -228,5 +228,6 @@
         "subdir": "typescript"
       }
     ]
-  }
+  },
+  "package_namespace": "uzume"
 }

@@ -122,11 +122,11 @@ Automatic layout saving remains pending.
 
 ## Implementation and validation
 
-[projects.lua](../../editor/lua/ainvim/projects.lua) groups native tabs by project
+[projects.lua](../../editor/lua/uzume/editor/projects.lua) groups native tabs by project
 directory and owns window/project navigation, naming and close preflight.
-[panes.lua](../../editor/lua/ainvim/panes.lua) handles native splits, floating
+[panes.lua](../../editor/lua/uzume/editor/panes.lua) handles native splits, floating
 placeholders, fullscreen, hidden buffers, transfers, close and mouse borders.
-The older [sessions.lua](../../editor/lua/ainvim/sessions.lua) now supplies
+The older [sessions.lua](../../editor/lua/uzume/editor/sessions.lua) now supplies
 low-level tab/buffer discovery, homes, terminal ownership and snapshot
 compatibility; its filename does not introduce another product entity.
 

@@ -37,6 +37,10 @@ def checkout(root, branch):
             return str(Path(fields['worktree']).resolve())
 
 
+def same_checkout(first, second):
+    return bool(first and second and Path(first).resolve() == Path(second).resolve())
+
+
 def operation(root):
     for marker in ('CHERRY_PICK_HEAD', 'MERGE_HEAD', 'rebase-merge', 'rebase-apply', 'REVERT_HEAD', 'BISECT_LOG'):
         path = Path(git(root, 'rev-parse', '--git-path', marker).decode().strip())
@@ -151,7 +155,7 @@ def apply(plan):
             raise ValueError('The destination branch was created after preview. Prepare again.')
         if oid(project) != plan['head']:
             raise ValueError('The starting branch moved after preview. Prepare again.')
-    elif oid(project, 'refs/heads/' + plan['branch']) != plan['head'] or checkout(project, plan['branch']) != plan['cwd']:
+    elif oid(project, 'refs/heads/' + plan['branch']) != plan['head'] or not same_checkout(checkout(project, plan['branch']), plan['cwd']):
         raise ValueError('The destination moved or changed checkouts. Prepare again.')
     if plan['cwd']:
         clean(plan['cwd'])
@@ -209,7 +213,7 @@ def main(request):
         return prepare(request)
     path = Path(request['record'])
     plan = json.loads(path.read_text())
-    if str(path) != plan['record']:
+    if path.resolve() != Path(plan['record']).resolve():
         raise ValueError('Integration record path does not match.')
     if action == 'status':
         if plan.get('cwd') and plan['state'] in ('conflicts', 'paused', 'applying'):

@@ -1,7 +1,7 @@
-# ai-nvim pilot: clear the session navigator filter
+# uzume pilot: clear the session navigator filter
 
 Implement this small real task in the current worktree and branch
-`ai-nvim/clear-filter-sessions`.
+`uzume/clear-filter-sessions`.
 
 Read CONTRIBUTING.md and relevant context first. Your only implementation file
 is `src/session_navigator.rs`; add meaningful regression coverage in its existing

@@ -4,7 +4,7 @@ from agent_harness import *
 
 try:
     wait(lambda: lua('vim.fn.exists(":UzumeAgent")') == '2')
-    do('require("smear_cursor").enabled=false; require("ainvim.sessions").adopt()')
+    do('require("smear_cursor").enabled=false; require("uzume.editor.sessions").adopt()')
     origin = js('vim.api.nvim_get_current_tabpage()')
     for name, content in {'.gitignore':'ignored.txt\n','remove.txt':'remove me\n','partial.txt':'old\n','exec.sh':'#!/bin/sh\n','data.bin':'old'}.items():
         (project/name).write_text(content)

@@ -1,4 +1,4 @@
-local group = vim.api.nvim_create_augroup("ainvim_editor", { clear = true })
+local group = vim.api.nvim_create_augroup("uzume_editor", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = group,
   callback = function()

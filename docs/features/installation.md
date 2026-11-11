@@ -56,7 +56,7 @@ the installer does not silently delete them. Previous releases remain available.
 
 `--register` creates the isolated config symlink and an executable launcher. It
 refuses unrelated configs or launchers. The launcher records the chosen XDG
-config/data/state/cache roots, sets `NVIM_APPNAME=ai-nvim` only for its subprocess,
+config/data/state/cache roots, sets `NVIM_APPNAME=uzume` only for its subprocess,
 and forwards arguments to `nvim`. It does not install Neovim itself.
 
 `--plugin-cache PATH` optionally reads local Git repositories containing the
@@ -67,34 +67,40 @@ needed. `--no-cache` ignores both options for a clean-source check. `--cc COMMAN
 (or `CC`) chooses the C compiler. The old `--syntax-cache` option has been removed:
 syntax is built from sources now.
 
-[packages.lua](../../editor/lua/ainvim/packages.lua) loads the bundle selected by
+[packages.lua](../../editor/lua/uzume/editor/packages.lua) loads the bundle selected by
 the lockfile hash using native `packadd`, checking the host marker first. Optional
 packages follow Extras choices. Startup never downloads or updates plugins;
 opening supported files may install missing language tools through Mason.
 
 ## Existing installations and updates
 
-Your existing `uzume` shell function and `nvims` entry still work: the config/data
-namespace remains `ai-nvim`. Re-run `python3 setup-editor` after updating the
-checkout to a new lockfile, before restarting the editor. Registration is optional
-if the existing config link already points to that checkout.
+Installations using the old namespace must close Uzume and run:
 
-For the first update from the captured-parser preview, the new source pins produce
-a new bundle. The old bundle, tools, worktrees, review comments and saved layouts
-remain untouched. Do not point the config link at another worktree while an agent
-is using it. The installer refuses to replace an unrelated link automatically.
+```sh
+python3 setup-editor --migrate --register
+```
+
+The command moves existing config/data/state/cache directories to `uzume`, keeping
+compatibility symlinks for saved absolute paths. It refuses conflicting destination
+directories and running editors. See [namespace migration](namespace-migration.md)
+for recovery, shell-function updates and retained worktrees.
+
+For subsequent updates, re-run `python3 setup-editor` after a lockfile change,
+before restarting. Existing settings, tool references and older package bundles
+are retained. Registration is optional if the config link already targets the
+same checkout. New installs use `python3 setup-editor --register` directly.
 
 ## Stored state
 
 | Location under normal XDG defaults | Contents |
 | --- | --- |
 | `~/.local/bin/uzume` | Generated launcher (or the chosen `--bin-dir`) |
-| `~/.config/ai-nvim` | Symlink to the checkout's editor directory |
-| `~/.local/share/ai-nvim/releases/<hash>` | Pinned plugin bundle, locally compiled syntax, platform/completion markers |
-| `~/.local/share/ai-nvim/extras.json` | Saved pack choices |
-| `~/.local/share/ai-nvim/tool-paths.json` | Executables discovered on PATH or an explicitly supplied cache |
-| `~/.local/share/ai-nvim/mason/` | Separately managed language tools |
-| ai-nvim's state/cache directories | Recovery, history and cache |
+| `~/.config/uzume` | Symlink to the checkout's editor directory |
+| `~/.local/share/uzume/releases/<hash>` | Pinned plugin bundle, locally compiled syntax, platform/completion markers |
+| `~/.local/share/uzume/extras.json` | Saved pack choices |
+| `~/.local/share/uzume/tool-paths.json` | Executables discovered on PATH or an explicitly supplied cache |
+| `~/.local/share/uzume/mason/` | Separately managed language tools |
+| uzume's state/cache directories | Recovery, history and cache |
 
 Installation downloads public upstream source code. It does not upload project
 files or handle agent credentials. Extras settings remain local; sending context

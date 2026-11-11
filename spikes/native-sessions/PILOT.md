@@ -6,7 +6,7 @@ and attention handling feel useful when Codex and Claude work on real code?
 ## Run
 
 ```sh
-~/Code/ai-nvim/spike --drudwyn
+~/Code/uzume/spike --drudwyn
 ```
 
 Use a wide terminal. The first session shows the session navigator source and a
@@ -14,9 +14,9 @@ Codex launch pane; the second shows the workspace navigator and Claude. Neither
 agent starts automatically.
 
 1. Press **Space o** to open Codex without submitting work. Complete any normal
-   CLI setup. Open `/hooks` and review/enable the ai-nvim hooks if Codex marks them
+   CLI setup. Open `/hooks` and review/enable the uzume hooks if Codex marks them
    as needing review. These hooks only report local lifecycle metadata.
-2. In Codex, ask **Read .ai-nvim-task.md and carry out the task.**
+2. In Codex, ask **Read .uzume-task.md and carry out the task.**
 3. Press **Esc twice**, then **Space 2** and **Space o** to open Claude. Complete
    its normal setup, then give it the same instruction.
 4. Press **Esc twice**, then **Space 1** or **Space 2** to switch, or **Space a**
@@ -35,16 +35,16 @@ asks you to submit the instruction yourself; it never duplicates the task.
 Both worktrees originate from clean `tmux-drudwyn` main at `570a865`. The pilot
 uses `~/Code/tmux-drudwyn`, not the older `tmux-agent-watch` clone.
 
-| Session | CLI | Worktree under `~/Code/ai-nvim-worktrees/` | Branch | Assigned file |
+| Session | CLI | Worktree under `~/Code/uzume-worktrees/` | Branch | Assigned file |
 | --- | --- | --- | --- | --- |
-| sessions | Codex | `drudwyn-sessions` | `ai-nvim/clear-filter-sessions` | `src/session_navigator.rs` |
-| workspaces | Claude | `drudwyn-workspaces` | `ai-nvim/clear-filter-workspaces` | `src/navigator.rs` |
+| sessions | Codex | `drudwyn-sessions` | `uzume/clear-filter-sessions` | `src/session_navigator.rs` |
+| workspaces | Claude | `drudwyn-workspaces` | `uzume/clear-filter-workspaces` | `src/navigator.rs` |
 
 The task is Ctrl-u to clear a navigator's search query while staying in filter
 mode, preserving other modes and normal text input. Each agent adds its own
 regression coverage and footer hint in its assigned file. Task copies are in
 [tasks/sessions.md](tasks/sessions.md) and [tasks/workspaces.md](tasks/workspaces.md),
-and locally in each worktree's untracked `.ai-nvim-task.md`. Agents are told to
+and locally in each worktree's untracked `.uzume-task.md`. Agents are told to
 leave changes uncommitted for review. Nothing automatically merges or pushes.
 Worktrees isolate files and branches; they are not permission sandboxes.
 

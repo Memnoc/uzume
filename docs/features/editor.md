@@ -2,9 +2,9 @@
 
 The editor restores the familiar reading and editing workflow before agent
 sessions return. It is an independent Lua configuration using selected plugins;
-it owns its configuration directly. [ui.lua](../../editor/lua/ainvim/ui.lua) configures
+it owns its configuration directly. [ui.lua](../../editor/lua/uzume/editor/ui.lua) configures
 Rose Pine, the dashboard, Snacks, WhichKey, bufferline, lualine, Git signs,
-Flash and paired delimiters. [keymaps.lua](../../editor/lua/ainvim/keymaps.lua)
+Flash and paired delimiters. [keymaps.lua](../../editor/lua/uzume/editor/keymaps.lua)
 is the complete mapping reference.
 
 ## Appearance and discovery
@@ -34,7 +34,7 @@ The dashboard's logo, headings, and navigation icons use iris (`#c4a7e7`), label
 and filenames use the pale mauve text color, and shortcut letters use rose
 (`#ebbcba`). Filetype icons retain their own recognizable colors. The base,
 surface, and overlay backgrounds and the syntax/diagnostic accent palette remain
-upstream defaults. These settings live in [ui.lua](../../editor/lua/ainvim/ui.lua)
+upstream defaults. These settings live in [ui.lua](../../editor/lua/uzume/editor/ui.lua)
 and use Rose Pine's palette and `before_highlight` callback, scoped to its main
 variant. No global `ColorScheme` hook forces these colors onto other themes.
 **Space uC** can switch to another installed colorscheme;
@@ -52,7 +52,7 @@ navigation icons, labels, and shortcut keys.
 
 The home screen centers a two-color cave-and-sun emblem above the Uzume
 wordmark, closely following the repository SVG. The shared artwork lives in
-[branding.lua](../../editor/lua/ainvim/branding.lua) and also appears after the
+[branding.lua](../../editor/lua/uzume/editor/branding.lua) and also appears after the
 last project is closed. Unicode half-block characters reproduce the solid arch,
 rounded sun, and baseline using normal text rendering, with no image renderer,
 conversion utility, or graphics-protocol dependency. The arch follows
@@ -99,7 +99,7 @@ when learning them. **Space ?** reveals the current buffer's mappings.
 | Space sR | Resume the last picker |
 | s | Flash jump to a visible target |
 
-[project.lua](../../editor/lua/ainvim/project.lua) uses a focused picker's cwd,
+[project.lua](../../editor/lua/uzume/editor/project.lua) uses a focused picker's cwd,
 then the file's containing attached LSP root, then `.git` (file or directory),
 `lua`, and cwd. This supports worktrees without requiring a repository at the
 terminal's original directory. `rg` and `fd` provide external search tools.
@@ -136,7 +136,7 @@ They do not create a source file to save. To write a new file, use **Space fn**
 and **Ctrl-s**: the filename prompt supports completion, cancellation preserves
 the draft, and existing files are not silently overwritten. Named files save
 normally. Native `:w filename` also works; `:w` alone still needs a named buffer.
-The first-save behavior is implemented in [save.lua](../../editor/lua/ainvim/save.lua).
+The first-save behavior is implemented in [save.lua](../../editor/lua/uzume/editor/save.lua).
 
 The shells use Snacks terminals and Neovim terminal buffers. Separate terminal
 identities prevent the right and floating shortcuts from opening the same pane.
@@ -145,7 +145,7 @@ affected terminal. Managed [agent terminals](agents.md) use double Escape for
 editor controls and pass single Escape, jk and Ctrl-w through to the CLI.
 
 Terminal input uses a steady block cursor, configured through Neovim's native
-`guicursor` option in [options.lua](../../editor/lua/ainvim/options.lua).
+`guicursor` option in [options.lua](../../editor/lua/uzume/editor/options.lua).
 Normal editing cursor shapes and Smear Cursor settings are unchanged. This
 applies to Uzume's terminal buffers; the host terminal controls its own shell
 cursor. Ghostty's `cursor-style-blink = false` sets its default, while WezTerm's
@@ -189,11 +189,11 @@ to appear. This uses Neovim plus the existing Snacks toggle, with no new plugin.
 The [diagnostic display investigation](../prototypes/0006-diagnostic-display.md)
 records the real Rust reproduction and why the earlier baseline hid messages.
 
-[options.lua](../../editor/lua/ainvim/options.lua) and
-[autocmds.lua](../../editor/lua/ainvim/autocmds.lua) enable local undo/recovery,
+[options.lua](../../editor/lua/uzume/editor/options.lua) and
+[autocmds.lua](../../editor/lua/uzume/editor/autocmds.lua) enable local undo/recovery,
 restore file position, highlight yanks and check external file changes on focus,
 buffer entry and terminal exit. File saving remains explicit: recovery is not
-source autosave. State stays in ai-nvim's own Neovim directories.
+source autosave. State stays in uzume's own Neovim directories.
 
 ## Verification and limits
 
