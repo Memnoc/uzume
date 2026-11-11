@@ -22,6 +22,7 @@ local wordmark = {
 -- Standard highlight groups let every colorscheme supply its own logo colors.
 function M.section(dashboard)
   local text = {}
+  local height = vim.api.nvim_win_get_height(dashboard.win)
   local function row(parts)
     if #text > 0 then
       text[#text + 1] = { "\n" }
@@ -37,11 +38,16 @@ function M.section(dashboard)
     end
     text[#text + 1] = { (" "):rep(31 - width - left) }
   end
+  -- Give the artwork some breathing room on tall home screens.
+  if height >= 40 then
+    row({ "" })
+    row({ "" })
+  end
   for _, parts in ipairs(logo) do
     row(parts)
   end
   row({ "" })
-  local compact = vim.api.nvim_win_get_height(dashboard.win) < 30
+  local compact = height < 30
   for _, line in ipairs(compact and { "U Z U M E" } or wordmark) do
     row({ line })
   end

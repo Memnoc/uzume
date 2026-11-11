@@ -15,6 +15,8 @@ shows mode, branch, file, diagnostics and position. Snacks supplies file icons,
 indent guides, status-column UI, input prompts and warning/error notifications.
 Indent-guide animation is disabled. WhichKey's Helix-style menu appears after
 pressing Space and pausing; no function-row key is required.
+On home screens at least 40 terminal rows tall, two blank rows above the artwork
+place the logo slightly lower. Shorter windows retain the compact spacing.
 
 Notifications use Snacks' compact style with a rounded border, a visible title,
 opaque background and wrapped text. They stay for seven seconds without taking
