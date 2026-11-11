@@ -95,6 +95,13 @@ Verify executable configuration and resolved dependencies against documented pin
 
 ## Next steps and open design work
 
+**2026-11-11 — local integration implemented.** The maintainer approved combining
+independent task work into a chosen local feature branch for a later PR, with
+explicit conflict resolution. The first implementation applies each reviewed
+task delta as one commit, preserves source checkouts, and supports saved conflict
+status, continuation and explicit abort. See [task integration](features/integration.md).
+Pushing/PR creation and removal/bulk cleanup are not part of this increment.
+
 **2026-11-11 — proposed next increment: task completion and cleanup.** The review
 and feedback loop now needs an editor UI for keeping a task, integrating its
 reviewed changes into a chosen destination, or removing its worktree and local

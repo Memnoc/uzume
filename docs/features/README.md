@@ -18,6 +18,7 @@ records preserve what was actually checked at each increment.
 | Separate config, nvims, dependencies, pins and upgrades | [Installation and releases](installation.md) |
 | Codex/Claude workspaces, marked files/reference context, attention and cleanup | [AI tasks](agents.md) |
 | Task changes picker, stable diffs, line comments, queued feedback and explicit refresh | [Task review](review.md) |
+| Combine tasks into a local feature branch, resolve conflicts and resume/abort | [Task integration](integration.md) |
 | Autosave and release management: planned behavior | [Design record](../design.md) |
 
 Start with the [launch guide](../../editor/README.md). Press **Space** and pause

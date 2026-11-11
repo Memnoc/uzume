@@ -64,7 +64,8 @@ after selection. These checks do not fetch remotes, predict merge conflicts with
 `editor/agent/branches.py` reads Git metadata; `uzume.branch_launch` owns the
 picker and advisories. Programmatic `uzume.agents.start()` remains available to
 callers that explicitly choose a source. Continuation does not merge or delete
-branches; integration and cleanup controls remain a separate increment.
+branches. [Task integration](integration.md) combines reviewed changes into a
+chosen local feature branch; task removal and bulk cleanup remain separate work.
 
 **Current-file launch:** opens the file's counterpart from the new worktree on
 the left, marks it as working context, and focuses the agent. The current file

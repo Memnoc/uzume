@@ -8,7 +8,7 @@ local function footer(state)
   return (state.stale and " New changes · R refresh " or " R refresh ")
     .. "· c comment · C list"
     .. (state.comment_count and (" (" .. state.comment_count .. ")") or "")
-    .. " · s send · f files · u diff · q close "
+    .. " · s send · i integrate · f files · u diff · q close "
 end
 local function notify(message, level)
   vim.notify(message, level or vim.log.levels.INFO, { title = "Task review" })
@@ -234,6 +234,9 @@ function M.show(index)
     for key, action in pairs({ q = M.close, f = M.files, u = M.toggle, R = M.refresh, C = M.comments, s = M.send }) do
       vim.keymap.set("n", key, action, { buffer = buf, nowait = true, desc = "Review: " .. key })
     end
+    vim.keymap.set("n", "i", function()
+      require("uzume.integration").open()
+    end, { buffer = buf, desc = "Integrate reviewed task" })
     vim.keymap.set({ "n", "x" }, "c", M.comment, { buffer = buf, desc = "Comment on review lines" })
     vim.keymap.set("n", "<Tab>", function()
       for index, view in ipairs(state.views) do

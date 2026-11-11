@@ -47,6 +47,13 @@ A reading and feedback workflow over a **Review Snapshot**, including reviewed p
 **Review Comment**:
 Feedback tied to code in a **Review Snapshot**, retaining file, location, and snapshot context so later worktree edits do not silently change its meaning.
 
+**Integration**:
+An explicit local operation applying a Task's reviewed delta since its baseline
+as one commit to a chosen destination branch. Several Tasks may feed the same
+feature branch. Conflicts pause in the destination checkout for manual resolution;
+source Tasks remain intact. Integration does not push, create a PR, merge upstream
+or remove task branches/worktrees.
+
 **Feedback Delivery**:
 An explicit handoff of review comments or selected context to an **Agent Instance**, with a pending state when queued.
 Review comments are previewed and explicitly queued as an immutable batch for a

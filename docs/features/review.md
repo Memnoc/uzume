@@ -20,6 +20,8 @@ this first version.
 | Space vc / c in review | Comment on the current line or visual line range |
 | Space vC / C in review | List saved local comments for this task |
 | Space vs / s in review | Preview unsent comments or inspect the pending batch |
+| Space vi / i in review | Preview and integrate this task into a local feature branch |
+| Space vI | Reopen saved local integrations |
 
 Side-by-side is the default: the starting commit is on the left, captured task
 content on the right. Review opens above the existing workspace without
@@ -28,6 +30,10 @@ or Tab select either side. The footer lists local shortcuts. Existing editor dif
 are temporarily excluded from comparison and restored when review closes.
 The toggle retains the nearest corresponding source line when that line appears
 in the unified patch. It never silently changes mode to fit a narrow terminal.
+
+After review, [integrate the task](integration.md) into a local destination branch.
+Multiple independent tasks can feed the same feature branch for testing and a
+later PR. Nothing is pushed or deleted by integration.
 
 ## Stable snapshots
 

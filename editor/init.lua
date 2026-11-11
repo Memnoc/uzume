@@ -15,6 +15,7 @@ require("uzume.workspace_buffers").setup()
 require("ainvim.navigator").setup()
 require("uzume.agents").setup()
 require("uzume.review").setup()
+require("uzume.integration").setup()
 if require("ainvim.extras").enabled("smear") then
   require("smear_cursor").setup({
     hide_target_hack = true,
