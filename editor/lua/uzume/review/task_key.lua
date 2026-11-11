@@ -6,11 +6,13 @@ return function(task)
   if not keys[input] then
     local ok, key = pcall(vim.fn.sha256, input)
     if not ok then
-      local result = vim.system({
-        "python3",
-        "-c",
-        "import hashlib, sys; print(hashlib.sha256(sys.stdin.buffer.read()).hexdigest())",
-      }, { stdin = input, text = true, timeout = 5000 }):wait()
+      local result = vim
+        .system({
+          "python3",
+          "-c",
+          "import hashlib, sys; print(hashlib.sha256(sys.stdin.buffer.read()).hexdigest())",
+        }, { stdin = input, text = true, timeout = 5000 })
+        :wait()
       assert(result.code == 0, "Could not identify saved task review: " .. (result.stderr or ""))
       key = vim.trim(result.stdout or "")
     end

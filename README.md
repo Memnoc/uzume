@@ -12,7 +12,7 @@
 <p align="center">
   <a href="#project-status"><img src="https://img.shields.io/badge/status-prototype-eb6f92" alt="Status: prototype"></a>
   <a href="editor/README.md#installation-and-pins"><img src="https://img.shields.io/badge/Neovim-0.11%2B-c4a7e7" alt="Requires Neovim 0.11 or newer"></a>
-  <a href="docs/features/installation.md#current-limits-and-verification"><img src="https://img.shields.io/badge/preview-macOS_ARM64-9ccfd8" alt="Current preview: macOS ARM64"></a>
+  <a href="docs/features/installation.md#verification-and-remaining-work"><img src="https://img.shields.io/badge/preview-macOS_ARM64%20%7C%20Linux_x86__64-9ccfd8" alt="Tested preview: macOS ARM64 and Linux x86_64"></a>
 </p>
 
 <p align="center">

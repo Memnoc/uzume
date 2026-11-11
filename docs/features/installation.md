@@ -32,9 +32,10 @@ flows. Node/npm are needed for Mason's web language tools; Rust projects need
 their Rust toolchain. See [tool installation](tool-installation.md) for tool-specific
 requirements. The editor can start before either agent CLI is installed.
 
-The source-build path supports macOS and Linux. Cache-free installation and the
-editor suite have been exercised on macOS ARM64; Linux and Intel Mac validation
-remain pending. This does not yet claim a fully tested platform matrix.
+Cache-free installation and all 16 regression cases have passed on macOS ARM64
+and Ubuntu 24.04 x86_64. Linux CI checks Neovim 0.11.0 and 0.12.6. See the
+[Linux guide](linux.md) for prerequisites, coverage and platform limits.
+Linux ARM64, Intel Mac and hands-on Linux terminal validation remain pending.
 
 ## How it works
 
@@ -126,7 +127,7 @@ running the regular suite against the newly built bundle. It does not register
 anything in your real config or bin directories, and makes no agent requests.
 
 Neovim and host executables remain user-installed; the distro-managed Neovim,
-release/update/rollback UI and supported platform matrix from ADR-0004 are still
+release/update/rollback UI and broader platform matrix from ADR-0004 are still
 unfinished. Source pins control inputs; they do not make compiler-dependent output
 byte-identical across systems. CLI compatibility and language-tool runtime
 requirements need their own validation.

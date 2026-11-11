@@ -13,7 +13,7 @@ Users may authenticate through browser-based organizational SSO, including Okta.
 
 ## Decision
 
-Use existing official Codex and Claude Code installations and their authentication flows; ai-nvim neither collects credentials nor implements login. Autosave session and review state locally, exclude credentials and agent transcripts from session snapshots, and require explicit user handoff for context and feedback delivery. Users retain familiar account access without granting autosave permission to upload their work.
+Use existing official Codex and Claude Code installations and their authentication flows; Uzume neither collects credentials nor implements login. Autosave session and review state locally, exclude credentials and agent transcripts from session snapshots, and require explicit user handoff for context and feedback delivery. Users retain familiar account access without granting autosave permission to upload their work.
 
 ## Considered options
 

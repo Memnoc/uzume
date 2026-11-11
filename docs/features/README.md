@@ -17,6 +17,8 @@ records preserve what was actually checked at each increment.
 | Rust, Lua, C/C++, TypeScript/React, HTML/CSS, completion and formatting | [Languages](languages.md) |
 | Cursor animation and its controls | [Cursor animation](languages.md#cursor-animation) |
 | Separate config, nvims, dependencies, pins and upgrades | [Installation and releases](installation.md) |
+| Linux prerequisites, CI coverage and platform limits | [Linux](linux.md) |
+| Consistent naming and preserved worktrees/history on upgrade | [Namespace migration](namespace-migration.md) |
 | Codex/Claude workspaces, marked files/reference context, attention and cleanup | [AI tasks](agents.md) |
 | Task changes picker, stable diffs, line comments, queued feedback and explicit refresh | [Task review](review.md) |
 | Combine tasks into a local feature branch, resolve conflicts and resume/abort | [Task integration](integration.md) |
@@ -37,5 +39,3 @@ For every feature change, update its write-up with what changed, how to use it,
 how it works, dependencies and stored state, what was verified, and known limits.
 Add the feature here if it is new. Keep planned behavior separate from available
 behavior; implementation detail belongs in these guides, not in everyday menus.
-
-[Namespace migration](namespace-migration.md) covers upgrades from the old app name without losing retained work.

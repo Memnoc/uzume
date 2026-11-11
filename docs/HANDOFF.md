@@ -173,12 +173,24 @@ The default shell/config/bin paths are untouched. Use the printed temporary
 `XDG_DATA_HOME` to run the editor suite against that bundle. The registration
 case is part of the regular suite and does not download anything.
 
-The first cache-free build and the existing 14 editor cases passed on macOS
-ARM64; installer checks passed separately and bring the suite to 15 cases.
-See [installation](features/installation.md), [ADR-0008](adr/0008-source-based-installation.md)
-and [verification record](verification-installation-2026-11-11.md). No Linux or
-Intel Mac run has been performed yet. The previous cached-install verification
-is historical evidence, not the new-machine installation path.
+Cache-free installation and all **16 cases** passed on macOS ARM64 and Ubuntu
+24.04 x86_64. Linux CI checks Neovim 0.11.0 and 0.12.6; macOS's final full run used
+`v0.12.0-dev-2155+g1e6c4ea896`, with a focused 0.11.0 review compatibility test too.
+See [Linux](features/linux.md), [installation](features/installation.md),
+[ADR-0009](adr/0009-uzume-namespace-migration.md) and
+[the current verification record](verification-namespace-linux-2026-11-11.md).
+Intel Mac, Linux ARM64 and hands-on Linux terminal trials remain pending.
+Earlier cached-install reports are historical evidence, not the new-machine path.
+
+Namespace/Linux implementation is published on `feat/uzume-namespace-linux` in
+`/Code/uzume-namespace`. The user's normal `/Code/uzume` checkout remains at
+`8a86dc0` pending closure of their live Uzume windows. After they confirm closure:
+recheck process and Git state, fast-forward main to the verified feature tip,
+run `python3 setup-editor --migrate --register` from `/Code/uzume`, narrowly update
+the old app name in their backed-up `uzume` shell function and `nvims` picker,
+and verify startup, tool references and retained worktrees before publishing main.
+The user authorized the migration; closing the live editor is the outstanding
+safety prerequisite. Never kill it or move its directories underneath it.
 
 The harness verifies the adapters' contract, not every live vendor CLI release.
 Manual Codex and Claude trials have informed the workflow, but upgrades still
@@ -201,7 +213,7 @@ evaluation; a passing PTY test cannot establish perceived smoothness.
    syntax artifacts, and build explicit update/rollback. Independent source
    installation is implemented; personal caches are no longer required.
    Plugins/tools are pinned today; Neovim itself is not distro-managed yet.
-4. **Coverage and maintenance.** Add CI on the supported platform, maintain
+4. **Coverage and maintenance.** Extend the existing Ubuntu CI matrix, maintain
    vendor CLI compatibility probes, expand meaningful editor/language smoke
    coverage, and measure four-agent output/resizing before performance claims.
    Pane motion now has automated coverage; heavy-output and terminal-specific
@@ -214,7 +226,8 @@ evaluation; a passing PTY test cannot establish perceived smoothness.
 Optional later work: PR review and remote publishing; external multiplexer
 integration; SSH projects if demanded; richer attention/worker discovery; CLI
 conversation resume; automatic interrupt-and-send; persisted focus policies;
-namespace migration; Rust only where measurements or ownership justify it.
+retirement of legacy path aliases after proving no retained references remain;
+Rust only where measurements or ownership justify it.
 
 ## Accepted pane motion and experiment history
 
