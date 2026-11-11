@@ -31,6 +31,7 @@ controls remain primary. Preserve plain `nvim` and its existing configuration.
 | Editor | Rose Pine with scoped mauve accents, Snacks explorer/pickers/notifications, completion, Git signs, native LSP/diagnostics/inlay hints, formatting | Familiar, capable editing before bespoke AI UI; other colorschemes retain their palettes |
 | Extras | Own feature catalog on Space l; Rust, Lua, C/C++, web tooling, Smear Cursor; pinned Mason packages and opt-out automatic missing-tool install | Discoverable tool bundles without importing another distribution |
 | Multiplexing | Project → Windows → Panes; native tabpages, splits and floats; Space w and Space p menus | No tmux requirement, no second renderer, no extra session concept |
+| Pane motion | Slide enabled by default; Space uA selects Slide, Instant, Pulse or Spring | Native geometry, interruption handling, no extra renderer or dependency |
 | Tasks | Space ac/aC names a Codex/Claude branch and opens its worktree beside an idle CLI; ae/aE starts without a marked file; ab/aB selects/continues a branch | Separate writable directories prevent independent agents colliding; branch names alone do not |
 | Starting state | Saved source edits/new files inherited via a private index and task baseline commit; original index/HEAD/files unchanged | Prevent the apparent loss of edits on switching into a task |
 | Context | Explicit marked file list, including cross-project references; supplied with a prompt | Opening a file alone is not authorization to send it |
@@ -53,12 +54,19 @@ worktrees, snapshots and saved records. Do not do a blind string replacement.
 | `setup-editor`, `editor/plugins.lock.json`, `editor/tools.lock.json` | Exact plugin bundle installation, syntax hashes, selected tool versions; optional shell registration |
 | `ainvim/projects.lua`, `sessions.lua`, `panes.lua`, `navigator.lua` | Product grouping, layout persistence, pane operations and pickers; native window terminology differs from product Window |
 | `ainvim/branding.lua`, `ui.lua` | Logo and whole-dashboard size budget; dashboard-only viewport correction |
-| `uzume/agents.lua`, `agent_views.lua`, `agent_input.lua`, `context.lua` | Agent lifecycle/UI, meaningful labels/icons, terminal routing and explicit file context |
-| `uzume/branch_launch.lua`, `worktrees.lua`, `task_editor.lua`, `workspace_buffers.lua` | Named or existing task launch, checkout/baseline identity, left editor pane and buffer scoping |
+| `uzume/agents/init.lua`, `views.lua`, `input.lua`, `context.lua` | Agent lifecycle/UI, meaningful labels/icons, terminal routing and explicit file context |
+| `uzume/agents/branches.lua`, `worktrees.lua`, `editor.lua`, `buffers.lua` | Named or existing task launch, checkout/baseline identity, left editor pane and buffer scoping |
 | `editor/agent/branches.py`, `create_worktree.py` | Git preflight, task creation and inherited-state capture using argument arrays/private index |
 | `editor/agent/supervisor.py`, `processes.py`, `hook.py`, `feedback.py` | CLI supervision/PTY, process cleanup, hook events, bounded feedback delivery |
-| `uzume/review*.lua`, `editor/review/snapshot.py` | Review UI, stable capture, comments and delivery records |
-| `uzume/integration.lua`, `conflicts.lua`, `editor/review/integration.py` | Local integration plan/apply/status, editable conflict result, Git capture/cherry-pick and operation persistence |
+| `uzume/review/`, `editor/review/snapshot.py` | Review UI, stable capture, comments and delivery records |
+| `uzume/integration/init.lua`, `conflicts.lua`, `editor/review/integration.py` | Local integration plan/apply/status, editable conflict result, Git capture/cherry-pick and operation persistence |
+
+See the [Lua directory map](../editor/lua/README.md). Feature helpers now live
+under `agents/`, `review/`, `integration/`, `layout/`, `ui/` and `core/`. Public
+`require("uzume.agents")`, `require("uzume.review")` and
+`require("uzume.integration")` resolve through `init.lua`. Restart after this
+update; live module caches are not migrated. Python resource paths are resolved
+from the editor root marker, independently of Lua nesting.
 
 Lua owns editor interaction. Python handles process supervision and Git-heavy
 operations. Keep those boundaries understandable before considering Rust.
@@ -92,6 +100,7 @@ Paths are relative to Neovim's `stdpath` for `NVIM_APPNAME=ai-nvim`:
 | Location | Contents |
 | --- | --- |
 | data/releases/<lock hash> | Installed immutable plugin/syntax bundle |
+| data/pane-motion.json | Versioned animation preference; fresh installs default to Slide |
 | data/mason | Managed language tools |
 | data/worktrees, data/task-branches | Task checkouts and branch/baseline metadata |
 | data/integration-worktrees | Separate destination checkouts when needed |
@@ -134,12 +143,14 @@ The duplicate README test edit was backed up outside the repository as
 this repository-history operation with the product's one-task delta integration.
 Check `git status`, `git log --oneline --decorate -6`, and `git worktree list`
 on entry to a future session: local worktree placement and remote state can change.
-No remote publication is part of this handoff's consolidation task.
+That consolidation was initially local. The subsequent final-polish request
+authorizes merging the accepted animation implementation and publishing main;
+inspect the remote and verification record for the completed publication state.
 
 ## Verification and how to continue safely
 
-Run `python3 tests/run.py` from the repository root. It runs 13 cases sequentially:
-dashboard resizing; normal and forced-exit agent cleanup; saved-state inheritance;
+Run `python3 tests/run.py` from the repository root. It runs 14 cases sequentially:
+dashboard resizing; pane motion, restoration and interruption; normal and forced-exit agent cleanup; saved-state inheritance;
 task navigation; named and existing-branch launch; review; comments; Codex and
 Claude feedback; normal and diff3 conflict integration. Each uses real Neovim/PTY
 and real disposable Git repositories, with mock external CLIs and isolated XDG
@@ -149,8 +160,8 @@ and retained for diagnosis. Installed pinned bundles and Neovim are prerequisite
 Focused commands remain available, e.g. `python3 tests/integration.py` and
 `UZUME_TEST_CONFLICT_STYLE=diff3 python3 tests/integration.py`.
 Use the actual editor and Git boundary for behavioral regressions, not tests
-that simply assert private helper structure. For a throwaway animation probe,
-use disposable UI observations before deciding what warrants a permanent test.
+that simply assert private helper structure. The accepted pane-motion behavior now has permanent coverage in
+`tests/pane_motion.py`; the throwaway demo remains separate.
 
 Fresh-install smoke: isolate all four XDG roots, provide plugin repositories
 containing the pinned commits and the matching syntax cache to `setup-editor`,
@@ -183,8 +194,8 @@ evaluation; a passing PTY test cannot establish perceived smoothness.
 4. **Coverage and maintenance.** Add CI on the supported platform, maintain
    vendor CLI compatibility probes, expand meaningful editor/language smoke
    coverage, and measure four-agent output/resizing before performance claims.
-   Native pane management has earlier manual probes but less permanent coverage
-   than the newer task/review/integration workflows.
+   Pane motion now has automated coverage; heavy-output and terminal-specific
+   mouse behavior still need hands-on validation.
 5. **Production specification.** Reconcile remaining editor capabilities, storage
    migration/retention, crash recovery and operating limits with the agreed
    design. Complete the planned compliance triage before a production spec or
@@ -195,55 +206,29 @@ integration; SSH projects if demanded; richer attention/worker discovery; CLI
 conversation resume; automatic interrupt-and-send; persisted focus policies;
 namespace migration; Rust only where measurements or ownership justify it.
 
-## Animation experiment
+## Accepted pane motion and experiment history
 
-Implemented separately on `spike/pane-animations`, based on `f286734`, in
-`/Users/matteostara/Code/uzume-pane-animations`. Main retains instant pane behavior.
-Run `/Users/matteostara/Code/uzume-pane-animations/spike-animations` to compare
-Instant, Ease, Pulse, Spring and Slide in a disposable three-pane workspace with local output.
-Space uA opens the mode list (j/k, Enter); Space uD demonstrates a resize.
-The launcher shares only pinned plugin files read-only, disables automatic tool
-installation, and discards its demo state on exit. Ordinary `uzume` is unaffected.
+Slide is enabled by default in the regular editor. Space uA offers Slide, Instant,
+Pulse and Spring; Ease was removed because it overlapped with Slide. The choice
+persists locally. See [pane animations](features/pane-animations.md) for controls,
+implementation, interruption behavior and limits.
 
-The real-Neovim probe showed native geometry tweening is feasible without an
-extra dependency. Eased operations settled in approximately 142–157 ms and pulse
-cues around 189–191 ms in that run. Split/resize, floating, fullscreen/restore,
-docking, repeated operations, keyboard mode selection and cancellation ran
-without editor errors. These are callback timings, not measured GPU frame rates.
-Eased mode repeatedly resizes terminals; pulse leaves final geometry immediate.
-Native topology movement stays atomic and receives a cue. Arbitrary native
-commands, mouse arbitration, CPU/battery cost and four live agents remain
-unverified. No motion policy has been accepted for main.
+The throwaway `spike/pane-animations` branch remains available separately at
+`/Users/matteostara/Code/uzume-pane-animations`; its `spike-animations` launcher
+uses disposable state. Its demo, generated files and monkeypatch were not merged.
+The regular implementation in `uzume/layout/` is called directly by pane
+operations, preserves native buffer/process ownership, settles before a new
+managed operation, and yields to typing, focus changes and later native geometry.
+It deliberately does not preserve spring velocity across repeated actions.
 
-Follow-up `c65ba69` on the experiment branch adds Spring after the maintainer
-liked the initial variants and requested a bouncing desktop-style option.
-The preview starts in Spring; a damped response overshoots and settles in about
-420 ms, with exact final geometry and Instant cancellation. A real editor probe
-observed a 69→87-column resize peak at 90, rebound to 86, and settle at 87.
-Repeated Spring resize keys retarget from the visible position while accumulating
-the intended destination. Velocity continuity and sub-cell rendering are not
-implemented; whole-cell rounding remains the fundamental visual limit. The
-branch's prototype record contains the details. Main's runtime remains unchanged.
+The experiment established that native whole-cell geometry transitions were
+usable. Spring was fluid but the bounce was not preferred. Slide was accepted
+with a 200 ms ease-out, fixed-size upward float entrance and anchored directional
+split reveals; focus changes and topology moves remain instant. These timings
+are policy values, not measured GPU frame rates. Four busy agents, CPU/battery
+cost and terminal-specific visual performance remain evaluation work.
 
-Latest preference refinement: Spring was fluid enough but its bounce was not
-preferred. The experiment now starts in Slide: a restrained 200 ms ease-out,
-with floating panes entering upward at final size, monotonic split/resize
-transitions, and no highlight pulse after atomic tile changes. The probe showed
-no resize overshoot and constant floating width/height during the upward entrance;
-Instant cancellation and exact destinations still worked. Use Space pf to try
-the entrance, Space uD for resize, and Space uA to compare. This remains an
-experiment awaiting visual feedback, with no runtime animation added to main.
-
-Directional reveal refinement is also implemented on the experiment branch:
-Slide opens right splits inward from their right edge and bottom splits upward
-from their bottom edge, while floating panes retain the fixed-size upward slide.
-It animates the source side of the shared divider so unrelated panes do not
-donate space during the reveal. Nested file/shell probes confirmed anchored
-outer edges, stable neighboring layouts, retained focus, split-from-float and
-Instant cancellation. Try Space pv/ps and pT/pt; focus switching stays instant.
-
-The full usage/observation record is on the experiment branch:
+The historical observation record is available with:
 `git show spike/pane-animations:docs/prototypes/0009-pane-animations.md`.
-Keep the demo and monkeypatch implementation off main. If a mode is preferred,
-rewrite a small opt-in implementation with cancellation/focus/layout coverage
-and load measurements rather than promoting the experiment wholesale.
+The existing ADRs cover native pane ownership and isolated agent lifetimes;
+this reversible motion preference does not change those architectural decisions.

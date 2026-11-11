@@ -1,8 +1,7 @@
 -- Stable, in-memory review. Git capture is asynchronous; no source buffer is edited.
 local M = {}
 local api = vim.api
-local script = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(debug.getinfo(1, "S").source:sub(2))))
-  .. "/review/snapshot.py"
+local script = require("uzume.core.paths").file("review/snapshot.py")
 local labels = { A = "+ Added", M = "~ Modified", D = "- Deleted", T = "~ Type changed", U = "! Unmerged" }
 local function footer(state)
   return (state.stale and " New changes · R refresh " or " R refresh ")
@@ -17,7 +16,7 @@ local function update_comments(state)
   if M.current ~= state then
     return
   end
-  local ok, comments = pcall(require("uzume.review_comment_store").read, state.task)
+  local ok, comments = pcall(require("uzume.review.comment_store").read, state.task)
   state.comment_count = ok and #comments or nil
   for _, win in ipairs(state.views) do
     if api.nvim_win_is_valid(win) then
@@ -47,8 +46,8 @@ function M.close()
   end
   M.current = nil
   state.closed = true
-  require("uzume.review_comments").close()
-  require("uzume.review_feedback").close()
+  require("uzume.review.comments").close()
+  require("uzume.review.feedback").close()
   if state.timer then
     state.timer:stop()
     state.timer:close()
@@ -171,7 +170,7 @@ function M.comment()
       anchor[side] = { first = rows[1], last = rows[#rows], lines = excerpt }
     end
   end
-  require("uzume.review_comments").add(state, file, anchor, function()
+  require("uzume.review.comments").add(state, file, anchor, function()
     update_comments(state)
   end)
 end
@@ -180,7 +179,7 @@ function M.comments()
     return notify("Open a task review first: Space vr.", vim.log.levels.WARN)
   end
   local state = M.current
-  require("uzume.review_comments").list(state, function()
+  require("uzume.review.comments").list(state, function()
     update_comments(state)
   end)
 end
@@ -489,7 +488,7 @@ function M.send()
   if not M.current then
     return notify("Open a task review first: Space vr.", vim.log.levels.WARN)
   end
-  require("uzume.review_feedback").open(M.current)
+  require("uzume.review.feedback").open(M.current)
 end
 function M.setup()
   for key, mapping in pairs({

@@ -1,8 +1,8 @@
 -- Comment composition and inspection. No agent transport lives in this module.
 local M = {}
 local api = vim.api
-local store = require("uzume.review_comment_store")
-local feedback = require("uzume.review_feedback_store")
+local store = require("uzume.review.comment_store")
+local feedback = require("uzume.review.feedback_store")
 local delivery_labels = { queued = "Queued", supplied = "Supplied", claimed = "Handoff uncertain", paused = "Paused" }
 local ui = {}
 local function protect(fn)

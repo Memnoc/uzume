@@ -167,7 +167,7 @@ require("bufferline").setup({
       Snacks.bufdelete(buf)
     end,
     custom_filter = function(buf)
-      return require("uzume.workspace_buffers").contains(buf)
+      return require("uzume.agents.buffers").contains(buf)
     end,
     diagnostics = "nvim_lsp",
     get_element_icon = function(element)

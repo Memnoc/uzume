@@ -8,6 +8,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 CASES = [
     ('dashboard', ['dashboard.py'], {}),
+    ('pane-motion', ['pane_motion.py'], {}),
     ('agents', ['agents.py'], {}),
     ('agents-crash', ['agents.py', '--crash'], {}),
     ('inheritance', ['inheritance.py'], {}),

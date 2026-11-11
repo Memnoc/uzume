@@ -135,5 +135,8 @@ Lua editor is the appropriate place to test these interactions; there is no new
 Rust subsystem in this increment. The [probe record](../prototypes/0008-window-management.md)
 records actual workflow and compatibility checks. Heavy-output performance,
 terminal-specific mouse ergonomics and hands-on layout evaluation remain
-open. Agent attention, review, worktree automation and animation polish follow
-this window-management trial.
+open. Agent tasks and review are now implemented; see the feature index.
+
+Managed panes now use Slide animation by default. **Space uA** chooses Slide,
+Instant, Pulse or Spring and saves the preference. See [pane animations](pane-animations.md)
+for controls, interruption rules and regression coverage.

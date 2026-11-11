@@ -1,11 +1,11 @@
 -- Integration is explicit and local. Git owns commit creation and conflict state.
 local M = {}
 local api = vim.api
-local base = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(debug.getinfo(1, "S").source:sub(2))))
+local base = require("uzume.core.paths").editor
 local storage = vim.fn.stdpath("state") .. "/integrations"
 local window
 local function protect(fn)
-  require("uzume.context").run(fn, "Task integration")
+  require("uzume.agents.context").run(fn, "Task integration")
 end
 local function request(value, done)
   vim.system(
@@ -45,7 +45,7 @@ local function guard(task, destination)
     if not item.exited then
       assert(item.task.cwd ~= destination, "Destination belongs to a running agent. Choose a feature branch instead.")
       if item.task.cwd == task.cwd then
-        local status = require("uzume.agent_input").status(item)
+        local status = require("uzume.agents.input").status(item)
         assert(
           status.state == "ready" or status.state == "review",
           "Wait for this task's agent to finish before integrating."
@@ -81,7 +81,7 @@ local function edit(plan, path)
     })
   end
   vim.t.uzume_integration = plan.record
-  require("uzume.conflicts").detach(api.nvim_get_current_tabpage())
+  require("uzume.integration.conflicts").detach(api.nvim_get_current_tabpage())
   for _, win in ipairs(vim.t.uzume_resolution_wins or {}) do
     if api.nvim_win_is_valid(win) then
       api.nvim_win_close(win, true)
@@ -124,7 +124,7 @@ function M.files(plan)
             api.nvim_set_current_win(result_win)
             vim.cmd.diffthis()
             vim.wo.foldenable = false
-            require("uzume.conflicts").attach(result_win, wins, {
+            require("uzume.integration.conflicts").attach(result_win, wins, {
               files = function()
                 M.files(plan)
               end,
@@ -142,7 +142,7 @@ end
 function M.show(plan)
   M.close()
   if (plan.state == "integrated" or plan.state == "aborted") and vim.t.uzume_integration == plan.record then
-    require("uzume.conflicts").detach(api.nvim_get_current_tabpage(), true)
+    require("uzume.integration.conflicts").detach(api.nvim_get_current_tabpage(), true)
   end
   M.current = plan
   local lines = {

@@ -212,7 +212,7 @@ function M.attach(result, sides, callbacks)
     { key = "<leader>vS", hint = "Space vS", label = "Save result and FINISH integration", run = finish },
   }
   local function protect(fn)
-    require("uzume.context").run(fn, "Resolve conflict")
+    require("uzume.agents.context").run(fn, "Resolve conflict")
   end
   local function menu()
     Snacks.picker.select(actions, {

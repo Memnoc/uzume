@@ -1,8 +1,8 @@
 -- Preview is local. Only an explicit queue action publishes a frozen batch.
 local M = {}
 local api = vim.api
-local store = require("uzume.review_feedback_store")
-local comments = require("uzume.review_comment_store")
+local store = require("uzume.review.feedback_store")
+local comments = require("uzume.review.comment_store")
 local window
 local layout
 local highlights = api.nvim_create_namespace("uzume_review_actions")
@@ -15,7 +15,7 @@ local labels = {
   unpublished = "UNSENT · Batch saved but not published; preview and queue again",
 }
 local function protect(fn)
-  require("uzume.context").run(fn, "Task review")
+  require("uzume.agents.context").run(fn, "Task review")
 end
 function M.close()
   if window then
@@ -202,7 +202,7 @@ function M.open(state)
         "Preview and queue this review again"
       )
       if delivery == "queued" and not store.prompt_requested(batch) then
-        local input = require("uzume.agent_input")
+        local input = require("uzume.agents.input")
         local status = input.status(item)
         if status.state ~= "working" then
           assert(

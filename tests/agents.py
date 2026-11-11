@@ -76,7 +76,7 @@ try:
             assert js('#vim.t.uzume_task.context.files') == 0
             keys('<CR>')
             wait(lambda: lua('vim.bo.filetype') != 'snacks_picker_input')
-        visible = js('(function() local r={} for _,buf in ipairs(vim.api.nvim_list_bufs()) do if require("uzume.workspace_buffers").contains(buf) and vim.api.nvim_buf_get_name(buf):match("example.txt$") then r[#r+1]=buf end end return r end)()')
+        visible = js('(function() local r={} for _,buf in ipairs(vim.api.nvim_list_bufs()) do if require("uzume.agents.buffers").contains(buf) and vim.api.nvim_buf_get_name(buf):match("example.txt$") then r[#r+1]=buf end end return r end)()')
         assert len(visible) == 1, visible
         assert js('vim.api.nvim_buf_is_valid(vim.fn.bufnr(' + json.dumps(str(project/'example.txt')) + '))')
         if count == 1:

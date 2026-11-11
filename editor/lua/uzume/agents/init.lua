@@ -2,8 +2,7 @@
 local M = { instances = {} }
 local api = vim.api
 local attention = { waiting = true, review = true, failed = true }
-local supervisor = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(debug.getinfo(1, "S").source:sub(2))))
-  .. "/agent/supervisor.py"
+local supervisor = require("uzume.core.paths").file("agent/supervisor.py")
 
 local function notify(message, level)
   vim.notify(message, level or vim.log.levels.INFO, { title = "Uzume agents" })
@@ -137,7 +136,7 @@ local function launch(task, tab, project_name, kind)
     directory = directory,
     status = { state = "starting", reason = "Starting CLI", since = os.time() },
   }
-  require("uzume.context").write(item)
+  require("uzume.agents.context").write(item)
   local job = vim.fn.jobstart({ python, supervisor, directory }, {
     term = true,
     cwd = task.cwd,
@@ -191,8 +190,8 @@ function M.start(kind, opts, done)
   local file, relative
   local source = (vim.t.uzume_task or {}).cwd or project.root
   if not opts.empty then
-    file = require("uzume.context").file()
-    relative, source = require("uzume.worktrees").relative_file(project, file)
+    file = require("uzume.agents.context").file()
+    relative, source = require("uzume.agents.worktrees").relative_file(project, file)
     assert(
       relative,
       "This file is outside this project's checkouts.\n\n"
@@ -208,7 +207,7 @@ function M.start(kind, opts, done)
     source = opts.selection.cwd or project.root
   end
   local origin = api.nvim_get_current_win()
-  require("uzume.worktrees").create(project.root, label, function(task, err)
+  require("uzume.agents.worktrees").create(project.root, label, function(task, err)
     if not task then
       notify(err, vim.log.levels.ERROR)
       if done then
@@ -238,7 +237,7 @@ function M.start(kind, opts, done)
         task = task,
         empty = true,
       })
-      local editor = require("uzume.task_editor").create(task)
+      local editor = require("uzume.agents.editor").create(task)
       local selected = relative and (task.cwd .. "/" .. relative) or nil
       if selected and vim.fn.filereadable(selected) == 1 then
         vim.cmd.edit(vim.fn.fnameescape(selected))
@@ -247,9 +246,9 @@ function M.start(kind, opts, done)
       end
       local item = launch(task, tab, project.name, kind)
       if selected and vim.fn.filereadable(selected) == 1 then
-        require("uzume.context").add(item, { selected })
+        require("uzume.agents.context").add(item, { selected })
       elseif previous == origin then
-        require("uzume.task_editor").pick(editor, task)
+        require("uzume.agents.editor").pick(editor, task)
       end
       return item
     end)
@@ -295,7 +294,7 @@ function M.continue_task(task, kind, relative)
       vim.cmd.edit(vim.fn.fnameescape(path))
       vim.cmd("checktime " .. api.nvim_get_current_buf())
     end)
-    require("uzume.context").add(item, { path })
+    require("uzume.agents.context").add(item, { path })
   end
   for _, item in pairs(M.instances) do
     if item.task.cwd == task.cwd and alive(item) then
@@ -331,16 +330,16 @@ function M.continue_task(task, kind, relative)
     task = task,
     empty = true,
   })
-  local editor = require("uzume.task_editor").create(task)
+  local editor = require("uzume.agents.editor").create(task)
   local selected = relative and (task.cwd .. "/" .. relative)
   if selected and vim.fn.filereadable(selected) == 1 then
     vim.cmd.edit(vim.fn.fnameescape(selected))
   end
   local item = launch(task, tab, project.name, kind)
   if selected and vim.fn.filereadable(selected) == 1 then
-    require("uzume.context").add(item, { selected })
+    require("uzume.agents.context").add(item, { selected })
   else
-    require("uzume.task_editor").pick(editor, task)
+    require("uzume.agents.editor").pick(editor, task)
   end
   return item
 end
@@ -380,8 +379,8 @@ local function poll()
 end
 
 function M.setup()
-  require("uzume.agent_views").setup()
-  require("uzume.agent_input").setup()
+  require("uzume.agents.views").setup()
+  require("uzume.agents.input").setup()
   local group = api.nvim_create_augroup("uzume_agents", { clear = true })
   local timer = assert(vim.uv.new_timer())
   timer:start(500, 500, vim.schedule_wrap(poll))
@@ -404,40 +403,40 @@ function M.setup()
   })
   local function map(key, fn, desc)
     vim.keymap.set("n", "<leader>a" .. key, function()
-      require("uzume.context").run(fn, desc)
+      require("uzume.agents.context").run(fn, desc)
     end, { desc = desc })
   end
   map("c", function()
-    require("uzume.branch_launch").open("codex")
+    require("uzume.agents.branches").open("codex")
   end, "Codex with Current File")
   map("C", function()
-    require("uzume.branch_launch").open("claude")
+    require("uzume.agents.branches").open("claude")
   end, "Claude with Current File")
   map("a", M.pick, "Agents / Attention")
   map("b", function()
-    require("uzume.branch_launch").choose("codex", { empty = vim.bo.buftype ~= "" or api.nvim_buf_get_name(0) == "" })
+    require("uzume.agents.branches").choose("codex", { empty = vim.bo.buftype ~= "" or api.nvim_buf_get_name(0) == "" })
   end, "Codex from Existing Branch")
   map("B", function()
-    require("uzume.branch_launch").choose("claude", { empty = vim.bo.buftype ~= "" or api.nvim_buf_get_name(0) == "" })
+    require("uzume.agents.branches").choose("claude", { empty = vim.bo.buftype ~= "" or api.nvim_buf_get_name(0) == "" })
   end, "Claude from Existing Branch")
   map("e", function()
-    require("uzume.branch_launch").open("codex", { empty = true })
+    require("uzume.agents.branches").open("codex", { empty = true })
   end, "Empty Codex Workspace")
   map("E", function()
-    require("uzume.branch_launch").open("claude", { empty = true })
+    require("uzume.agents.branches").open("claude", { empty = true })
   end, "Empty Claude Workspace")
-  map("f", require("uzume.context").mark, "Mark Current File for Agent")
-  map("F", require("uzume.context").select, "Mark Multiple Files")
-  map("m", require("uzume.context").manage, "Marked Context / Remove File")
-  map("d", require("uzume.context").draft, "Insert Marked Context in Prompt")
+  map("f", require("uzume.agents.context").mark, "Mark Current File for Agent")
+  map("F", require("uzume.agents.context").select, "Mark Multiple Files")
+  map("m", require("uzume.agents.context").manage, "Marked Context / Remove File")
+  map("d", require("uzume.agents.context").draft, "Insert Marked Context in Prompt")
   map("r", M.restart, "Restart Task CLI (Fresh Conversation)")
   api.nvim_create_user_command("UzumeAgent", function(args)
-    require("uzume.context").run(function()
+    require("uzume.agents.context").run(function()
       assert(
         #args.fargs == 1 or (#args.fargs == 2 and args.fargs[2] == "empty"),
         "Use :UzumeAgent codex [empty] or :UzumeAgent claude [empty]"
       )
-      require("uzume.branch_launch").open(args.fargs[1], { empty = args.fargs[2] == "empty" })
+      require("uzume.agents.branches").open(args.fargs[1], { empty = args.fargs[2] == "empty" })
     end)
   end, {
     nargs = "+",

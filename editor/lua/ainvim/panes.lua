@@ -3,6 +3,7 @@
 local M = { floats = {}, hidden_by_tab = {}, serial = 0 }
 local api = vim.api
 local native = require("ainvim.sessions")
+local motion = require("uzume.layout.motion")
 
 local function view(win)
   return api.nvim_win_call(win, vim.fn.winsaveview)
@@ -70,6 +71,7 @@ function M.hidden(tab)
 end
 
 function M.split(direction, shell)
+  motion.finish()
   local project = require("ainvim.projects").current()
   assert(project, "Open a project first: Space ap, then N")
   local win, buf = api.nvim_get_current_win(), api.nvim_get_current_buf()
@@ -101,14 +103,17 @@ function M.split(direction, shell)
     end
     vim.cmd.startinsert()
   end
+  motion.reveal(win, api.nvim_get_current_win(), direction)
 end
 
 function M.float()
+  motion.finish()
   local win, buf = current()
   if M.floats[win] then
     return M.dock(win)
   end
   assert(api.nvim_win_get_config(win).relative == "", "This popup is managed by another tool")
+  local before = motion.capture(win)
   local saved, title = view(win), name(win, buf)
   vim.bo[buf].bufhidden = "hide"
   local old = { number = vim.wo[win].number, relativenumber = vim.wo[win].relativenumber }
@@ -121,10 +126,12 @@ function M.float()
   vim.w[floating].ainvim_name = vim.w[win].ainvim_name
   M.floats[floating] = { slot = win, tab = api.nvim_get_current_tabpage(), options = old }
   restore_view(floating, saved)
+  motion.change(floating, before, true)
   return floating
 end
 
 function M.dock(win)
+  motion.finish()
   win = win or api.nvim_get_current_win()
   local state = assert(M.floats[win], "Pane is already tiled")
   local buf, saved = api.nvim_win_get_buf(win), view(win)
@@ -146,7 +153,9 @@ function M.dock(win)
 end
 
 function M.zoom()
+  motion.finish()
   local win = current()
+  local before = motion.capture(win)
   local state = M.floats[win]
   if state and state.zoom then
     local zoom = state.zoom
@@ -155,32 +164,40 @@ function M.zoom()
       return M.dock(win)
     end
     api.nvim_win_set_config(win, zoom.config)
+    motion.change(win, before)
     return
   end
   local was_tiled = not state
   if was_tiled then
     win = M.float()
+    motion.finish()
     state = M.floats[win]
   end
   state.zoom = { tiled = was_tiled, config = api.nvim_win_get_config(win) }
   api.nvim_win_set_config(win, rect(true))
+  motion.change(win, before)
 end
 
 function M.move(direction)
+  motion.finish()
   local win = current()
+  local before = motion.capture(win)
   if M.floats[win] then
     assert(not M.floats[win].zoom, "Leave fullscreen before moving the pane")
     local config = api.nvim_win_get_config(win)
     config.row = tonumber(config.row) + (direction == "J" and 2 or direction == "K" and -2 or 0)
     config.col = tonumber(config.col) + (direction == "L" and 4 or direction == "H" and -4 or 0)
     api.nvim_win_set_config(win, clamp(config))
+    motion.change(win, before)
   else
     vim.cmd.wincmd(direction)
   end
 end
 
 function M.resize(width, height)
+  motion.finish()
   local win = current()
+  local before = motion.capture(win)
   if M.floats[win] then
     assert(not M.floats[win].zoom, "Leave fullscreen before resizing the pane")
     local config = api.nvim_win_get_config(win)
@@ -194,9 +211,11 @@ function M.resize(width, height)
       api.nvim_win_set_height(win, math.max(1, api.nvim_win_get_height(win) + height))
     end
   end
+  motion.change(win, before)
 end
 
 function M.swap()
+  motion.finish()
   local win, buf = current()
   local panes = native.windows(api.nvim_get_current_tabpage())
   assert(#panes > 1, "Create another pane first")
@@ -218,6 +237,7 @@ function M.swap()
 end
 
 function M.hide()
+  motion.finish()
   local win, buf = current()
   local tab = api.nvim_get_current_tabpage()
   local saved = view(win)
@@ -249,6 +269,7 @@ function M.hide()
 end
 
 function M.restore(pane)
+  motion.finish()
   local tab = api.nvim_get_current_tabpage()
   local hidden = M.hidden(tab)
   pane = pane or hidden[#hidden]
@@ -267,12 +288,16 @@ function M.restore(pane)
   restore_view(win, pane.view)
   if pane.floating then
     win = M.float()
+    motion.finish()
+    local before = motion.capture(win)
     api.nvim_win_set_config(win, clamp(pane.floating))
+    motion.change(win, before, true)
   end
   return win
 end
 
 function M.close(win)
+  motion.finish()
   win = win or api.nvim_get_current_win()
   local buf = api.nvim_win_get_buf(win)
   local terminal = vim.bo[buf].buftype == "terminal"
@@ -303,6 +328,7 @@ end
 
 -- Process exit is not a user navigation action: clean up without switching tabs.
 function M.remove_exited_terminal(buf)
+  motion.finish()
   if not api.nvim_buf_is_valid(buf) then
     return
   end
@@ -375,6 +401,7 @@ function M.pick()
 end
 
 function M.transfer()
+  motion.finish()
   local win, buf = current()
   assert(not vim.b[buf].uzume_agent_id, "Agent panes belong to their task window; move or float them within it")
   local project = require("ainvim.projects").current()
@@ -421,6 +448,7 @@ function M.transfer()
 end
 
 function M.forget(tab)
+  motion.finish()
   M.hidden_by_tab[tab] = nil
   for win, state in pairs(M.floats) do
     if state.tab == tab then
@@ -429,6 +457,7 @@ function M.forget(tab)
   end
 end
 function M.prepare_save()
+  motion.finish()
   assert(not next(M.floats), "Dock floating/fullscreen panes before saving the layout")
   for tab in pairs(M.hidden_by_tab) do
     assert(#M.hidden(tab) == 0, "Restore hidden panes before saving the layout")
@@ -449,6 +478,7 @@ function M.confirm(prompt, fn)
 end
 
 function M.setup()
+  motion.setup()
   local group = api.nvim_create_augroup("ainvim_panes", { clear = true })
   api.nvim_create_autocmd("VimResized", {
     group = group,

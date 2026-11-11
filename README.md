@@ -49,6 +49,10 @@ covers catalog views, manual installation, disabling automation and retries.
 in its own branch/worktree window under the current project. **Space aa** shows
 agent attention. See the [AI task guide](docs/features/agents.md).
 
+**Space uA** selects [pane animation](docs/features/pane-animations.md): Slide is
+enabled by default, with Instant available for immediate layout changes.
+
+- [Lua module map](editor/lua/README.md): code grouped by editor feature.
 - [Maintainer handoff](docs/HANDOFF.md): architecture, verification, decisions, and prioritized next work.
 - [Design record](docs/design.md): agreed behavior, deferred features, and open questions.
 - [Feature guide](docs/features/README.md): available features, shortcuts, implementation and limits.
@@ -64,6 +68,6 @@ Keep the feature index current and distinguish implemented features from plans.
 
 Development proceeds in small, testable increments. Record design decisions, use focused prototypes to resolve uncertainty, and validate real editing workflows before expanding the feature set.
 
-The initial reference terminals are Ghostty and WezTerm on macOS and Linux. Kitty is an additional compatibility target. Animation polish follows a usable core.
+The initial reference terminals are Ghostty and WezTerm on macOS and Linux. Kitty is an additional compatibility target. Pane motion uses native terminal cells; visual performance still needs evaluation under busy agent output.
 
 The Uzume name and cave-and-sun logo are established. Rust component boundaries and the production dependency set remain open.

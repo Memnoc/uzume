@@ -209,7 +209,7 @@ agent tasks are described in the [agent workflow](agents.md).
 The installed Neovim nightly prevents native empty-prompt buffers from deleting
 their first character. This reproduces without plugins; stable Neovim 0.11.6
 with the same editor configuration deletes it normally. The compatibility layer
-in [input.lua](../../editor/lua/uzume/input.lua) handles Backspace/Ctrl-h at that
+in [input.lua](../../editor/lua/uzume/ui/input.lua) handles Backspace/Ctrl-h at that
 boundary for Snacks search and naming fields, including multibyte characters.
 Other positions use native Backspace, and ordinary source buffers keep their
 existing mappings. Remove this workaround when the supported Neovim baseline

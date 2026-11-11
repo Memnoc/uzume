@@ -134,6 +134,7 @@ These steps are proposed sequencing, not an approved implementation ticket list.
 The [maintainer handoff](HANDOFF.md) records the consolidated prototype baseline,
 module map, verification commands, and prioritized remaining work. Historical
 trial steps above describe the development sequence, not a fresh implementation
-plan. A separate `spike/pane-animations` experiment provides Instant, Ease and Pulse
-variants for tiling/resize evaluation; no animation behavior is accepted for the
-main editor yet. Its launch command and observations are in the handoff.
+plan. The separate `spike/pane-animations` trial informed the accepted regular
+implementation: Slide enabled by default, with Instant, Pulse and Spring available
+on Space uA. Ease was removed as redundant. See the [pane animation guide](features/pane-animations.md)
+for behavior and limits; the trial's demo and monkeypatch remain on its branch.

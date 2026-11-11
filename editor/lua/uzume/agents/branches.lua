@@ -1,10 +1,9 @@
 -- Choose an explicit starting branch and inspect saved-state advisories before launch.
 local M = {}
 local api = vim.api
-local script = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(debug.getinfo(1, "S").source:sub(2))))
-  .. "/agent/branches.py"
+local script = require("uzume.core.paths").file("agent/branches.py")
 local function run(fn)
-  require("uzume.context").run(fn, "Uzume agents")
+  require("uzume.agents.context").run(fn, "Uzume agents")
 end
 local function read(project, done)
   vim.system(
@@ -102,9 +101,9 @@ function M.open(kind, opts)
   local source = (vim.t.uzume_task or {}).cwd or project.root
   local file
   if not opts.empty then
-    file = require("uzume.context").file()
+    file = require("uzume.agents.context").file()
     local relative
-    relative, source = require("uzume.worktrees").relative_file(project, file)
+    relative, source = require("uzume.agents.worktrees").relative_file(project, file)
     assert(
       relative,
       "This file is outside this project's checkouts.\nSpace ae / aE: start an empty workspace.\nSpace af: mark it as a reference."
@@ -128,8 +127,8 @@ function M.choose(kind, opts)
   local project = assert(require("ainvim.projects").current(), "Open a project first: Space ap")
   local file, relative, source
   if not opts.empty then
-    file = require("uzume.context").file()
-    relative, source = require("uzume.worktrees").relative_file(project, file)
+    file = require("uzume.agents.context").file()
+    relative, source = require("uzume.agents.worktrees").relative_file(project, file)
     assert(
       relative,
       "This file is outside this project's checkouts.\nSpace ae / aE: start an empty workspace.\nSpace af: mark it as a reference."
@@ -217,7 +216,7 @@ function M.choose(kind, opts)
                 break
               end
             end
-            task = task or require("uzume.worktrees").retained(project.root, entry)
+            task = task or require("uzume.agents.worktrees").retained(project.root, entry)
             if not task and entry.cwd and entry.base then
               task = {
                 id = entry.branch:sub(7),

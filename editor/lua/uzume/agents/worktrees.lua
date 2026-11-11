@@ -58,8 +58,7 @@ function M.create(project, label, done, source, selection, branch)
   vim.fn.mkdir(parent, "p", 448)
   local task =
     { id = id, label = label, project = project, cwd = parent .. "/" .. id, branch = branch or "uzume/" .. id }
-  local script = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(debug.getinfo(1, "S").source:sub(2))))
-    .. "/agent/create_worktree.py"
+  local script = require("uzume.core.paths").file("agent/create_worktree.py")
   local command = { "python3", script, source, task.cwd, task.branch }
   if selection then
     command[#command + 1] = vim.json.encode(selection)

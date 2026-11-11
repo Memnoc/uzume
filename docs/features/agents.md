@@ -61,7 +61,7 @@ launch with an explanation. Branch HEAD and checkout status are checked again
 after selection. These checks do not fetch remotes, predict merge conflicts with
 `main`, or lock files against other running agents. Browsing never modifies Git.
 
-`editor/agent/branches.py` reads Git metadata; `uzume.branch_launch` owns the
+`editor/agent/branches.py` reads Git metadata; `uzume.agents.branches` owns the
 picker and advisories. Programmatic `uzume.agents.start()` remains available to
 callers that explicitly choose a source. Continuation does not merge or delete
 branches. [Task integration](integration.md) combines reviewed changes into a
@@ -187,12 +187,12 @@ remain separate work.
 ## Implementation and verification
 
 - `uzume.agents` owns launch, terminal lifetime, attention and shortcuts.
-- `uzume.context` owns marks, role classification, atomic context manifests and
+- `uzume.agents.context` owns marks, role classification, atomic context manifests and
   context controls. Errors shown by agent actions omit internal Lua locations.
-- `uzume.workspace_buffers` scopes the tab strip without deleting buffers.
-- `uzume.agent_views` routes duplicate terminal selections to their existing
+- `uzume.agents.buffers` scopes the tab strip without deleting buffers.
+- `uzume.agents.views` routes duplicate terminal selections to their existing
   pane after layout operations settle, restoring the displaced editor buffer.
-- `uzume.worktrees` launches the asynchronous `editor/agent/create_worktree.py`
+- `uzume.agents.worktrees` launches the asynchronous `editor/agent/create_worktree.py`
   helper, which captures saved state with Git argument arrays and a private index.
 - `editor/agent/supervisor.py` supervises the official CLI and observed children.
   `hook.py` supplies marked paths and lifecycle metadata, never logs incoming

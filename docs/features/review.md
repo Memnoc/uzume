@@ -153,7 +153,7 @@ the pending batch, or the latest batch; a full delivery-history browser is defer
 
 ### Implementation and storage
 
-`uzume.review_feedback` provides the preview; `review_feedback_store` owns frozen
+`uzume.review.feedback` provides the preview; `review_feedback_store` owns frozen
 batches and run identity. Batch records live under
 `stdpath('state')/review-feedback/<task-hash>/`; run-scoped pending/claimed packets
 and receipts live under `stdpath('state')/agents/<run>/feedback/`. Directories use
