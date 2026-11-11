@@ -8,6 +8,7 @@ a restart and shows required/optional tool availability in its preview.
 The menu border keeps the controls visible: **Ctrl-n/p** moves, **Enter** toggles,
 **Ctrl-s** saves, and one **Esc** cancels. **Ctrl-v** cycles catalog views,
 **Ctrl-r** installs/retries the selected pack, and **Ctrl-g** opens Mason.
+**Ctrl-a** adds a user language pack; **Ctrl-e** edits a selected user definition.
 Outside Extras, **Space cm** opens Mason directly.
 Type to filter; arrow keys also move.
 The preview appears beside the list in wide terminals and below it in narrower
@@ -37,14 +38,18 @@ copy for the open menu. Enter edits only the draft. Ctrl-s validates all catalog
 choices and atomically renames a temporary JSON file into place; Esc drops the
 draft. [packages.lua](lua/uzume/editor/packages.lua) and
 [languages.lua](lua/uzume/editor/languages.lua) use startup choices to load features.
-There is no plugin-manager runtime and no general third-party
-Extras marketplace or custom-pack editor yet. Mason supplies the tool installation
+There is no plugin-manager runtime or third-party marketplace. Declarative user
+packs live outside the checkout; [the user-pack guide](../docs/features/user-language-packs.md)
+describes guided creation and editing. Mason supplies the tool installation
 backend; our catalog and native LSP configuration remain independent.
 
 For enabling a pack or adding an unbundled language, see the
 [language installation walkthrough](../docs/features/languages.md#install-language-support).
 
 ## Available packs
+
+**Ctrl-v** cycles All, Languages, Features, User, Available, Installed and Enabled.
+The list labels built-in and user-owned packs; new user packs start disabled.
 
 The requested packs are enabled initially:
 

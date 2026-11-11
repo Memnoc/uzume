@@ -33,7 +33,7 @@ git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit'
 (project / 'example.txt').write_text('uncommitted source\n')
 config = root / 'config/uzume'
 config.parent.mkdir()
-config.symlink_to(REPO / 'editor')
+config.symlink_to(Path(os.environ.get('UZUME_TEST_CONFIG', REPO / 'editor')))
 data = root / 'data/uzume'
 data.mkdir(parents=True)
 (data / 'releases').symlink_to(BUNDLE)

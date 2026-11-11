@@ -267,3 +267,20 @@ passes the regression without it.
 `python3 tests/agents.py --inputs-only` checks complete deletion in both search
 and naming fields. The full suite also checks explicit file-reference delivery
 and user-facing agent labels.
+
+## Floating command line
+
+Press `:` for a compact, rounded command box near the top, centered horizontally.
+It scales with terminal width, capped at 100 columns; narrow terminals remain
+usable. Native command editing, Enter execution, Escape cancellation, history
+and Tab completion remain intact. Search/input prompts use the same Noice
+command-line plumbing. This does not replace Snacks input/pickers.
+
+Pinned Noice and Nui render command input and completion only. Messages and
+notifications remain with the existing editor/Snacks paths; LSP hover/signature
+handling remains native. `uzume/ui/commandline.lua` owns the scope and appearance,
+using theme highlight links. No new persisted preference is introduced. Rebuild
+packages with `./setup-editor` when updating to this dependency bundle, then restart.
+
+`tests/commandline.py` exercises execution, editing, cancellation, native history,
+completion and 50/80/150-column layouts through a real terminal editor.

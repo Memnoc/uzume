@@ -47,10 +47,11 @@ a new language integration.
 | Key | Action |
 | --- | --- |
 | Type / Ctrl-n,p or arrows | Filter / move |
-| Ctrl-v | Cycle All → Available → Installed → Enabled |
+| Ctrl-v | Cycle All → Languages → Features → User → Available → Installed → Enabled |
 | Enter | Toggle a draft pack choice |
 | Ctrl-s | Save choices; newly enabled packs start installing missing required tools |
 | Ctrl-r | Install/retry the selected pack's required tools in uzume storage, even if external copies exist |
+| Ctrl-a / Ctrl-e | Add a user language pack / edit its definition |
 | Ctrl-g | Open Mason's package browser, installation output and optional tools |
 | Esc | Close and discard unsaved pack choices |
 

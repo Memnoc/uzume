@@ -38,10 +38,34 @@ M.catalog = {
     tools = {},
   },
 }
+local builtin_filetypes = {
+  rust = { "rust" },
+  lua = { "lua" },
+  c = { "c", "cpp" },
+  web = {
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "html",
+    "css",
+    "scss",
+    "less",
+    "json",
+    "jsonc",
+  },
+}
+for _, entry in ipairs(M.catalog) do
+  entry.kind = entry.id == "smear" and "feature" or "language"
+  entry.source = "Built-in"
+  entry.filetypes = builtin_filetypes[entry.id]
+end
+M.builtins = vim.deepcopy(M.catalog)
+vim.list_extend(M.catalog, require("uzume.extras.packs").load(M.builtins))
 local path = vim.fn.stdpath("data") .. "/extras.json"
 M.active = {}
 for _, entry in ipairs(M.catalog) do
-  M.active[entry.id] = true
+  M.active[entry.id] = entry.default ~= false
 end
 if vim.fn.filereadable(path) == 1 then
   local ok, saved = pcall(function()
@@ -63,7 +87,12 @@ M.desired = vim.deepcopy(M.active)
 
 function M.enabled(id)
   if id == "languages" then
-    return M.active.rust or M.active.lua or M.active.c or M.active.web
+    for _, entry in ipairs(M.catalog) do
+      if entry.kind == "language" and M.active[entry.id] then
+        return true
+      end
+    end
+    return false
   end
   return M.active[id] == true
 end
@@ -86,15 +115,39 @@ end
 function M.show()
   local installer = require("uzume.editor.installer")
   local draft = vim.deepcopy(M.desired)
-  local views, view = { "All", "Available", "Installed", "Enabled" }, 1
+  local views, view = { "All", "Languages", "Features", "User", "Available", "Installed", "Enabled" }, 1
   local lock = vim.json.decode(table.concat(vim.fn.readfile(vim.fn.stdpath("config") .. "/plugins.lock.json"), "\n"))
   local function items()
-    local result = {}
+    local result = {
+      {
+        id = "add",
+        action = "add",
+        text = "Add a language…",
+        state = "local pack",
+        preview = {
+          text = "# Add a language\n\nChoose a filetype, language server and formatter.\n\nThe pack is saved outside Uzume, disabled until you enable it.\nTools come from the pinned Mason registry, or your PATH.\n\nCtrl-a: add · Ctrl-e: edit a user pack\n\nUser packs: "
+            .. require("uzume.extras.packs").directory
+            .. "\n\nBuilt-in packs are tested with Uzume. User packs need a real-project check.\nCompilers, runtimes and project dependencies remain yours to install.\nSyntax uses Neovim defaults unless you supply an existing parser.",
+          ft = "markdown",
+        },
+      },
+    }
+    for _, problem in ipairs(require("uzume.extras.packs").errors) do
+      result[#result + 1] = {
+        id = problem.path,
+        action = "repair",
+        path = problem.path,
+        text = "Repair " .. vim.fs.basename(problem.path),
+        state = "invalid pack",
+        preview = { text = problem.error .. "\n\nEnter: edit definition. Restart after fixing.", ft = "text" },
+      }
+    end
     for _, entry in ipairs(M.catalog) do
       local lines = {
         "# " .. entry.name,
         "",
         entry.description,
+        "Source: " .. entry.source .. (entry.kind == "language" and " language pack" or " feature"),
         "",
         "Selected: " .. (draft[entry.id] and "Enabled" or "Disabled"),
         "Running now: " .. (M.active[entry.id] and "Enabled" or "Disabled"),
@@ -105,6 +158,23 @@ function M.show()
         "",
         "## Tools",
       }
+      if entry.spec then
+        vim.list_extend(lines, {
+          "Definition: " .. entry.path,
+          "Filetypes: " .. table.concat(entry.spec.filetypes, ", "),
+          "Syntax: "
+            .. (
+              entry.spec.syntax and (entry.spec.syntax .. " parser must already be installed")
+              or "Neovim default syntax"
+            ),
+          "",
+          "Prerequisites (not installed by Extras):",
+        })
+        for _, requirement in ipairs(entry.spec.prerequisites or {}) do
+          lines[#lines + 1] = "- " .. requirement
+        end
+        vim.list_extend(lines, { "- Project dependencies and language runtime/toolchain as needed.", "", "## Tools" })
+      end
       local missing, managed, pending, failed = false, true, false, false
       local function describe(tool, optional)
         local status = installer.status(tool)
@@ -143,7 +213,7 @@ function M.show()
           lines[#lines + 1] = "- " .. plugin.name .. " @ " .. plugin.commit:sub(1, 12)
         end
       end
-      if entry.id ~= "smear" then
+      if entry.kind == "language" and not entry.spec then
         lines[#lines + 1] = "- Native syntax resources (CSS/SCSS/LESS use Vim syntax)."
       end
       vim.list_extend(lines, {
@@ -153,15 +223,25 @@ function M.show()
         "Enter: toggle · Ctrl-s: save choices · Esc: discard draft",
         "Ctrl-r: install/retry this pack's required tools in Uzume storage",
         "Ctrl-g: Mason package browser, optional tools and installation logs",
+        "Ctrl-a: add a language · Ctrl-e: edit user pack (restart after edits)",
         "Pack activation changes require restart. New tools attach without restart.",
         "External tools are usable but not managed by Uzume. Installed view shows managed packs.",
         "Installation starts immediately; Escape does not cancel downloads.",
       })
-      if view == 1 or view == 2 and not managed or view == 3 and managed or view == 4 and draft[entry.id] then
+      local selected_view = views[view]
+      if
+        selected_view == "All"
+        or selected_view == "Languages" and entry.kind == "language"
+        or selected_view == "Features" and entry.kind == "feature"
+        or selected_view == "User" and entry.spec
+        or selected_view == "Available" and not managed
+        or selected_view == "Installed" and managed
+        or selected_view == "Enabled" and draft[entry.id]
+      then
         result[#result + 1] = {
           id = entry.id,
           entry = entry,
-          text = entry.name,
+          text = entry.name .. " · " .. entry.source .. " " .. entry.kind,
           enabled = draft[entry.id],
           unsaved = draft[entry.id] ~= M.desired[entry.id],
           restart = draft[entry.id] ~= M.active[entry.id],
@@ -183,6 +263,8 @@ function M.show()
   end
   local function keys(mode)
     return {
+      ["<C-a>"] = { "add_language", mode = mode, desc = "Add a User Language Pack" },
+      ["<C-e>"] = { "edit_pack", mode = mode, desc = "Edit User Language Pack" },
       ["<C-s>"] = { "save_extras", mode = mode, desc = "Save Extras Choices" },
       ["<Esc>"] = { "close", mode = mode, desc = "Close Extras" },
       ["<C-r>"] = { "install_pack", mode = mode, desc = "Install / Retry Language Pack" },
@@ -193,6 +275,7 @@ function M.show()
   local autocmd
   Snacks.picker({
     title = "Extras · All",
+    matcher = { fuzzy = false },
     items = items(),
     preview = "preview",
     layout = function()
@@ -205,7 +288,9 @@ function M.show()
           border = "rounded",
           title = " {title} · ✓ enabled · ○ disabled ",
           title_pos = "center",
-          footer = " Enter toggle · C-s save · C-r install · C-g tools · Esc cancel ",
+          footer = vim.o.columns >= 120
+              and " Enter toggle · C-s save · C-a add · C-e edit · C-r install · C-g Mason · Esc close "
+            or " Enter toggle · C-s save · C-a add · Esc close ",
           footer_pos = "center",
           {
             win = "input",
@@ -223,6 +308,13 @@ function M.show()
       }
     end,
     format = function(item)
+      if item.action then
+        return {
+          { item.action == "add" and "+ " or "! ", "DiagnosticInfo" },
+          { item.text },
+          { "  · " .. item.state, "Comment" },
+        }
+      end
       return {
         { item.enabled and "✓ " or "○ ", item.enabled and "DiagnosticOk" or "Comment" },
         { item.text },
@@ -232,12 +324,39 @@ function M.show()
       }
     end,
     confirm = function(picker, item)
-      if item then
+      if item and item.action then
+        picker:close()
+        vim.schedule(function()
+          if item.action == "add" then
+            require("uzume.extras.create").start()
+          else
+            vim.cmd.edit(vim.fn.fnameescape(item.path))
+          end
+        end)
+      elseif item then
         draft[item.id] = not draft[item.id]
         refresh(picker)
       end
     end,
     actions = {
+      add_language = function(picker)
+        picker:close()
+        vim.schedule(function()
+          require("uzume.extras.create").start()
+        end)
+      end,
+      edit_pack = function(picker)
+        local item = picker:current()
+        local file = item and (item.path or item.entry and item.entry.path)
+        if not file then
+          vim.notify("Select a user pack to edit its definition.", vim.log.levels.INFO)
+          return
+        end
+        picker:close()
+        vim.schedule(function()
+          vim.cmd.edit(vim.fn.fnameescape(file))
+        end)
+      end,
       save_extras = function(picker)
         local newly_enabled = {}
         for _, entry in ipairs(M.catalog) do
@@ -253,7 +372,7 @@ function M.show()
       end,
       install_pack = function(picker)
         local item = picker:current()
-        if item then
+        if item and item.entry then
           installer.install_pack(item.entry, true)
           refresh(picker)
         end
@@ -284,11 +403,23 @@ function M.show()
         vim.api.nvim_del_autocmd(autocmd)
       end
     end,
-    win = { input = { keys = keys({ "i", "n" }) }, list = { keys = keys("n") }, preview = { keys = keys("n") } },
+    win = {
+      input = { keys = keys({ "i", "n" }) },
+      list = { keys = keys("n") },
+      preview = { keys = keys("n"), wo = { wrap = true, linebreak = true } },
+    },
   })
 end
 
 function M.setup()
+  if #require("uzume.extras.packs").errors > 0 then
+    vim.schedule(function()
+      vim.notify(
+        "Some user language packs could not load. Space l shows errors and repair actions.",
+        vim.log.levels.WARN
+      )
+    end)
+  end
   vim.api.nvim_create_user_command("Extras", M.show, { desc = "Manage optional editor features" })
   vim.keymap.set("n", "<leader>l", M.show, { desc = "Extras", silent = true })
 end

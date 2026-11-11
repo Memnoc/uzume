@@ -29,7 +29,7 @@ controls remain primary. Preserve plain `nvim` and its existing configuration.
 | Area | Current behavior | Reason / boundary |
 | --- | --- | --- |
 | Editor | Rose Pine with scoped mauve accents, Snacks explorer/pickers/notifications, completion, Git signs, native LSP/diagnostics/inlay hints, formatting | Familiar, capable editing before bespoke AI UI; other colorschemes retain their palettes |
-| Extras | Own feature catalog on Space l; Rust, Lua, C/C++, web tooling, Smear Cursor; pinned Mason packages and opt-out automatic missing-tool install | Discoverable tool bundles without importing another distribution |
+| Extras | Own feature catalog on Space l; curated packs plus user JSON packs and Ctrl-a guided creation; pinned Mason packages and opt-out automatic missing-tool install | Discoverable tool bundles without importing another distribution |
 | Multiplexing | Project → Windows → Panes; native tabpages, splits and floats; Space w and Space p menus; ps/pS split down/up, pv/pV right/left | No tmux requirement, no second renderer, no extra session concept |
 | Pane motion | Slide enabled by default; Space uA selects Slide, Instant, Pulse or Spring | Native geometry, interruption handling, no extra renderer or dependency |
 | Tasks | Space ac/aC names a Codex/Claude branch and opens its worktree beside an idle CLI; ae/aE starts without a marked file; ab/aB selects/continues a branch | Separate writable directories prevent independent agents colliding; branch names alone do not |
@@ -155,8 +155,8 @@ inspect the remote and verification record for the completed publication state.
 
 ## Verification and how to continue safely
 
-Run `python3 tests/run.py` from the repository root. It runs 16 cases sequentially:
-namespace migration; installer registration and conflict refusal; dashboard resizing; pane motion, restoration and interruption; normal and forced-exit agent cleanup; saved-state inheritance;
+Run `python3 tests/run.py` from the repository root. It runs 21 cases sequentially:
+namespace migration; installer registration and conflict refusal; dashboard resizing; shortcut search/audit; floating command line; user language packs and creation UI; pane motion, restoration and interruption; normal and forced-exit agent cleanup; saved-state inheritance;
 task navigation; named and existing-branch launch; review; comments; Codex and
 Claude feedback; normal and diff3 conflict integration. Each uses real Neovim/PTY
 and real disposable Git repositories, with mock external CLIs and isolated XDG
@@ -207,6 +207,23 @@ The harness verifies the adapters' contract, not every live vendor CLI release.
 Manual Codex and Claude trials have informed the workflow, but upgrades still
 need live smoke tests. Terminal appearance/frame rate needs real Ghostty/WezTerm
 evaluation; a passing PTY test cannot establish perceived smoothness.
+
+## Final feature increment: user packs and command line
+
+See [ADR-0010](adr/0010-user-language-packs.md) and the
+[user-pack guide](features/user-language-packs.md). Definitions are in the config
+sibling `uzume-user/languages`, never inside the source checkout. Invalid packs
+are isolated and shown for repair. No user parser installer or plugin marketplace
+was added. New Noice/Nui pins require rebuilding the package bundle before startup.
+Noice owns command input/completion only; Snacks still owns notifications.
+
+Linux CI's Neovim 0.11 restore failure was reproduced locally: routine file-position
+messages caused a hit-enter prompt while sourcing a saved layout. `silent source`
+suppresses normal output while preserving real errors; the existing agent/crash
+regressions exercise restoration. Do not replace this with `silent!` or just raise
+the RPC timeout. The new user preference is to freeze feature expansion here and
+concentrate on polishing and bug fixes; the broader backlog below is not an
+instruction to add more features in the next iteration.
 
 ## Next work, in order
 

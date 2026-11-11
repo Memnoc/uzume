@@ -26,25 +26,12 @@ need their Rust toolchain and rustfmt, and C/C++ projects need their compiler an
 build configuration. Mason does not install those project/runtime dependencies.
 See [tool installation](tool-installation.md) for prerequisites and error recovery.
 
-For a language outside the current catalog, there is **no install-everything
-button yet**. Mason can install its packages, but that alone does not configure
-its LSP, formatting, syntax or automatic installation in Uzume. Adding a supported
-pack currently involves maintained configuration changes:
-
-- Add the pack and required/optional tools in `editor/lua/uzume/editor/extras.lua`,
-  including the `languages` activation check.
-- Add package names and filetype triggers in `editor/lua/uzume/editor/installer.lua`
-  and reviewed tool version pins in `editor/tools.lock.json`.
-- Wire the native LSP, formatter and syntax/filetype settings in
-  `editor/lua/uzume/editor/languages.lua`.
-- If Treesitter syntax or an extra plugin is needed, pin its sources in
-  `editor/plugins.lock.json`, adjust package loading if needed, and rerun
-  `python3 setup-editor` to build the updated bundle for the host.
-- Test server attachment, diagnostics, navigation and formatting in a real sample
-  project, plus installation on the supported platforms, before shipping the pack.
-
-A generic user-defined pack interface remains future work. The bundled packs
-below are the supported end-to-end installation path today.
+For a language outside the catalog, use **Space l → Ctrl-a** to create a user
+language pack. Choose its server and formatter, inspect prerequisites, then enable,
+save and restart. **Ctrl-e** edits its definition outside the distribution checkout.
+See [User language packs](user-language-packs.md) for the walkthrough, schema,
+manual definitions and boundaries. Mason installation alone still does not configure
+a language; the pack supplies that wiring.
 
 ## Language packs
 

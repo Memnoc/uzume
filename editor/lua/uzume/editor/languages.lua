@@ -148,10 +148,62 @@ function M.setup()
     require("nvim-ts-autotag").setup()
   end
 
+  local custom_formatters = {}
+  for _, entry in ipairs(extras.catalog) do
+    if entry.spec and extras.enabled(entry.id) then
+      local spec = entry.spec
+      local extensions = {}
+      for _, ext in ipairs(spec.extensions or {}) do
+        extensions[ext] = spec.filetypes[1]
+      end
+      vim.filetype.add({ extension = extensions })
+      for _, item in ipairs(spec.servers or {}) do
+        local ok, base = pcall(function()
+          return vim.lsp.config[item.name]
+        end)
+        local config = vim.tbl_deep_extend(
+          "force",
+          {},
+          ok and base or {},
+          item.config or {},
+          { filetypes = spec.filetypes, name = item.name }
+        )
+        local name = "uzume_" .. entry.id:sub(6) .. "_" .. item.name
+        server(name, item.command, item.args, config)
+      end
+      local chain = {}
+      for _, item in ipairs(spec.formatters or {}) do
+        local name = "uzume_" .. entry.id:sub(6) .. "_" .. item.name
+        local ok, definition = pcall(require, "conform.formatters." .. item.name)
+        definition = ok and type(definition) == "table" and vim.deepcopy(definition) or { stdin = true }
+        definition.inherit = false
+        definition.command = function()
+          return tools.find(item.command) or item.command
+        end
+        if item.args then
+          definition.args = item.args
+        end
+        if item.stdin ~= nil then
+          definition.stdin = item.stdin
+        end
+        custom_formatters[name] = definition
+        chain[#chain + 1] = name
+      end
+      for _, ft in ipairs(spec.filetypes) do
+        if #chain > 0 then
+          formatters[ft] = chain
+        end
+        if spec.syntax then
+          vim.treesitter.language.register(spec.syntax, ft)
+          syntax[ft] = true
+        end
+      end
+    end
+  end
   vim.g.uzume_autoformat = true
   require("conform").setup({
     formatters_by_ft = formatters,
-    formatters = {
+    formatters = vim.tbl_extend("force", custom_formatters, {
       rustfmt = {
         command = function()
           return tools.find("rustfmt") or "rustfmt"
@@ -167,7 +219,7 @@ function M.setup()
           return tools.prettier(ctx.filename) or "prettier"
         end,
       },
-    },
+    }),
     format_on_save = function(buf)
       if vim.g.uzume_autoformat and vim.b[buf].uzume_autoformat ~= false then
         return { timeout_ms = 2000, lsp_format = "fallback" }

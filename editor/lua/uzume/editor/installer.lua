@@ -17,20 +17,7 @@ end
 M.lock = read(vim.fn.stdpath("config") .. "/tools.lock.json", {})
 M.failures = read(data .. "/tool-failures.json", {})
 M.auto = read(data .. "/tool-settings.json", {}).auto_install ~= false
-M.packages = {
-  ["rust-analyzer"] = "rust-analyzer",
-  ["lua-language-server"] = "lua-language-server",
-  stylua = "stylua",
-  clangd = "clangd",
-  vtsls = "vtsls",
-  ["vscode-html-language-server"] = "html-lsp",
-  ["vscode-css-language-server"] = "css-lsp",
-  ["vscode-json-language-server"] = "json-lsp",
-  ["vscode-eslint-language-server"] = "eslint-lsp",
-  prettier = "prettier",
-  ["tailwindcss-language-server"] = "tailwindcss-language-server",
-  ["emmet-ls"] = "emmet-ls",
-}
+M.packages = vim.deepcopy(require("uzume.extras.tool_packages"))
 -- Only these filetypes trigger installs. Optional integrations remain explicit.
 M.filetypes = {
   rust = { "rust", "rust-analyzer", "rustfmt" },
@@ -48,6 +35,24 @@ M.filetypes = {
   json = { "web", "vscode-json-language-server", "prettier" },
   jsonc = { "web", "vscode-json-language-server", "prettier" },
 }
+function M.register_user_packs()
+  for _, entry in ipairs(require("uzume.editor.extras").catalog) do
+    if entry.spec then
+      for _, group in ipairs({ "servers", "formatters" }) do
+        for _, tool in ipairs(entry.spec[group] or {}) do
+          if tool.package then
+            M.packages[tool.command] = tool.package
+            M.lock.packages[tool.package] = tool.version
+          end
+        end
+      end
+      for _, ft in ipairs(entry.spec.filetypes) do
+        M.filetypes[ft] = vim.list_extend({ entry.id }, entry.tools)
+      end
+    end
+  end
+end
+M.register_user_packs()
 local function changed()
   vim.api.nvim_exec_autocmds("User", { pattern = "UzumeToolsChanged", modeline = false })
 end
@@ -78,6 +83,20 @@ local function registry_ready(callback)
       done(ok)
     end
   end))
+end
+
+-- The add-language UI uses the same checksum-verified registry as installation.
+function M.catalog(callback)
+  registry_ready(function(ok)
+    if not ok then
+      notice(
+        "Pinned registry unavailable. Existing packs still work; retry Add Language when online.",
+        vim.log.levels.WARN
+      )
+      return
+    end
+    callback(read(tools.root .. "/registries/github/mason-org/mason-registry/registry.json", {}))
+  end)
 end
 
 function M.status(name)
@@ -138,7 +157,11 @@ function M.ensure(name, explicit)
   local package = M.packages[name]
   if not package then
     if not tools.find(name) then
-      finish(false, "Install rustfmt with your Rust toolchain: rustup component add rustfmt")
+      finish(
+        false,
+        name == "rustfmt" and "Install rustfmt with your Rust toolchain: rustup component add rustfmt"
+          or "Install " .. name .. " on PATH, or set a Mason package and version in the user pack"
+      )
     end
     return
   end

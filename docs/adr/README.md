@@ -11,6 +11,7 @@
 | [0007](0007-local-reviewed-delta-integration.md) | Integrate reviewed task deltas into explicit local destinations | accepted | 2026-11-11 |
 | [0008](0008-source-based-installation.md) | Install from pinned sources and register a standalone launcher | accepted | 2026-11-11 |
 | [0009](0009-uzume-namespace-migration.md) | Canonical Uzume namespaces with safe legacy-path migration | accepted | 2026-11-11 |
+| [0010](0010-user-language-packs.md) | Extend Extras with independent declarative user language packs | accepted | 2026-11-11 |
 
 The 2026-11-08 [domain refinement](../design.md#projects-windows-panes-and-concurrent-work)
 replaces user-facing sessions with projects containing windows and panes. ADR

@@ -13,6 +13,7 @@ records preserve what was actually checked at each increment.
 | Default Slide, Instant, Pulse/Spring alternatives and saved mode | [Pane animations](pane-animations.md) |
 | Git changes, diagnostics, undo and recovery | [Editor and navigation](editor.md#reading-changes-and-recovery) |
 | Optional packs, menu icons, saving choices | [Extras](../../editor/EXTRAS.md) |
+| Add unsupported languages without modifying core; local JSON definitions | [User language packs](user-language-packs.md) |
 | Available/installed catalog, Mason, file-triggered tools, retry controls | [Tool installation](tool-installation.md) |
 | Rust, Lua, C/C++, TypeScript/React, HTML/CSS, completion and formatting | [Languages](languages.md) |
 | Cursor animation and its controls | [Cursor animation](languages.md#cursor-animation) |
