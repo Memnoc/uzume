@@ -135,29 +135,13 @@ The initial reference terminals are Ghostty and WezTerm on macOS and Linux. Kitt
 
 The Uzume name and cave-and-sun logo are established. Rust component boundaries and the production dependency set remain open.
 
-## Repository layout
+## Architecture
 
 ```mermaid
 flowchart LR
-    root["Uzume"] --> editor["editor/<br/>Active distribution"]
-    root --> install["installer/ · setup-editor<br/>Installation and launcher"]
-    root --> tests["tests/<br/>Workflow regressions"]
-    root --> docs["docs/<br/>Guides, decisions and handoff"]
-    root --> spikes["spikes/ · spike<br/>Historical experiments"]
-
-    editor --> lua["lua/uzume/<br/>Editor, UI, panes and agent workflows"]
-    editor --> helpers["agent/ · review/<br/>Python process and Git helpers"]
-
-    classDef default fill:#1f1d2e,stroke:#c4a7e7,color:#e0d4eb,stroke-width:1px
-    classDef brand fill:#c4a7e7,stroke:#c4a7e7,color:#191724,stroke-width:2px
-    classDef historical fill:#1f1d2e,stroke:#8b7c98,color:#a99ab8,stroke-dasharray:4 4
-    class root brand
-    class spikes historical
+    editor["Neovim UI · Lua"] --> helpers["Process and Git helpers · Python"]
+    helpers --> tools["Git · Codex · Claude"]
 ```
 
-Historical experiments are never loaded by the installed editor.
-
-`editor/lua/uzume/editor/` contains the editor's core modules. Agent, review,
-integration and layout modules live beside it under `uzume/`. See the
-[Lua map](editor/lua/README.md). Compatibility links may remain at old storage
-paths after migration so existing worktrees and saved records keep working.
+The editor lives in `editor/`; installation, tests and documentation live in
+`installer/`, `tests/` and `docs/`. See the [Lua map](editor/lua/README.md) for module details.
