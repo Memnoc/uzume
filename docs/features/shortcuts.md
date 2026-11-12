@@ -42,6 +42,7 @@ appear in their own buffers. Optional plugins and executables can add mappings.
 | --- | --- |
 | Space ap / as; ww / aw | Project navigator; window navigator |
 | Space wn / wN; w[ / w]; wd | New editor/shell window; previous/next project window; confirm close |
+| Space wi | Inspect window project, branch, checkout and file |
 | Space ws / wR | Save local file layout / restore it from a fresh empty editor |
 | Space ps / pS; pv / pV | Split editor down/up; right/left |
 | Space - / Space pipe | Existing down/right split aliases |
@@ -64,7 +65,7 @@ Layout restore retains its existing guard against replacing an active editor.
 Inside the project/window navigator: **n/e/N** creates a shell window/editor
 window/opens a project directory; **r** renames; **x then y** confirms close;
 **s** saves layout; **/** filters; **Ctrl-u** clears; **j/k or arrows** move;
-**Enter** opens; **q/Esc** closes. These actions have searchable descriptions.
+**Enter** opens; **?** shows all controls; **q/Esc** closes. These actions have searchable descriptions.
 
 ## Agents, review and integration
 
@@ -78,10 +79,10 @@ window/opens a project directory; **r** renames; **x then y** confirms close;
 | Space vc / vC / vs | Comment on review lines; inspect comments; preview feedback to send |
 | Space vi / vI | Local integration/continue; integration history |
 
-Review buffers expose **f/u/R/q/C/s/i/c/Tab** for files, diff layout, refresh,
+Review buffers expose **?** for the full guide and **f/u/R/q/C/s/i/c/Tab** for files, diff layout, refresh,
 close, comments, feedback, integration, comment and switch side. Feedback uses
 **a** to send/focus, **Ctrl-s** to queue, **x** to cancel queued feedback and **r**
-to refresh status. Integration uses **a** to apply a preview, **f** for files,
+to refresh status. Integration exposes **?** for its guide and uses **a** to apply a preview, **f** for files,
 **c** to continue and **x** for confirmed abort when applicable. Conflict actions
 are available through **Space vm** in conflict buffers. Actions appear only when
 valid for that surface/state; adding descriptions does not bypass confirmations.
@@ -93,7 +94,7 @@ omitted their action context, command-only Mason/layout entry points, and unname
 navigator/integration/feedback controls. These are now covered. Existing bindings
 were retained; **Space pN** groups shell directions to avoid a long flat menu.
 
-`tests/shortcut_audit.py` verifies 144 core leader bindings, descriptions,
+`tests/shortcut_audit.py` verifies 145 core leader bindings, descriptions,
 action-prefix collisions, navigator search and guarded layout persistence.
 A temporary startup observer recorded 241 mapping registrations with no
 replacement collisions, rather than relying only on the final keymap table.

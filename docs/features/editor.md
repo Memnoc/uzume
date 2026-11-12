@@ -235,6 +235,26 @@ restore file position, highlight yanks and check external file changes on focus,
 buffer entry and terminal exit. File saving remains explicit: recovery is not
 source autosave. State stays in uzume's own Neovim directories.
 
+## Window and checkout context
+
+The statusline identifies **Project**, **Task** or **Integration**, followed by the
+actual branch of that window's checkout. It does not take the branch from an
+unrelated file you happen to open. Long project/branch labels shorten to fit.
+**Space wi** opens the complete project/window labels, branch, checkout directory,
+project directory and current file. Press **r** to refresh; **q/Esc** closes.
+
+Opening a file outside the checkout displays **Outside checkout** in the
+statusline. The context dialog explains that edits affect that file; opening it
+does not switch the window's checkout or send it to an agent. This is an
+informational warning, not an editing restriction or an unsaved-change check.
+
+[location.lua](../../editor/lua/uzume/ui/location.lua) owns checkout identity and
+asynchronous read-only Git queries. Its in-memory branch cache throttles queries
+to once per two seconds per directory. Editor activity triggers refreshes;
+explicit refresh bypasses the interval. Detached HEAD shows the short commit.
+No preference or repository data is written. `tests/workspace_context.py` covers
+external branch changes, detached HEAD, cross-checkout files and the detail view.
+
 ## Verification and limits
 
 The [baseline record](../prototypes/0003-editor-baseline.md) documents real PTY

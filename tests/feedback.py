@@ -59,6 +59,17 @@ try:
     action_text = lua('table.concat(vim.api.nvim_buf_get_lines(vim.api.nvim_win_get_buf(' + str(actions) + '),0,-1,false),"\\n")')
     assert '[a] Send to agent' in action_text and '[Ctrl-s] Queue only' in action_text
     assert js('vim.api.nvim_win_get_position(' + str(actions) + ')[1]') > js('vim.api.nvim_win_get_position(0)[1]')
+    original_columns = js('vim.o.columns')
+    for columns in (60, 80, original_columns):
+        do('vim.o.columns=' + str(columns) + '; vim.api.nvim_exec_autocmds("VimResized",{})')
+        time.sleep(0.25)
+        rows = js('vim.api.nvim_buf_get_lines(vim.api.nvim_win_get_buf(' + str(actions) + '),0,-1,false)')
+        width = js('vim.api.nvim_win_get_width(' + str(actions) + ')')
+        height = js('vim.api.nvim_win_get_height(' + str(actions) + ')')
+        assert len(rows) <= height, ('Action rows hidden', columns, rows, height)
+        for row in rows:
+            assert js('vim.fn.strdisplaywidth(' + json.dumps(row, ensure_ascii=False) + ')') <= width, (columns, row, width)
+        assert all(key in '\n'.join(rows) for key in ('[a]', '[Ctrl-s]', '[x]', '[r]', '[q / Esc]'))
     assert hook(agent, 'Stop') == {}, 'Preview sent unsent drafts'
     keys('<C-s>')
     wait(lambda: 'QUEUED' in text())

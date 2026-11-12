@@ -30,6 +30,7 @@ controls remain primary. Preserve plain `nvim` and its existing configuration.
 | --- | --- | --- |
 | Editor | Named Uzume colorscheme (mauve/orange), Snacks explorer/pickers/notifications, completion, Git signs, native LSP/diagnostics/inlay hints, formatting | Pinned Rose Pine renderer with isolated options; original Rose Pine and other themes retain their palettes |
 | Extras | Own feature catalog on Space l; curated packs plus user JSON packs and Ctrl-a guided creation; pinned Mason packages and opt-out automatic missing-tool install | Discoverable tool bundles without importing another distribution |
+| Checkout visibility | Statusline uses the window checkout branch; Space wi shows full paths and warns about an outside file | Async cached read-only Git; opening a reference does not switch checkout or supply agent context |
 | Multiplexing | Project → Windows → Panes; native tabpages, splits and floats; Space w and Space p menus; ps/pS split down/up, pv/pV right/left | No tmux requirement, no second renderer, no extra session concept |
 | Pane motion | Slide enabled by default; Space uA selects Slide, Instant, Pulse or Spring | Native geometry, interruption handling, no extra renderer or dependency |
 | Tasks | Space ac/aC names a Codex/Claude branch and opens its worktree beside an idle CLI; ae/aE starts without a marked file; ab/aB selects/continues a branch | Separate writable directories prevent independent agents colliding; branch names alone do not |
@@ -59,6 +60,7 @@ bindings, context-dependent menus and regression coverage.
 | `editor/init.lua`, `editor/lua/uzume/editor/` | Bootstrap, native package load, editor options, Extras/languages/tools, UI/keymaps |
 | `setup-editor`, `editor/plugins.lock.json`, `editor/tools.lock.json` | Exact plugin bundle installation, pinned grammar/query sources, selected tool versions; optional standalone launcher registration |
 | `uzume/editor/projects.lua`, `sessions.lua`, `panes.lua`, `navigator.lua` | Product grouping, layout persistence, pane operations and pickers; native window terminology differs from product Window |
+| `uzume/ui/location.lua`, `text.lua`, `help.lua` | Window checkout identity, terminal-cell label sizing and shared scrollable menu guides |
 | `uzume/editor/branding.lua`, `ui.lua` | Logo and whole-dashboard size budget; dashboard-only viewport correction |
 | `uzume/agents/init.lua`, `views.lua`, `input.lua`, `context.lua` | Agent lifecycle/UI, meaningful labels/icons, terminal routing and explicit file context |
 | `uzume/agents/branches.lua`, `worktrees.lua`, `editor.lua`, `buffers.lua` | Named or existing task launch, checkout/baseline identity, left editor pane and buffer scoping |
@@ -291,3 +293,24 @@ The historical observation record is available with:
 `git show spike/pane-animations:docs/prototypes/0009-pane-animations.md`.
 The existing ADRs cover native pane ownership and isolated agent lifetimes;
 this reversible motion preference does not change those architectural decisions.
+
+## Checkout and menu polish (2026-11-12)
+
+Project/window navigation follows the selected theme and fits smaller terminals.
+Selected checkout details sit below its list; ? shows controls when the compact
+footer cannot fit them. Review and integration use concise titles and ? guides.
+Feedback retains an always-visible action area, now wrapping on resize. Agent
+and changed-file pickers separate their title from Enter/Esc hints.
+
+`tests/workspace_context.py` is included in the consolidated suite, covering
+branch changes, detached HEAD, outside-checkout files and light/dark/narrow menus.
+Review tests exercise help return; both feedback fixtures exercise action resizing.
+This pass adds no cleanup policy, preference persistence or process-performance
+claims. Batch cleanup ergonomics, sustained concurrent-agent load testing and
+persistent theme selection remain possible follow-up polish.
+
+Verification: all **23/23** consolidated cases passed on macOS with the installed
+Neovim 0.12 development build. Checkout/menu tests and Codex feedback also passed
+on minimum Neovim 0.11.0. The updated shortcut audit covers 145 core bindings;
+StyLua and whitespace checks pass. Linux verification is delegated to CI after
+publishing; these local checks are not Linux runtime evidence.

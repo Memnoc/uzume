@@ -62,6 +62,8 @@ accelerate plugin installation. Syntax parsers are built locally.
    and **N** prompts for a project directory. Each window keeps its own panes.
    A new editor window shows its project/name/path and the explorer, not an unnamed file.
    **Space fn** starts a real new file; **Ctrl-s** asks for its name on first save.
+   **Space wi** shows the window checkout, actual branch and file location.
+   In navigators, **?** opens the complete key guide.
    The menus show rename, confirmed close, local
    layout save and filter controls. See [Native navigators](../docs/features/navigators.md)
    for the full workflow and restore limits.

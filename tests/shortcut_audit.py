@@ -8,7 +8,7 @@ GROUPS = {
     'files': ['e', 'E', 'fe', 'fE', ' ', 'ff', 'fF', 'fg', 'fr', 'fR', 'fp', 'fc', 'fn', ',', 'fb'],
     'search': ['/', 'sg', 'sG', 'sw', 'sb', 'sB', ':', 'sc', 'sC', 'sh', 's"', 'sj', 'sm', 'sR', 'sd', 'sD', 'su', 'n'],
     'buffers': ['bp', 'bj', 'bb', '`', 'bd', 'bo', 'bD'],
-    'projects/windows': ['ap', 'as', 'aw', 'ww', 'wn', 'wN', 'w]', 'w[', 'wd', 'ws', 'wR'],
+    'projects/windows': ['ap', 'as', 'aw', 'ww', 'wn', 'wN', 'w]', 'w[', 'wd', 'wi', 'ws', 'wR'],
     'panes': ['-', '|', 'ps', 'pS', 'pv', 'pV', 'pt', 'pT', 'pNh', 'pNj', 'pNk', 'pNl',
               'pp', 'pf', 'pm', 'pz', 'pr', 'px', 'po', 'pd', 'pgh', 'pgj', 'pgk', 'pgl',
               'pMh', 'pMj', 'pMk', 'pMl', 'pR>', 'pR<', 'pR+', 'pR-', 'pR='],

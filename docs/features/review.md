@@ -26,7 +26,7 @@ this first version.
 Side-by-side is the default: the starting commit is on the left, captured task
 content on the right. Review opens above the existing workspace without
 rearranging its editor and agent panes. Both sides are read-only. Mouse clicks
-or Tab select either side. The footer lists local shortcuts. Existing editor diffs
+or Tab select either side. The footer shows the main shortcuts and **?** opens the full scrollable key guide. Narrow panes keep the ?/q hints; task-side titles identify the branch. **Esc** also closes review. Existing editor diffs
 are temporarily excluded from comparison and restored when review closes.
 The toggle retains the nearest corresponding source line when that line appears
 in the unified patch. It never silently changes mode to fit a narrow terminal.
@@ -106,7 +106,7 @@ supplied feedback batch.
    continuation. **Ctrl-s** remains queue-only: it leaves focus in review and does
    not submit terminal input. Saving a comment or previewing alone sends nothing.
 5. **r** refreshes delivery status. **x** cancels a pending batch. **q** returns to
-   review. A fixed, two-line action bar stays at the bottom while you scroll the
+   review. A separate action bar wraps to the available width and stays at the bottom while you scroll the
    preview. Highlighted keys distinguish **a — Send to agent** from
    **Ctrl-s — Queue only**; cancel, refresh and back sit on the second line.
    The queued status also points to **a**, so you do not need to type a separate
@@ -200,3 +200,7 @@ preview versus publication, single-use delivery, cancellation, outdated excerpts
 additive file context, ignored worker/permission events, edited comment versions,
 restart isolation, private batch storage, automatic idle prompting, busy queues,
 permission-dialog protection and existing draft handling. They make no model requests.
+
+The changed-file picker keeps its title focused on the task and places
+Enter/Esc hints in the footer. Feedback action-bar resize checks cover 60 and
+80 columns, retaining every action without clipping its row.

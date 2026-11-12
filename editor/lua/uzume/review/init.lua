@@ -3,11 +3,22 @@ local M = {}
 local api = vim.api
 local script = require("uzume.core.paths").file("review/snapshot.py")
 local labels = { A = "+ Added", M = "~ Modified", D = "- Deleted", T = "~ Type changed", U = "! Unmerged" }
-local function footer(state)
-  return (state.stale and " New changes · R refresh " or " R refresh ")
-    .. "· c comment · C list"
-    .. (state.comment_count and (" (" .. state.comment_count .. ")") or "")
-    .. " · s send · i integrate · f files · u diff · q close "
+local display = require("uzume.ui.text")
+local review_keys = {
+  "c comment on the current line or selection",
+  "C list review comments",
+  "s send review feedback",
+  "i integrate reviewed changes locally",
+  "f choose a changed file",
+  "u toggle side-by-side / unified diff",
+  "R refresh the snapshot",
+  "Tab switch review side",
+  "q / Esc close review",
+}
+local function footer(state, width)
+  local prefix = state.stale and "New changes · " or ""
+  local keys = width >= 64 and "c comment · s send · f files · ? keys · q close" or "? keys · q close"
+  return " " .. display.fit(prefix .. keys, width - 2) .. " "
 end
 local function notify(message, level)
   vim.notify(message, level or vim.log.levels.INFO, { title = "Task review" })
@@ -20,7 +31,7 @@ local function update_comments(state)
   state.comment_count = ok and #comments or nil
   for _, win in ipairs(state.views) do
     if api.nvim_win_is_valid(win) then
-      api.nvim_win_set_config(win, { footer = footer(state) })
+      api.nvim_win_set_config(win, { footer = footer(state, api.nvim_win_get_width(win)) })
     end
   end
 end
@@ -222,9 +233,9 @@ function M.show(index)
       height = height,
       style = "minimal",
       border = "rounded",
-      title = " " .. title .. " ",
+      title = " " .. display.fit(title, pane_width - 2) .. " ",
       title_pos = "center",
-      footer = footer(state),
+      footer = footer(state, pane_width),
       footer_pos = "center",
     })
     state.views[#state.views + 1] = win
@@ -232,6 +243,13 @@ function M.show(index)
     vim.bo[buf].filetype = ft or "text"
     for key, action in pairs({
       q = { M.close, "Close Review" },
+      ["<Esc>"] = { M.close, "Close Review" },
+      ["?"] = {
+        function()
+          require("uzume.ui.help").open("Review keys", review_keys)
+        end,
+        "Review Key Guide",
+      },
       f = { M.files, "Review Changed Files" },
       u = { M.toggle, "Toggle Unified Diff" },
       R = { M.refresh, "Refresh Review Snapshot" },
@@ -265,7 +283,13 @@ function M.show(index)
     local half = math.floor((width - 3) / 2)
     local ft = vim.filetype.match({ filename = file.path }) or "text"
     pane(file.before, "Base " .. state.task.base:sub(1, 7) .. " · " .. title, 2, half, ft)
-    pane(file.after, "Task · " .. title, half + 5, width - half - 3, ft)
+    pane(
+      file.after,
+      "Task " .. (state.task.branch or state.task.label) .. " · " .. title,
+      half + 5,
+      width - half - 3,
+      ft
+    )
   else
     pane(file.patch, (file.note and "Preview unavailable · " or "Unified · ") .. title, 2, width, "diff")
     vim.keymap.set("n", "]c", function()
@@ -314,13 +338,21 @@ function M.files()
     state.picker:close()
   end
   state.picker = Snacks.picker({
-    title = "Task changes · " .. state.task.label .. " · Enter review · Esc cancel",
+    title = "Task changes · " .. (state.task.branch or state.task.label),
     items = vim.tbl_map(function(file)
       return { index = file.index, path = file.path, status = file.status, text = file.text }
     end, state.snapshot.files),
     format = "text",
     preview = "none",
-    layout = { preset = "select" },
+    layout = {
+      preset = "select",
+      config = function(layout)
+        layout.layout[1].footer = " Enter review · Esc close "
+        layout.layout[1].footer_pos = "center"
+        return layout
+      end,
+    },
+    win = { input = { keys = { ["<Esc>"] = { "close", mode = { "i", "n" } } } } },
     confirm = function(picker, entry)
       picker:close()
       -- Snacks closes its layout on the next tick. Replace review windows only
@@ -423,7 +455,7 @@ local function watch(state)
             state.stale = true
             for _, win in ipairs(state.views) do
               if api.nvim_win_is_valid(win) then
-                api.nvim_win_set_config(win, { footer = footer(state) })
+                api.nvim_win_set_config(win, { footer = footer(state, api.nvim_win_get_width(win)) })
               end
             end
           end

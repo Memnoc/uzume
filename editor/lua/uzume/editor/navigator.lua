@@ -1,43 +1,45 @@
--- EDITOR SPIKE: reproduce the supplied Drudwyn navigator surfaces with native floats.
+-- Project and window navigation in native floats.
 local M = {}
 local api = vim.api
 local projects = require("uzume.editor.projects")
 local native = require("uzume.editor.sessions")
 local ns = api.nvim_create_namespace("uzume.editor.navigator")
 local groups = {
-  Normal = { fg = "#e0def4", bg = "#191724" },
-  Muted = { fg = "#6e6a86", bg = "#191724" },
-  Selected = { fg = "#ea9a97", bg = "#191724", bold = true },
-  Active = { fg = "#3e8fb0", bg = "#191724" },
-  Border = { fg = "#e0def4", bg = "#191724" },
+  Normal = "NormalFloat",
+  Muted = "Comment",
+  Selected = "PmenuSel",
+  Active = "Title",
+  Border = "FloatBorder",
+}
+local text = require("uzume.ui.text")
+local clean, fit = text.clean, text.fit
+local actions = {
+  "Enter open",
+  "n shell",
+  "e editor",
+  "N project",
+  "j/k select",
+  "r rename",
+  "x close item",
+  "s save layout",
+  "/ filter",
+  "Ctrl-u clear",
+  "? keys",
+  "Esc close",
 }
 local function colors()
-  for name, value in pairs(groups) do
-    api.nvim_set_hl(0, "AiNav" .. name, value)
+  for name, link in pairs(groups) do
+    api.nvim_set_hl(0, "UzumeNav" .. name, { link = link })
   end
-end
-local function clean(text)
-  return tostring(text or ""):gsub("[%c]", " ")
-end
-local function fit(text, width)
-  if width <= 0 then
-    return ""
-  end
-  text = clean(text)
-  if vim.fn.strdisplaywidth(text) <= width then
-    return text
-  end
-  while vim.fn.strdisplaywidth(text .. "…") > width and text ~= "" do
-    text = vim.fn.strcharpart(text, 0, vim.fn.strchars(text) - 1)
-  end
-  return text .. "…"
 end
 local function geometry(kind)
   kind = kind or (M.current and M.current.kind)
   local width =
-    math.max(20, math.min(vim.o.columns - 4, math.floor(vim.o.columns * (kind == "projects" and 0.85 or 0.9))))
-  local height =
-    math.max(16, math.min(vim.o.lines - 4, math.floor((vim.o.lines - 2) * (kind == "projects" and 0.75 or 0.82))))
+    math.max(1, math.min(vim.o.columns - 4, math.floor(vim.o.columns * (kind == "projects" and 0.85 or 0.9))))
+  local height = math.max(
+    1,
+    math.min(vim.o.lines - 4, math.max(16, math.floor((vim.o.lines - 2) * (kind == "projects" and 0.75 or 0.82))))
+  )
   return {
     relative = "editor",
     row = math.floor((vim.o.lines - height - 2) / 2),
@@ -90,7 +92,8 @@ local function snapshot(kind)
   return all, entries
 end
 local function configure(win)
-  vim.wo[win].winhighlight = "Normal:AiNavNormal,NormalFloat:AiNavNormal,FloatBorder:AiNavBorder,Cursor:AiNavNormal"
+  vim.wo[win].winhighlight =
+    "Normal:UzumeNavNormal,NormalFloat:UzumeNavNormal,FloatBorder:UzumeNavBorder,Cursor:UzumeNavNormal"
   vim.wo[win].wrap = false
   vim.wo[win].cursorline = false
   vim.wo[win].winblend = 0
@@ -160,7 +163,7 @@ local function draw()
     local padding = math.max(0, col - vim.fn.strdisplaywidth(before))
     local start = #before + padding
     lines[row + 1] = before .. string.rep(" ", padding) .. text
-    highlights[#highlights + 1] = { row, start, #lines[row + 1], "AiNav" .. (group or "Normal") }
+    highlights[#highlights + 1] = { row, start, #lines[row + 1], "UzumeNav" .. (group or "Normal") }
   end
   local function rule(row, group)
     put(row, 0, string.rep("─", width), group or "Border")
@@ -184,25 +187,18 @@ local function draw()
     put(2, 1, summary, "Muted")
   end
   rule(3)
-  local footer = "n shell  e editor  N project  j/k move  Enter "
-    .. (s.kind == "projects" and "switch" or "jump")
-    .. "  r rename  x close  s save  / filter  Esc close"
-  if s.input then
-    footer = "Type " .. (s.input_label or "text") .. "  Ctrl-u clear  Enter apply  Esc cancel"
+  local footer_lines = text.wrap(s.input and {
+    "Enter apply",
+    "Esc cancel",
+    "Ctrl-u clear",
+  } or actions, width)
+  if not s.input and (#footer_lines > 3 or height < 20) then
+    footer_lines = text.wrap({ "Enter open", "? keys", "Esc close" }, width)
   end
-  local footer_rows = vim.fn.strdisplaywidth(footer) > width and 2 or 1
-  local footer_top = height - footer_rows - 2
+  local footer_top = height - #footer_lines - 2
   rule(footer_top, "Muted")
-  if footer_rows == 1 or s.input then
-    put(footer_top + 1, 0, footer, "Muted")
-  else
-    put(
-      footer_top + 1,
-      0,
-      "n shell  e editor  N project  j/k move  Enter " .. (s.kind == "projects" and "switch" or "jump"),
-      "Muted"
-    )
-    put(footer_top + 2, 0, "r rename  x close  s save  / filter  Esc close", "Muted")
+  for index, line in ipairs(footer_lines) do
+    put(footer_top + index, 0, line, "Muted")
   end
   local function render_rows(list, top, bottom, group_name)
     if group_name then
@@ -251,7 +247,9 @@ local function draw()
     end
   end
   if s.kind == "projects" then
-    render_rows(items, 5, footer_top - 2)
+    render_rows(items, 5, footer_top - 5)
+  elseif height < 24 then
+    render_rows(items, 4, footer_top - 5, "WINDOWS / AGENTS")
   else
     local work, workers = {}, {}
     for _, item in ipairs(items) do
@@ -259,10 +257,18 @@ local function draw()
     end
     -- Navigation order follows the two visible groups, as in the screenshots.
     s.items = vim.list_extend(vim.deepcopy(work), workers)
-    local middle = math.max(8, math.floor(height * 0.52))
+    local middle = math.max(7, math.floor((footer_top - 4) * 0.5))
     render_rows(work, 4, middle - 1, "WINDOWS")
     rule(middle)
-    render_rows(workers, middle + 1, footer_top - 2, "AGENTS")
+    render_rows(workers, middle + 1, footer_top - 5, "AGENTS")
+  end
+  local chosen = selected(s)
+  if chosen and chosen.tab then
+    local info = require("uzume.ui.location").get(chosen.tab)
+    if info.root then
+      put(footer_top - 3, 1, info.project .. " / " .. info.kind .. " · " .. info.branch, "Active")
+      put(footer_top - 2, 1, vim.fn.fnamemodify(info.root, ":~"), "Muted")
+    end
   end
   if s.confirm then
     put(footer_top - 1, 1, "Close " .. clean(s.confirm.name) .. "?  y confirm · n/Esc cancel", "Selected")
@@ -408,6 +414,7 @@ function M.open(kind)
     end
   end
   local labels = {
+    ["?"] = "Navigator Key Guide",
     j = "Next Project / Window",
     ["<Down>"] = "Next Project / Window",
     k = "Previous Project / Window",
@@ -431,6 +438,9 @@ function M.open(kind)
   local function map(key, fn)
     vim.keymap.set("n", key, fn, { buffer = s.buf, silent = true, nowait = true, desc = labels[key] })
   end
+  map("?", function()
+    require("uzume.ui.help").open("Navigator keys", actions)
+  end)
   for _, key in ipairs({ "j", "<Down>" }) do
     map(key, function()
       move(1)
@@ -555,7 +565,7 @@ function M.open(kind)
     if not s.confirm then
       action(function()
         native.save()
-        s.notice = "Saved locally · :AiLayoutRestore from a fresh editor"
+        s.notice = "Saved locally · Space wR restores layout"
         draw()
       end)
     end

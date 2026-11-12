@@ -190,15 +190,19 @@ function M.show(plan)
     width = 0.85,
     height = 0.8,
     border = "rounded",
-    title = " Integrate task ",
+    title = " "
+      .. require("uzume.ui.text").fit("Local integration · " .. plan.branch, math.floor(vim.o.columns * 0.85) - 2)
+      .. " ",
     title_pos = "center",
-    footer = footer,
+    footer = vim.fn.strdisplaywidth(footer) <= math.floor(vim.o.columns * 0.85) - 2 and footer
+      or " ? keys · q / Esc back ",
     footer_pos = "center",
     zindex = 85,
     bo = { filetype = "uzume_integration", modifiable = false, bufhidden = "wipe" },
     wo = { wrap = true, linebreak = true, number = false, relativenumber = false },
   })
   local labels = {
+    ["?"] = "Integration Key Guide",
     q = "Close Integration",
     ["<Esc>"] = "Close Integration",
     r = "Refresh Integration Status",
@@ -212,6 +216,16 @@ function M.show(plan)
       protect(fn)
     end, { buffer = window.buf, nowait = true, desc = labels[key] })
   end
+  map("?", function()
+    require("uzume.ui.help").open("Integration keys", {
+      "a apply the preview as a local commit",
+      "f open integration files / resolve conflicts",
+      "c continue after resolving and saving",
+      "x abort this integration",
+      "r refresh status",
+      "q / Esc back",
+    })
+  end)
   local function mutate(action)
     guard(plan.task, plan.cwd)
     request({ action = action, record = plan.record }, function(updated)

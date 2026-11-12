@@ -115,20 +115,45 @@ function M.open(state)
       border = "none",
       wo = { wrap = true, linebreak = true, number = false, relativenumber = false },
     })
+    local function action_lines()
+      return require("uzume.ui.text").wrap({
+        "[a] Send to agent",
+        "[Ctrl-s] Queue only",
+        "[x] Cancel queue",
+        "[r] Refresh status",
+        "[q / Esc] Back",
+      }, math.max(12, math.floor(vim.o.columns * 0.78) - 4))
+    end
     local actions = Snacks.win({
-      text = {
-        " [a] Send to agent     [Ctrl-s] Queue only",
-        " [x] Cancel queue      [r] Refresh status     [q / Esc] Back",
-      },
+      text = action_lines(),
       show = false,
       enter = false,
       focusable = false,
       bo = { filetype = "uzume_review_actions", bufhidden = "wipe" },
       wo = { wrap = false, number = false, relativenumber = false, cursorline = false },
     })
+    local function render_actions()
+      vim.bo[actions.buf].modifiable = true
+      api.nvim_buf_set_lines(actions.buf, 0, -1, false, action_lines())
+      vim.bo[actions.buf].modifiable = false
+      api.nvim_buf_clear_namespace(actions.buf, highlights, 0, -1)
+      for row, line in ipairs(action_lines()) do
+        for first, key in line:gmatch("()(%b[])") do
+          api.nvim_buf_set_extmark(actions.buf, highlights, row - 1, first - 1, {
+            end_col = first - 1 + #key,
+            hl_group = key == "[a]" and "DiagnosticOk" or "Special",
+          })
+        end
+        local first, last = line:find("Send to agent", 1, true)
+        if first then
+          api.nvim_buf_set_extmark(actions.buf, highlights, row - 1, first - 1, { end_col = last, hl_group = "Title" })
+        end
+      end
+    end
     layout = Snacks.layout.new({
       show = false,
       wins = { body = window, actions = actions },
+      on_update = render_actions,
       layout = {
         box = "vertical",
         width = 0.78,
@@ -139,20 +164,17 @@ function M.open(state)
         zindex = 75,
         backdrop = false,
         { win = "body", border = "none" },
-        { win = "actions", height = 2, border = "top" },
+        {
+          win = "actions",
+          height = function()
+            return #action_lines()
+          end,
+          border = "top",
+        },
       },
     })
     layout:show()
     window:focus()
-    for row, line in ipairs(api.nvim_buf_get_lines(actions.buf, 0, -1, false)) do
-      for first, key in line:gmatch("()(%b[])") do
-        api.nvim_buf_set_extmark(actions.buf, highlights, row - 1, first - 1, {
-          end_col = first - 1 + #key,
-          hl_group = row == 1 and "DiagnosticOk" or "Special",
-        })
-      end
-    end
-    api.nvim_buf_set_extmark(actions.buf, highlights, 0, 5, { end_col = 18, hl_group = "Title" })
     window.review_origin = origin
     local labels = {
       q = "Close Review Feedback",

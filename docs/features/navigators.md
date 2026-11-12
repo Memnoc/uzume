@@ -1,8 +1,8 @@
 # Project and window navigators
 
-The native navigator overlays retain the supplied Drudwyn appearance: dark
-surface, square border, salmon heading/selection, flat rows, muted secondary
-columns and a visible shortcut strip. The hierarchy is now **project → windows
+The native navigator overlays use square borders, flat rows, muted secondary
+columns and a visible shortcut strip. Their surfaces, selection and headings
+follow the active colorscheme, including light themes. The hierarchy is now **project → windows
 → panes**. The project navigator selects a complete project; the window navigator
 selects a complete pane layout, not one split. No tmux dependency is required.
 
@@ -27,6 +27,7 @@ Restart uzume to load the current increment.
 | x, then y | Confirm closing the selected project/window |
 | n or Esc at confirmation | Cancel closing |
 | s / Space ws | Save the file layout locally |
+| ? | Open the full key guide |
 | Esc / q | Close the navigator |
 | Mouse click / wheel | Select a row / move selection when mouse support is enabled |
 
@@ -36,9 +37,15 @@ label, never a filesystem path. Rows show each window's project and pane count,
 including managed hidden panes. The current project/window is selected on entry.
 Project switching returns to its last active window. Switching preserves jobs.
 
-The AGENTS section remains reserved for supervised-agent integration. Ordinary
-shells are not guessed to be agents by parsing their output, and no example
-status is presented as live data.
+Managed agents appear with their reported state and attention count. Ordinary
+shells are not guessed to be agents by parsing their output. Short windows combine
+agent and ordinary window rows to preserve room for navigation.
+
+Below the list, the selected window shows its project, checkout type, actual Git
+branch and directory. Long labels are truncated by terminal-cell width. The
+shortcut strip wraps where space permits; compact layouts show Enter, ? and Esc.
+Press **?** for the complete scrollable key guide. Inline prompts retain their
+own Enter/Esc/Ctrl-u hints. The overlay fits the available terminal size.
 
 ## Projects and windows
 
@@ -57,7 +64,7 @@ another editor window. **Space w** exposes window controls; **Space p** exposes 
 floating/fullscreen, hide/restore and close; see [Window management](window-management.md).
 
 The top buffer bar continues to list shared Neovim buffers. The status line names
-the active project and window; the navigators switch those groups. For a real new
+the active project, checkout type and branch; **Space wi** shows full context; the navigators switch those groups. For a real new
 file, Space fn creates an editable buffer and Ctrl-s asks for its filename on
 first save. The project home is not a file that needs saving.
 
@@ -107,3 +114,7 @@ the earlier session/split prototype and its usability findings. The
 [window-management record](../prototypes/0008-window-management.md) covers the
 current hierarchy. The previous runtime and snapshot names are compatibility
 details, not another user-facing session layer.
+
+`tests/workspace_context.py` checks actual/external/detached branch identity,
+reference-file warnings, theme links and navigator geometry at 150×45, 80×24,
+60×20 and 45×16. These checks use real Neovim and disposable Git worktrees.

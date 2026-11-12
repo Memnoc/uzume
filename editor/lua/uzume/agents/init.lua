@@ -87,7 +87,17 @@ function M.pick()
     return notify("No agents yet · Space ac: Codex · Space aC: Claude")
   end
   Snacks.picker.select(items, {
-    prompt = "Agents · Enter focus · Esc cancel",
+    prompt = "Agents",
+    snacks = {
+      layout = {
+        config = function(layout)
+          layout.layout[1].footer = " Enter focus · Esc close "
+          layout.layout[1].footer_pos = "center"
+          return layout
+        end,
+      },
+      win = { input = { keys = { ["<Esc>"] = { "close", mode = { "i", "n" } } } } },
+    },
     format_item = function(item)
       local age = math.max(0, os.time() - math.floor(item.status.since))
       return string.format(

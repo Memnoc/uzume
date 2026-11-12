@@ -21,6 +21,7 @@ CASES = [
     ('agents-crash', ['agents.py', '--crash'], {}),
     ('inheritance', ['inheritance.py'], {}),
     ('task-navigation', ['task_navigation.py'], {}),
+    ('workspace-context', ['workspace_context.py'], {}),
     ('named-launch', ['named_launch.py'], {}),
     ('branch-launch', ['branch_launch.py'], {}),
     ('review', ['review.py'], {}),

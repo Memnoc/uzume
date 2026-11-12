@@ -138,6 +138,9 @@ for key, direction in pairs({ h = "left", j = "below", k = "above", l = "right" 
     panes.split(direction, true)
   end, "New Shell Pane " .. directions[key])
 end
+map("n", "<leader>wi", function()
+  require("uzume.ui.location").show()
+end, "Window Context (Project / Branch / Checkout)")
 map("n", "<leader>ww", function()
   require("uzume.editor.navigator").open("windows")
 end, "Pick Window")

@@ -109,3 +109,10 @@ conflict recovery and explicit abort. No model requests or remote pushes run.
 The same test checks side choices, keeping both, undo, navigation, action-menu
 selection, preservation of other conflicts and cleanup of resolver controls.
 Run with `UZUME_TEST_CONFLICT_STYLE=diff3` to exercise Git's base-section markers.
+
+## Compact controls
+
+The integration dialog title names the destination branch. Its action hints
+fit the available width; narrow dialogs show **? keys · q / Esc back**. Press
+**?** for the full scrollable guide. The existing preview, apply, continue and
+abort guards remain in force; opening help never performs a Git operation.

@@ -164,21 +164,15 @@ require("lualine").setup({
   },
   sections = {
     lualine_a = { "mode" },
-    lualine_b = {
-      function()
-        if vim.t.uzume_unassigned then
-          return "No project"
-        end
-        if not vim.t.uzume_root then
-          return ""
-        end
-        return (vim.t.uzume_project_name or vim.fs.basename(vim.t.uzume_root))
-          .. " / "
-          .. (vim.t.uzume_name or "Editor")
-      end,
-      "branch",
-    },
+    lualine_b = { require("uzume.ui.location").statusline },
     lualine_c = {
+      {
+        require("uzume.ui.location").warning,
+        color = function()
+          local color = vim.api.nvim_get_hl(0, { name = "DiagnosticWarn", link = false }).fg
+          return { fg = color and string.format("#%06x", color) or nil }
+        end,
+      },
       "diagnostics",
       {
         "filename",

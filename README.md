@@ -90,6 +90,7 @@ The home screen also offers **k · Search Keymaps**.
 | **:** | Open the floating command line |
 | **Space ap** | Pick or open a project |
 | **Space ww** / **Space wn** | Pick a window / create an editor window |
+| **Space wi** | Inspect the active project, branch, checkout and file |
 | **Space ws** / **Space wR** | Save / restore the local file layout |
 | **Space ps** / **Space pS** | Split the editor down / up |
 | **Space pv** / **Space pV** | Split the editor right / left |
