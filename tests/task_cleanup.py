@@ -35,7 +35,9 @@ def call(action, fail=None, **kwargs):
     return json.loads(result.stdout)
 items = call('list')['tasks']
 assert len(items)==1 and items[0]['task']['branch']=='task/one', items
-assert items[0]['status']=='No task changes' and items[0]['blockers']==[], items
+assert items[0]['status']=='Not inspected' and 'token' not in items[0], items
+preview=call('inspect',branch='task/one')
+assert preview['status']=='No task changes' and preview['blockers']==[], preview
 assert git(project,'rev-parse','HEAD')==base and checkout.exists()
 print('PASS: retained task inventory does not include or modify the primary checkout')
 print('Artifacts:',root)

@@ -171,16 +171,26 @@ def inspect(request, task):
     return result
 
 def catalog(request):
+    # Discovery must not inspect/hash every checkout just to display its name.
+    # Cache repository identities within this request, never across mutations.
     project, data = Path(request['project']).resolve(), Path(request['data']).resolve()
     repo = common(project)
+    identities = {project: repo}
+    def repository(path):
+        path = Path(path).resolve()
+        if path not in identities:
+            identities[path] = common(path)
+        return identities[path]
+    def pending(task):
+        return dict(task=task, status='Not inspected')
     tasks, warnings = [], []
     for path, task in records(data/'task-branches'):
         try:
             if not all(isinstance(task.get(k),str) and task[k] for k in ('id','project','cwd','branch','base')):
                 continue
-            if not Path(task['project']).exists() or common(task['project'])!=repo:
+            if not Path(task['project']).exists() or repository(task['project'])!=repo:
                 continue
-            tasks.append(inspect(request,task))
+            tasks.append(pending(task))
         except (ValueError,OSError,subprocess.TimeoutExpired) as error:
             tasks.append(dict(task=task,status='Unavailable',blockers=[str(error)],integrated=[],changes='Unknown'))
     removed = [v for _,v in records(Path(request['state'])/'task-cleanup') if v.get('state')=='removed']
@@ -192,12 +202,7 @@ def catalog(request):
             continue
         task=dict(id=cwd.name,label=cwd.name,project=str(project),cwd=str(cwd),
                   branch=entry['branch'].removeprefix('refs/heads/'),base=entry['HEAD'],baseline_known=False)
-        try:
-            row=inspect(request,task)
-            # Legacy checkouts may lack a reliable original review baseline.
-            tasks.append(row)
-        except (ValueError,OSError,subprocess.TimeoutExpired) as error:
-            tasks.append(dict(task=task,status='Unavailable',blockers=[str(error)],integrated=[],changes='Unknown'))
+        tasks.append(pending(task))
     tasks.sort(key=lambda row:row['task']['branch'])
     return dict(tasks=tasks,warnings=warnings)
 
@@ -205,7 +210,14 @@ def selected(request):
     matches = [row for row in catalog(request)['tasks'] if row['task']['branch']==request['branch']]
     if len(matches)!=1:
         raise ValueError('Task is missing or ambiguous; refresh the list.')
-    return matches[0]
+    if matches[0]['status'] == 'Unavailable':
+        return matches[0]
+    # Every inspect/remove request validates current state, never inventory data.
+    task = matches[0]['task']
+    try:
+        return inspect(request, task)
+    except (ValueError,OSError,subprocess.TimeoutExpired) as error:
+        return dict(task=task,status='Unavailable',blockers=[str(error)],integrated=[],changes='Unknown')
 
 def remove(request):
     preview = selected(request)

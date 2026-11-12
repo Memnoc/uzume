@@ -91,6 +91,13 @@ buffer tabs should display the agent name/icon instead of `python3`.
 
 ## Invariants to preserve
 
+- Task inventory is discovery only: do not run full cleanup inspection for every
+  row. The 2026-11-12 latency fix reduced a 16-task inventory from about 4 s / 404
+  Git commands to 0.06 s by deferring checks until selection and caching repository
+  identities within the request. `tests/task_inventory.py` enforces the subprocess
+  budget and selected-checkout scope. Removal still performs fresh checks; never
+  turn inventory rows into removal authorization.
+
 - A Project can own windows rooted in different task worktrees. Do not collapse
   project identity into whichever cwd happens to be focused.
 - The left pane edits the task's file; the right pane is a single agent terminal.

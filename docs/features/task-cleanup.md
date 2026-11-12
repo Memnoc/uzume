@@ -5,6 +5,11 @@ agent windows. Select a branch and press Enter to inspect it. This manages Uzume
 checkouts under its own `data/worktrees` directory; ordinary branches and your
 primary checkout are not cleanup targets.
 
+The picker loads task names without scanning every checkout's contents. Rows say
+**Not inspected** until you select one; **Open in editor** is a local window/buffer
+hint. Press Enter to calculate the selected task's current changes, integration
+evidence and removal guards. The list itself never authorizes removal.
+
 | Control | Action |
 | --- | --- |
 | Space at | List retained tasks; Enter opens their details |
@@ -84,6 +89,10 @@ Git still retains those snapshots.
 New tasks always save metadata under `data/task-branches`; legacy linked checkouts
 in managed storage are discovered conservatively. Inspection uses a temporary
 index and object directory, so it does not alter the repository's index or objects.
+Discovery reads metadata and one Git worktree listing, reusing repository identity
+lookups within that request. Only the selected checkout gets full inspection;
+removal repeats its fresh checks under the existing lock. There is no persistent
+status cache that could authorize removal using stale results.
 
 `agent/task_lock.py` uses POSIX shared/exclusive locks under the repository's
 common Git directory. Supervisors hold a shared lock for the CLI lifetime;
@@ -103,3 +112,15 @@ legacy tasks and refusal conditions. `tests/task_cleanup_ui.py` drives the actua
 keys, review without launching, cancellation, removal and recovery UI with mocked
 agent CLIs. Both are part of `python3 tests/run.py`; no real user task is deleted
 by these tests. Bulk removal, archive expiry and a one-click restore are deferred.
+
+`tests/task_inventory.py` covers a dozen metadata-backed and legacy checkouts
+through the JSON command interface. It traces real Git subprocesses to enforce a
+small discovery budget and verifies that inspection only scans the selected
+checkout. This prevents the previous eager scan (404 Git processes / about 4 s
+for 16 local tasks). The same local inventory measured about 0.06 s after the fix;
+timings depend on storage and repository size, and detailed inspection can take
+longer for a large selected checkout.
+
+The latency fix passed the inventory and cleanup backend regressions, plus the
+real-editor cleanup flow on the local development Neovim and minimum 0.11.0.
+The full unrelated editor suite was not repeated for this backend-only change.
