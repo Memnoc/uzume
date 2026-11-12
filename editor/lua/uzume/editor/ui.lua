@@ -1,11 +1,44 @@
-local dashboard_accents = {
+local accents = {
   SnacksDashboardHeader = "iris",
   SnacksDashboardTitle = "iris",
   SnacksDashboardIcon = "iris",
   SnacksDashboardDesc = "text",
   SnacksDashboardFile = "text",
   SnacksDashboardKey = "rose",
+  FloatBorder = "iris",
+  FloatTitle = "iris",
+  WhichKeyBorder = "iris",
+  WhichKeyGroup = "iris",
 }
+
+-- These groups normally inherit cyan information colors. Brand the controls
+-- themselves, keeping diagnostic colors and other themes' fallback links intact.
+local accent_links = {
+  NoiceCmdlineIcon = "DiagnosticSignInfo",
+  NoiceCmdlineIconSearch = "DiagnosticSignWarn",
+  NoiceCmdlinePrompt = "Title",
+  NoiceCmdlinePopupBorder = "DiagnosticSignInfo",
+  NoiceCmdlinePopupBorderSearch = "DiagnosticSignWarn",
+  NoiceCmdlinePopupTitle = "DiagnosticSignInfo",
+  SnacksInputIcon = "DiagnosticHint",
+  SnacksInputBorder = "DiagnosticInfo",
+  SnacksInputTitle = "DiagnosticInfo",
+  SnacksPickerPrompt = "Special",
+  SnacksPickerKeymapLhs = "Special",
+  SnacksFooterDesc = "DiagnosticInfo",
+}
+local highlight_groups = {
+  SnacksDashboardHeader = { link = "Title" },
+  SnacksDashboardTitle = { link = "Title" },
+  SnacksDashboardIcon = { link = "Special" },
+  SnacksDashboardDesc = { link = "Special" },
+  SnacksDashboardFile = { link = "Special" },
+  SnacksDashboardKey = { link = "Number" },
+}
+for group, link in pairs(accent_links) do
+  accents[group] = "iris"
+  highlight_groups[group] = { link = link }
+end
 
 require("rose-pine").setup({
   variant = "main",
@@ -17,17 +50,10 @@ require("rose-pine").setup({
       muted = "#8b7c98",
     },
   },
-  -- Register the dashboard's default links so Moon and Dawn retain their look.
-  highlight_groups = {
-    SnacksDashboardHeader = { link = "Title" },
-    SnacksDashboardTitle = { link = "Title" },
-    SnacksDashboardIcon = { link = "Special" },
-    SnacksDashboardDesc = { link = "Special" },
-    SnacksDashboardFile = { link = "Special" },
-    SnacksDashboardKey = { link = "Number" },
-  },
+  -- Register upstream fallback links so Moon and Dawn retain their look.
+  highlight_groups = highlight_groups,
   before_highlight = function(group, highlight, palette)
-    local accent = dashboard_accents[group]
+    local accent = accents[group]
     if accent and require("rose-pine.config").options.variant == "main" then
       highlight.link = nil
       highlight.fg = palette[accent]

@@ -32,7 +32,11 @@ Uzume gives Rose Pine's main variant a gentle mauve text palette: ordinary text
 uses `#e0d4eb`, comments and secondary text `#a99ab8`, and muted text `#8b7c98`.
 The dashboard's logo, headings, and navigation icons use iris (`#c4a7e7`), labels
 and filenames use the pale mauve text color, and shortcut letters use rose
-(`#ebbcba`). Filetype icons retain their own recognizable colors. The base,
+(`#ebbcba`). Mauve/iris is also the interface accent: floating borders and titles,
+command/search prompt icons, input dialogs, picker prompts and shortcut keys,
+and WhichKey group headings use `#c4a7e7`. Noice's format-specific border/title
+links inherit the scoped accent, including `:lua`, help and search prompts.
+Filetype icons retain their own recognizable colors. The base,
 surface, and overlay backgrounds and the syntax/diagnostic accent palette remain
 upstream defaults. These settings live in [ui.lua](../../editor/lua/uzume/editor/ui.lua)
 and use Rose Pine's palette and `before_highlight` callback, scoped to its main
@@ -49,6 +53,10 @@ The first palette-only change left the dashboard cyan because Snacks links its
 header and labels to accent groups. A subsequent PTY check inspects the actual
 dashboard extmarks and resolved highlight colors, covering the logo, headings,
 navigation icons, labels, and shortcut keys.
+The 2026-11-12 accent check inspected the live command popup's format-specific
+border/title/icon groups, picker/input groups, semantic syntax/diagnostic/diff
+colors and switching through Moon, Dawn, Habamax and back. The existing command-line
+smoke test also passed after the accent update.
 
 The home screen centers a two-color cave-and-sun emblem above the Uzume
 wordmark, closely following the repository SVG. The shared artwork lives in

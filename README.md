@@ -137,10 +137,25 @@ The Uzume name and cave-and-sun logo are established. Rust component boundaries 
 
 ## Repository layout
 
-- `editor/`: the active distribution, including Lua UI and Python process/Git helpers.
-- `installer/` and `setup-editor`: source installation and launcher registration.
-- `tests/`: regression tests; `docs/`: features, architecture decisions and handoff.
-- `spikes/` and `spike`: historical experiments, never loaded by the installed editor.
+```mermaid
+flowchart LR
+    root["Uzume"] --> editor["editor/<br/>Active distribution"]
+    root --> install["installer/ · setup-editor<br/>Installation and launcher"]
+    root --> tests["tests/<br/>Workflow regressions"]
+    root --> docs["docs/<br/>Guides, decisions and handoff"]
+    root --> spikes["spikes/ · spike<br/>Historical experiments"]
+
+    editor --> lua["lua/uzume/<br/>Editor, UI, panes and agent workflows"]
+    editor --> helpers["agent/ · review/<br/>Python process and Git helpers"]
+
+    classDef default fill:#1f1d2e,stroke:#c4a7e7,color:#e0d4eb,stroke-width:1px
+    classDef brand fill:#c4a7e7,stroke:#c4a7e7,color:#191724,stroke-width:2px
+    classDef historical fill:#1f1d2e,stroke:#8b7c98,color:#a99ab8,stroke-dasharray:4 4
+    class root brand
+    class spikes historical
+```
+
+Historical experiments are never loaded by the installed editor.
 
 `editor/lua/uzume/editor/` contains the editor's core modules. Agent, review,
 integration and layout modules live beside it under `uzume/`. See the
