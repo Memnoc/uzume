@@ -85,10 +85,50 @@ untracked files. A private index is used; the task's real index and the original
 project's files/index/HEAD are not rewritten. The task's linked checkout is then
 removed and its branch ref deleted only if it still points at the inspected HEAD.
 
-The completion screen and **Space aT** show commands to recreate a separate
-branch and checkout from the original HEAD, restore working files, then restore
-the index. The commands have been exercised against staged/unstaged/untracked
-fixtures. They are shown for explicit execution, not run automatically.
+The completion screen and **Space aT** offer guided recovery as well as manual
+Git commands. Select a snapshot in history, then:
+
+1. Press **r Restore to a new branch**.
+2. Enter a new branch name, then an absolute path for a new directory. Defaults
+   use the snapshot ID; the directory's parent must already exist.
+3. Read the preview, which shows the original snapshot, new branch and directory.
+   **e** edits the choices; **Esc/b** returns to the snapshot; **q** closes.
+   Nothing is created before confirmation.
+4. Press **Enter Restore & open**. After completion, choose a recovered file in
+   a new editor window under the same project. The window is named
+   **Recovered · branch** and uses the recovered checkout as its working directory.
+
+| Recovery screen | Controls |
+| --- | --- |
+| Snapshot / history entry | r restore; q/Esc close; manual commands remain visible |
+| Branch and directory prompts | Ctrl-u clears the field; Enter next; Esc back |
+| Preview | Enter restore & open; e edit; Esc/b back; q close |
+| Destination or restore error | e edit choices; Esc/b back; q close |
+| Restore in progress | q/Esc closes the view; the confirmed operation continues |
+
+Recovery restores the original HEAD, working files, and index separately. This
+preserves staged versus unstaged edits, deletions and untracked files rather than
+committing everything together. Existing branches/directories (even empty ones
+or dangling symlinks), paths inside this repository's other checkouts/Git storage,
+submodules, and clean/smudge filters or working-tree encodings are refused. The
+preview pins archive object IDs; confirmation rechecks the plan and destinations.
+
+The archive stays available, so another recovery can use different new names.
+An agent is not restarted and an old CLI conversation or review session is not
+reattached. The recovered window is an ordinary editor checkout. Closing the
+progress view does not cancel a confirmed Git operation: completion is reported
+by notification and does not reopen the view. Open the reported directory with
+the project picker if you chose to close the progress view.
+
+If a restore fails after starting, any created branch/directory is kept for
+inspection. The error reports the path and attempt record; the original archive
+is unchanged. Inspect the partial result before choosing another destination.
+Attempt records live in `stdpath("state")/task-restores/<id>.json` with states
+**restoring**, **restored**, or **partial**. A process crash can leave **restoring**;
+it is not proof of success. No automatic rollback deletes a partial checkout.
+
+Manual commands remain available for explicit execution. They recreate a separate
+checkout from the original HEAD, restore working files, then restore the index.
 
 These are Git content snapshots, not a filesystem backup: empty directories,
 extended attributes, ownership and non-Git permission metadata are not retained.
@@ -108,6 +148,12 @@ Git still retains those snapshots.
 
 `uzume/agents/cleanup.lua` owns the UI and current-editor buffer/window guards.
 `agent/cleanup.py` exposes list, inspect, remove and history JSON commands.
+It also dispatches `restore-plan` and `restore` to `agent/recovery.py`.
+`uzume/agents/recovery.lua` owns snapshot display, branch/directory prompts,
+preview, progress/errors and reopening files. Recovery uses an atomic directory
+reservation and Git's new-branch creation; it never force-replaces a destination.
+Archived attributes are checked with a temporary index before checkout, and
+hooks are disabled for helper Git commands. See [ADR-0013](../adr/0013-guided-task-recovery.md).
 New tasks always save metadata under `data/task-branches`; legacy linked checkouts
 in managed storage are discovered conservatively. Inspection uses a temporary
 index and object directory, so it does not alter the repository's index or objects.
@@ -133,7 +179,14 @@ recovery, integration receipts, stale previews, primary checkout protection,
 legacy tasks and refusal conditions. `tests/task_cleanup_ui.py` drives the actual
 keys, review without launching, cancellation, removal and recovery UI with mocked
 agent CLIs. Both are part of `python3 tests/run.py`; no real user task is deleted
-by these tests. Bulk removal, archive expiry and a one-click restore are deferred.
+by these tests. Bulk removal and archive expiry remain deferred.
+
+`tests/task_restore.py` exercises the public JSON interface with real Git:
+preview without mutation; original HEAD/index/working recovery; unchanged source
+checkout; invalid/occupied destinations; stale snapshots; filter refusal; and
+an injected restore failure that retains a partial checkout and receipt.
+The cleanup UI test covers Space aT, branch/directory prompts, destination errors,
+preview cancellation and reopening a restored file without launching an agent.
 
 `tests/task_inventory.py` covers a dozen metadata-backed and legacy checkouts
 through the JSON command interface. It traces real Git subprocesses to enforce a
@@ -157,3 +210,11 @@ The navigation polish passed that browser test on the local development Neovim
 and minimum 0.11.0, the existing cleanup UI regression on the development build,
 the inventory work-budget regression, and Lua formatting/whitespace checks.
 Unrelated editor tests were not rerun for this UI-only change.
+
+Guided recovery verification: the consolidated suite passed **28/28** cases on
+the local macOS development setup. The strengthened recovery UI test then passed
+on both development Neovim and 0.11.0, including exact branch-name entry after
+Ctrl-u clear and completion without focus theft after dismissing progress.
+The expanded backend test also passed destination-race and foreign-repository
+checks. Python syntax, Lua formatting and whitespace checks passed. Linux remains
+covered by the CI matrix; these local results are not a Linux execution claim.

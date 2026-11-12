@@ -119,4 +119,7 @@ Retained-task details offer **Esc/b** to return to the filtered list with its
 selection preserved, **q** to close and keep, **v** to review, **x** for removal
 with exact branch confirmation, **r** to refresh and **h** for recovery history.
 During inspection Esc/b goes back and q closes; a failed check also offers r to retry.
+In **Space aT** recovery snapshots, **r** starts guided restore. The preview offers
+**Enter** to restore and open, **e** to edit choices, **Esc/b** to go back and **q**
+to close. Closing a confirmed restore's progress view does not cancel the operation.
 See [task cleanup](task-cleanup.md) for its guards and archive limits.

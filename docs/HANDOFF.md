@@ -36,7 +36,7 @@ controls remain primary. Preserve plain `nvim` and its existing configuration.
 | Tasks | Space ac/aC names a Codex/Claude branch and opens its worktree beside an idle CLI; ae/aE starts without a marked file; ab/aB selects/continues a branch | Separate writable directories prevent independent agents colliding; branch names alone do not |
 | Starting state | Saved source edits/new files inherited via a private index and task baseline commit; original index/HEAD/files unchanged | Prevent the apparent loss of edits on switching into a task |
 | Context | Explicit marked file list, including cross-project references; supplied with a prompt | Opening a file alone is not authorization to send it |
-| Task cleanup | Space at inspects retained tasks; explicit removal archives HEAD/baseline/index/working state; Space aT shows recovery | One task at a time, exact branch confirmation, process/Git/editor guards; no automatic archive expiry |
+| Task cleanup | Space at inspects retained tasks; explicit removal archives HEAD/baseline/index/working state; Space aT previews restoration into a new branch/directory | One task at a time, explicit confirmation, process/Git/editor guards; no automatic archive expiry |
 | Lifetime | Switching retains processes; closing the owning workspace stops them; restart/restore does not silently restart agents | Avoid abandoned agent processes while preserving files and layout |
 | Review | Stable snapshot, side-by-side default, unified toggle, changed-file picker, reviewed markers, snapshot-anchored comments | Reading remains stable while agents continue writing |
 | Feedback | Preview first; a queues, submits to a ready CLI and focuses it; Ctrl-s queues only; busy delivery at eligible hook boundary | No need to manually tell an idle agent to check its queue; no injection into permission prompts |
@@ -65,6 +65,7 @@ bindings, context-dependent menus and regression coverage.
 | `uzume/editor/branding.lua`, `ui.lua` | Logo and whole-dashboard size budget; dashboard-only viewport correction |
 | `uzume/agents/init.lua`, `views.lua`, `input.lua`, `context.lua` | Agent lifecycle/UI, meaningful labels/icons, terminal routing and explicit file context |
 | `uzume/agents/branches.lua`, `worktrees.lua`, `editor.lua`, `buffers.lua` | Named or existing task launch, checkout/baseline identity, left editor pane and buffer scoping |
+| `uzume/agents/cleanup.lua`, `recovery.lua`, `editor/agent/cleanup.py`, `recovery.py` | Retained-task discovery, inspection, archive/removal and guided restore into a new checkout |
 | `editor/agent/branches.py`, `create_worktree.py` | Git preflight, task creation and inherited-state capture using argument arrays/private index |
 | `editor/agent/supervisor.py`, `processes.py`, `hook.py`, `feedback.py` | CLI supervision/PTY, process cleanup, hook events, bounded feedback delivery |
 | `uzume/review/`, `editor/review/snapshot.py` | Review UI, stable capture, comments and delivery records |
@@ -128,6 +129,7 @@ Paths are relative to Neovim's `stdpath` for `NVIM_APPNAME=uzume`:
 | data/worktrees, data/task-branches | Task checkouts and branch/baseline metadata |
 | data/integration-worktrees | Separate destination checkouts when needed |
 | state/agents/<run> | Private launch/event/state/feedback records |
+| state/task-cleanup, state/task-restores | Cleanup snapshot receipts and separate restore attempt records |
 | state/review-comments, state/review-feedback | Local comment drafts and immutable handoff batches |
 | state/integrations | Local integration plans, patches and status |
 | state/navigator | Locally saved project/window layout |
@@ -245,10 +247,10 @@ instruction to add more features in the next iteration.
 
 ## Next work, in order
 
-1. **Task cleanup follow-up.** Single-task archive/remove and recovery instructions
-   are implemented (ADR-0012). Validate the wording on real projects before bulk
-   selection or archive expiry. One-click restore and cross-editor unsaved-buffer
-   coordination remain separate work; do not overstate the locks' coverage.
+1. **Task cleanup follow-up.** Single-task archive/remove and guided new-checkout
+   recovery are implemented (ADRs 0012–0013). Validate the wording on real projects
+   before bulk selection or archive expiry. Cross-editor unsaved-buffer coordination
+   remains separate work; do not overstate the locks' coverage.
 2. **Integration recovery hardening.** Exercise process death at mutation
    boundaries, external Git changes, lost records, hooks/signing failures, and
    partial operation receipts. Keep errors actionable and conflicts labeled.
@@ -360,6 +362,42 @@ use disposable worktrees only; no real model calls or user task removals occurre
 - Verification: browser navigation/progress/retry passed on development Neovim
   and 0.11.0; existing cleanup UI and inventory regressions passed, as did Lua
   formatting and whitespace checks. The unrelated full suite was not repeated.
-- Deferred: consistent project/branch labeling across all review/integration
-  surfaces and a guided restore-to-new-branch action were suggestions, not part
-  of this two-item polish pass. Recovery still presents explicit Git commands.
+- Deferred in that pass: consistent project/branch labeling across all review/
+  integration surfaces and guided restore. The latter is implemented in the
+  subsequent pass below; the manual commands remain available.
+
+## Guided recovery (2026-11-12, subsequent pass)
+
+- Completed: Space aT → snapshot → r → new branch → new directory → preview →
+  Enter Restore & open. Input prompts, preview, progress and errors state their
+  local shortcuts. Esc/b cancels before confirmation; e edits the destination.
+- Modules: `agents/recovery.lua` owns this UI separately from task browsing;
+  `agent/recovery.py` implements restore-plan/restore via cleanup.py's existing
+  JSON entry point. The archive ID is read from local receipts and refs belonging
+  to this repository. Preview pins the object IDs; confirmation checks them again.
+- Preservation: restore HEAD, working tree and index separately. Refuse occupied
+  branches/paths, nesting inside existing repository checkouts/Git storage and
+  custom filters/encodings/submodules. Exclusive mkdir and Git -b protect against
+  destination races. Source files/index/HEAD and archive refs remain intact.
+- Failure model: private `state/task-restores/<id>.json` records restoring,
+  restored or partial. Keep partial branches/directories and report their paths;
+  a process crash can leave restoring. Never automatically delete them or treat
+  an unfinished attempt as success. Existing manual commands remain visible.
+- UI lifetime: confirmed restore continues if its view is closed. Report its
+  result without stealing focus; only an active completion opens the recovered
+  checkout in a project-owned editor window and file picker. No agent starts,
+  no task conversation/review state is reattached, and no push occurs.
+- Tests: `task_restore.py` checks real Git state preservation, rejected targets,
+  changed snapshots, filters and injected checkout failure. `task_cleanup_ui.py`
+  exercises history, input/error controls, preview cancellation and opening a
+  restored file. Both are in the consolidated runner; fixtures are disposable.
+- Verification: 28/28 consolidated cases passed locally on macOS. Subsequent
+  strengthened backend checks passed; the final UI case passed on development
+  Neovim and 0.11.0, including dismissing a running restore without focus theft.
+  Ctrl-u explicitly clears recovery fields to avoid the development Neovim empty-
+  prompt boundary bug; tests assert exact branch names. Syntax, formatting and
+  whitespace checks passed. Local tests do not establish Linux execution results.
+- Remaining: Linux CI/real-machine validation and concurrent-agent daily use take
+  priority over feature expansion. Bulk cleanup, archive expiry, automatic partial
+  restore repair and a history UI for individual restore attempts are not shipped.
+  See [ADR-0013](adr/0013-guided-task-recovery.md) and the feature guide.

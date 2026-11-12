@@ -14,6 +14,7 @@
 | [0010](0010-user-language-packs.md) | Extend Extras with independent declarative user language packs | accepted | 2026-11-11 |
 | [0011](0011-named-uzume-colorscheme.md) | Named Uzume theme over an isolated pinned Rose Pine renderer | accepted | 2026-11-12 |
 | [0012](0012-task-cleanup-with-recovery.md) | Archive Git state before explicit retained-task removal | accepted | 2026-11-12 |
+| [0013](0013-guided-task-recovery.md) | Preview and restore archives into a new branch and checkout | accepted | 2026-11-12 |
 
 The 2026-11-08 [domain refinement](../design.md#projects-windows-panes-and-concurrent-work)
 replaces user-facing sessions with projects containing windows and panes. ADR

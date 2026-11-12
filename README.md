@@ -99,7 +99,7 @@ The home screen also offers **k · Search Keymaps**.
 | **Space pf** / **Space pm** | Float or dock a pane / fullscreen or restore it |
 | **Space ac** / **Space aC** | Start a Codex / Claude task on a named branch |
 | **Space aa** | Find agents needing attention |
-| **Space at** / **Space aT** | Inspect/clean up retained tasks / recovery history |
+| **Space at** / **Space aT** | Inspect/clean up retained tasks / history and guided recovery |
 | **Space vr** | Review task changes |
 | **Space vc** / **Space vs** | Comment on review lines / preview comments to send |
 | **Space vi** | Integrate a task into a local branch or continue integration |

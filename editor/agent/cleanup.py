@@ -264,6 +264,9 @@ def remove(request):
         return receipt
 
 def main(request):
+    if request['action'] in ('restore-plan', 'restore'):
+        import recovery
+        return recovery.plan(request) if request['action']=='restore-plan' else recovery.restore(request)
     if request['action']=='list':
         return catalog(request)
     if request['action']=='inspect':

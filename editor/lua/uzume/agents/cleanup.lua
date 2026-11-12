@@ -102,48 +102,8 @@ local function show(title, filetype, lines, actions, back)
   end
 end
 local function recovery(receipt)
-  local task, refs = receipt.task, receipt.refs
-  local target = vim.fs.dirname(task.project)
-    .. "/"
-    .. vim.fs.basename(task.project)
-    .. "-recovered-"
-    .. receipt.id:sub(1, 8)
-  local quote = vim.fn.shellescape
-  local commands = {
-    "git -C "
-      .. quote(task.project)
-      .. " worktree add -b recovered/"
-      .. receipt.id:sub(1, 8)
-      .. " "
-      .. quote(target)
-      .. " "
-      .. refs.head,
-    "git -C " .. quote(target) .. " restore --source=" .. refs.working .. " --worktree -- .",
-    "git -C " .. quote(target) .. " read-tree " .. refs.index,
-  }
-  show("Task recovery", "uzume_task_recovery", {
-    receipt.state:upper() .. " · " .. task.branch,
-    "Original checkout: " .. task.cwd,
-    "",
-    "A local snapshot preserves the original commit, baseline, staged and working files.",
-    "Nothing was pushed. Review/feedback history is retained.",
-    "",
-    "To recover in a NEW directory and branch, run these commands in order:",
-    "",
-    commands[1],
-    "",
-    commands[2],
-    "",
-    commands[3],
-    "",
-    "Working snapshot: " .. refs.working,
-    "Staged snapshot: " .. refs.index,
-    "Original commit: " .. refs.head,
-    "Task baseline: " .. refs.baseline,
-    receipt.error or "",
-    "Recovery refs retain Git data locally. Cleanup does not purge these archives.",
-    "q / Esc close",
-  }, {})
+  close()
+  require("uzume.agents.recovery").open(receipt)
 end
 function M.history(project)
   if inspection then

@@ -68,6 +68,12 @@ _Avoid_: close project, terminate agent
 Ending a **Project**'s active workspace, including its **Windows**, **Panes**, agents and owned processes, while retaining source/worktree files and locally saved layout and review state.
 _Avoid_: delete project files, switch project, remove worktree, finish review
 
+**Task Recovery**:
+Restoring a retained cleanup snapshot into a new branch and checkout after an
+explicit preview. Original HEAD, staged changes and working files remain distinct;
+existing checkouts and recovery refs are preserved. The recovered editor window
+belongs to the project, but does not restart an agent or its previous conversation.
+
 **Project Autosave**:
 Local persistence of a **Project**'s window/pane arrangement, open-file references, review progress, and draft comments. It is not source-file autosave or authorization to transmit context to an agent.
 

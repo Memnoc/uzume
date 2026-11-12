@@ -23,6 +23,7 @@ CASES = [
     ('task-navigation', ['task_navigation.py'], {}),
     ('workspace-context', ['workspace_context.py'], {}),
     ('task-cleanup', ['task_cleanup.py'], {}),
+    ('task-restore', ['task_restore.py'], {}),
     ('task-inventory', ['task_inventory.py'], {}),
     ('task-browser', ['task_browser.py'], {}),
     ('task-cleanup-ui', ['task_cleanup_ui.py'], {}),
