@@ -7,7 +7,7 @@ live `package.loaded` entries are not migrated in place.
 
 | Directory | Responsibility |
 | --- | --- |
-| `uzume/agents/` | Task launch/continuation, worktrees, context, terminal input, views and scoped buffers |
+| `uzume/agents/` | Task launch/continuation, worktrees, context, terminal input, views, scoped buffers and retained-task cleanup |
 | `uzume/review/` | Stable review UI, snapshot-anchored comments and feedback delivery |
 | `uzume/integration/` | Local task integration and conflict-resolution controls |
 | `uzume/layout/` | Pane animation and saved mode preference |

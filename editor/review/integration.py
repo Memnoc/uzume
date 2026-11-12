@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Explicit local integration. Source indexes and checkouts are never modified."""
+from contextlib import ExitStack
 import hashlib
 import json
 import os
@@ -10,6 +11,8 @@ import tempfile
 import uuid
 
 from snapshot import capture
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "agent"))
+from task_lock import lease
 
 for key in list(os.environ):
     if key.startswith('GIT_'):
@@ -234,10 +237,14 @@ def main(request):
         raise ValueError('Another integration is operating on this destination. Try again after it finishes.') from None
     os.close(fd)
     try:
-        if action == 'apply':
-            return apply(plan)
-        if action in ('finish', 'abort'):
-            return resume(plan, abort=action == 'abort')
+        with ExitStack() as leases:
+            leases.enter_context(lease(plan['task']['cwd']))
+            if plan.get('cwd') and not same_checkout(plan['cwd'], plan['task']['cwd']):
+                leases.enter_context(lease(plan['cwd']))
+            if action == 'apply':
+                return apply(plan)
+            if action in ('finish', 'abort'):
+                return resume(plan, abort=action == 'abort')
         raise ValueError('Unknown integration action')
     finally:
         lock.unlink()

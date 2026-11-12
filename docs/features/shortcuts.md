@@ -74,6 +74,7 @@ window/opens a project directory; **r** renames; **x then y** confirms close;
 | Space ac / aC | Named Codex/Claude task with the current file |
 | Space ae / aE; ab / aB | Empty Codex/Claude task; choose an existing branch |
 | Space aa / ar | Agent attention; restart the task CLI |
+| Space at / aT | Retained tasks and explicit cleanup; recovery history |
 | Space af / aF / am / ad | Mark current/multiple files; manage marks; add marked context to prompt |
 | Space vr / av; vf; vu; vR; vq | Open review; changed files; unified toggle; refresh; close |
 | Space vc / vC / vs | Comment on review lines; inspect comments; preview feedback to send |
@@ -94,7 +95,7 @@ omitted their action context, command-only Mason/layout entry points, and unname
 navigator/integration/feedback controls. These are now covered. Existing bindings
 were retained; **Space pN** groups shell directions to avoid a long flat menu.
 
-`tests/shortcut_audit.py` verifies 145 core leader bindings, descriptions,
+`tests/shortcut_audit.py` verifies 147 core leader bindings, descriptions,
 action-prefix collisions, navigator search and guarded layout persistence.
 A temporary startup observer recorded 241 mapping registrations with no
 replacement collisions, rather than relying only on the final keymap table.
@@ -113,3 +114,7 @@ integration, automatic project autosave, remote project support and generic
 third-party language packs remain separate work. LSP attachment and optional
 plugin availability affect the live menu; a missing inactive-provider action is
 not a shortcut collision.
+
+Retained-task details offer **q/Esc** to keep, **v** to review, **x** for removal
+with exact branch confirmation, **r** to refresh and **h** for recovery history.
+See [task cleanup](task-cleanup.md) for its guards and archive limits.

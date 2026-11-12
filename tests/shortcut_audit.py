@@ -12,7 +12,7 @@ GROUPS = {
     'panes': ['-', '|', 'ps', 'pS', 'pv', 'pV', 'pt', 'pT', 'pNh', 'pNj', 'pNk', 'pNl',
               'pp', 'pf', 'pm', 'pz', 'pr', 'px', 'po', 'pd', 'pgh', 'pgj', 'pgk', 'pgl',
               'pMh', 'pMj', 'pMk', 'pMl', 'pR>', 'pR<', 'pR+', 'pR-', 'pR='],
-    'agents': ['ac', 'aC', 'aa', 'ab', 'aB', 'ae', 'aE', 'af', 'aF', 'am', 'ad', 'ar', 'av'],
+    'agents': ['ac', 'aC', 'aa', 'ab', 'aB', 'ae', 'aE', 'af', 'aF', 'am', 'ad', 'ar', 'av', 'at', 'aT'],
     'review/integration': ['vr', 'vf', 'vu', 'vR', 'vq', 'vC', 'vs', 'vc', 'vi', 'vI'],
     'git/diagnostics': ['gs', 'gd', 'gl', 'gf', 'ghs', 'ghr', 'ghp', 'ghb', 'cd', 'xq', 'xl'],
     'format/UI': ['cf', 'uf', 'uF', 'uw', 'us', 'uL', 'ul', 'ud', 'uh', 'ug', 'uZ', 'uz', 'uM', 'uC', 'uA', 'uI'],

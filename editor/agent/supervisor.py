@@ -107,4 +107,13 @@ def main():
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    from task_lock import lease
+    try:
+        config = json.loads((Path(sys.argv[1]) / "launch.json").read_text())
+        with lease(config["cwd"]):
+            raise SystemExit(main())
+    except (ValueError, OSError) as error:
+        atomic(Path(sys.argv[1]) / "state.json", dict(state="failed", evidence="process",
+               since=time.time(), reason=str(error)))
+        print(str(error), file=sys.stderr)
+        raise SystemExit(1)

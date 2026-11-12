@@ -36,6 +36,7 @@ controls remain primary. Preserve plain `nvim` and its existing configuration.
 | Tasks | Space ac/aC names a Codex/Claude branch and opens its worktree beside an idle CLI; ae/aE starts without a marked file; ab/aB selects/continues a branch | Separate writable directories prevent independent agents colliding; branch names alone do not |
 | Starting state | Saved source edits/new files inherited via a private index and task baseline commit; original index/HEAD/files unchanged | Prevent the apparent loss of edits on switching into a task |
 | Context | Explicit marked file list, including cross-project references; supplied with a prompt | Opening a file alone is not authorization to send it |
+| Task cleanup | Space at inspects retained tasks; explicit removal archives HEAD/baseline/index/working state; Space aT shows recovery | One task at a time, exact branch confirmation, process/Git/editor guards; no automatic archive expiry |
 | Lifetime | Switching retains processes; closing the owning workspace stops them; restart/restore does not silently restart agents | Avoid abandoned agent processes while preserving files and layout |
 | Review | Stable snapshot, side-by-side default, unified toggle, changed-file picker, reviewed markers, snapshot-anchored comments | Reading remains stable while agents continue writing |
 | Feedback | Preview first; a queues, submits to a ready CLI and focuses it; Ctrl-s queues only; busy delivery at eligible hook boundary | No need to manually tell an idle agent to check its queue; no injection into permission prompts |
@@ -237,12 +238,10 @@ instruction to add more features in the next iteration.
 
 ## Next work, in order
 
-1. **Task lifecycle and cleanup UI.** Inventory retained tasks, live agents,
-   worktree dirtiness, integration receipts and destination state. Offer Keep,
-   Review/Integrate and explicit Remove task. Preserve primary checkouts; require
-   agents stopped; confirm discarded unintegrated work. Define equivalence for
-   squashed integration before claiming a branch is safe to prune. Start with
-   one task; bulk cleanup follows proven checks.
+1. **Task cleanup follow-up.** Single-task archive/remove and recovery instructions
+   are implemented (ADR-0012). Validate the wording on real projects before bulk
+   selection or archive expiry. One-click restore and cross-editor unsaved-buffer
+   coordination remain separate work; do not overstate the locks' coverage.
 2. **Integration recovery hardening.** Exercise process death at mutation
    boundaries, external Git changes, lost records, hooks/signing failures, and
    partial operation receipts. Keep errors actionable and conflicts labeled.
@@ -314,3 +313,22 @@ Neovim 0.12 development build. Checkout/menu tests and Codex feedback also passe
 on minimum Neovim 0.11.0. The updated shortcut audit covers 145 core bindings;
 StyLua and whitespace checks pass. Linux verification is delegated to CI after
 publishing; these local checks are not Linux runtime evidence.
+
+## Retained task cleanup (2026-11-12)
+
+`uzume/agents/cleanup.lua` and `agent/cleanup.py` implement the single-task
+inventory/inspect/archive/remove workflow. `agent/task_lock.py` coordinates
+supervisors and integration with deletion. Inspection uses temporary Git objects;
+removal writes recovery refs before touching checkout/branch. Named and generated
+tasks now persist metadata; legacy managed checkouts have unknown review status.
+The original user's retained worktrees were not used for destructive testing.
+Read [the guide](features/task-cleanup.md) for exact guards, recovery commands,
+partial receipts and limits. Tests use real Git/editor workflows in disposable
+state; `tests/task_cleanup.py` and `task_cleanup_ui.py` join the consolidated suite.
+
+Verification: the consolidated 25-case run exposed a command-callback regression
+and a fixture startup race. The callback now discards Ex-command metadata before
+opening review; integration fixtures wait for CLI readiness before emitting hooks.
+All 25 cases passed across the suite and targeted reruns of the affected cases.
+The new cleanup UI also passed on Neovim 0.11.0. Cleanup and recovery assertions
+use disposable worktrees only; no real model calls or user task removals occurred.

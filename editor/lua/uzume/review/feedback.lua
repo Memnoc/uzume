@@ -101,8 +101,12 @@ function M.open(state)
       if batch and store.status(state.task, batch) == "queued" and store.prompt_requested(batch) then
         status = "REQUEST SUBMITTED · Waiting for the feedback hook · r checks status"
       end
-      local text =
-        { "To: " .. (batch and batch.kind or state.task.kind) .. " · " .. state.task.label, status, "", body }
+      local text = {
+        "To: " .. (batch and batch.kind or state.task.kind or "No running agent") .. " · " .. state.task.label,
+        status,
+        "",
+        body,
+      }
       vim.bo[buf].modifiable = true
       api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(table.concat(text, "\n"), "\n", { plain = true }))
       vim.bo[buf].modifiable = false

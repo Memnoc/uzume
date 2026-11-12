@@ -24,6 +24,7 @@ records preserve what was actually checked at each increment.
 | Codex/Claude workspaces, marked files/reference context, attention and cleanup | [AI tasks](agents.md) |
 | Task changes picker, stable diffs, line comments, queued feedback and explicit refresh | [Task review](review.md) |
 | Combine tasks into a local feature branch, resolve conflicts and resume/abort | [Task integration](integration.md) |
+| Inspect, review, archive/remove retained tasks and recover their work | [Task cleanup](task-cleanup.md) |
 | Local layout persistence and recovery | [Native navigators](navigators.md) |
 | Full project autosave and release management: planned behavior | [Design record](../design.md) |
 

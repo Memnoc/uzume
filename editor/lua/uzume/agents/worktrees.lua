@@ -82,12 +82,10 @@ function M.create(project, label, done, source, selection, branch)
         return done(nil, "Could not read inherited task state; checkout retained at " .. task.cwd)
       end
       task = vim.tbl_extend("force", task, captured)
-      if branch then
-        local path = record_path(project, branch)
-        vim.fn.mkdir(vim.fs.dirname(path), "p", 448)
-        vim.fn.writefile({ vim.json.encode(task) }, path)
-        vim.fn.setfperm(path, "rw-------")
-      end
+      local path = record_path(project, task.branch)
+      vim.fn.mkdir(vim.fs.dirname(path), "p", 448)
+      vim.fn.writefile({ vim.json.encode(task) }, path)
+      vim.fn.setfperm(path, "rw-------")
       done(task)
     end)
   )

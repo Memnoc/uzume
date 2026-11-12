@@ -472,8 +472,8 @@ function M.refresh()
   remember(state)
   capture(state, true)
 end
-function M.open()
-  if M.current and M.current.tab == api.nvim_get_current_tabpage() then
+function M.open(selected_task)
+  if not selected_task and M.current and M.current.tab == api.nvim_get_current_tabpage() then
     if M.current.snapshot then
       return M.files()
     end
@@ -498,7 +498,7 @@ function M.open()
     watch(M.current)
     capture(M.current)
   end
-  local task = vim.t.uzume_task
+  local task = selected_task or vim.t.uzume_task
   if task then
     return start(task)
   end
@@ -543,7 +543,9 @@ function M.setup()
   end
   vim.keymap.set({ "n", "x" }, "<leader>vc", M.comment, { desc = "Comment on Review Lines" })
   vim.keymap.set("n", "<leader>av", M.open, { desc = "Review Task Changes" })
-  api.nvim_create_user_command("UzumeReview", M.open, {})
+  api.nvim_create_user_command("UzumeReview", function()
+    M.open()
+  end, {})
   api.nvim_create_autocmd("VimLeavePre", { callback = M.close })
   api.nvim_create_autocmd("TabClosed", {
     callback = function()

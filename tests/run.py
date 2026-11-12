@@ -22,6 +22,8 @@ CASES = [
     ('inheritance', ['inheritance.py'], {}),
     ('task-navigation', ['task_navigation.py'], {}),
     ('workspace-context', ['workspace_context.py'], {}),
+    ('task-cleanup', ['task_cleanup.py'], {}),
+    ('task-cleanup-ui', ['task_cleanup_ui.py'], {}),
     ('named-launch', ['named_launch.py'], {}),
     ('branch-launch', ['branch_launch.py'], {}),
     ('review', ['review.py'], {}),
