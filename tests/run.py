@@ -12,6 +12,7 @@ CASES = [
     ('dashboard', ['dashboard.py'], {}),
     ('keymaps', ['keymaps.py'], {}),
     ('commandline', ['commandline.py'], {}),
+    ('colorscheme', ['colorscheme.py'], {}),
     ('language-packs', ['language_packs.py'], {}),
     ('extras-ui', ['extras_ui.py'], {}),
     ('shortcut-audit', ['shortcut_audit.py'], {}),

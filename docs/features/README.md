@@ -7,6 +7,7 @@ records preserve what was actually checked at each increment.
 
 | Feature | What to read |
 | --- | --- |
+| Official palette, visibility, theme switching and Rose Pine compatibility | [Uzume colorscheme](colorscheme.md) |
 | Appearance, dashboard, explorer, search, buffers, windows, mouse, shells | [Editor and navigation](editor.md) |
 | Project/window menus, switching, naming, closing, local layout save | [Native navigators](navigators.md) |
 | Splits, moving, resizing, floating/fullscreen, hide/restore and mouse controls | [Window management](window-management.md) |

@@ -1,6 +1,6 @@
 # Uzume maintainer handoff
 
-Updated 2026-11-11. Read this first, then [CONTEXT.md](../CONTEXT.md), the
+Updated 2026-11-12. Read this first, then [CONTEXT.md](../CONTEXT.md), the
 [ADR index](adr/README.md), and the relevant [feature guide](features/README.md).
 This is a working prototype baseline. It is not a declaration of production
 readiness or completion of every item in the original design interview.
@@ -28,7 +28,7 @@ controls remain primary. Preserve plain `nvim` and its existing configuration.
 
 | Area | Current behavior | Reason / boundary |
 | --- | --- | --- |
-| Editor | Rose Pine with scoped mauve accents, Snacks explorer/pickers/notifications, completion, Git signs, native LSP/diagnostics/inlay hints, formatting | Familiar, capable editing before bespoke AI UI; other colorschemes retain their palettes |
+| Editor | Named Uzume colorscheme (mauve/orange), Snacks explorer/pickers/notifications, completion, Git signs, native LSP/diagnostics/inlay hints, formatting | Pinned Rose Pine renderer with isolated options; original Rose Pine and other themes retain their palettes |
 | Extras | Own feature catalog on Space l; curated packs plus user JSON packs and Ctrl-a guided creation; pinned Mason packages and opt-out automatic missing-tool install | Discoverable tool bundles without importing another distribution |
 | Multiplexing | Project → Windows → Panes; native tabpages, splits and floats; Space w and Space p menus; ps/pS split down/up, pv/pV right/left | No tmux requirement, no second renderer, no extra session concept |
 | Pane motion | Slide enabled by default; Space uA selects Slide, Instant, Pulse or Spring | Native geometry, interruption handling, no extra renderer or dependency |
@@ -66,6 +66,13 @@ bindings, context-dependent menus and regression coverage.
 | `editor/agent/supervisor.py`, `processes.py`, `hook.py`, `feedback.py` | CLI supervision/PTY, process cleanup, hook events, bounded feedback delivery |
 | `uzume/review/`, `editor/review/snapshot.py` | Review UI, stable capture, comments and delivery records |
 | `uzume/integration/init.lua`, `conflicts.lua`, `editor/review/integration.py` | Local integration plan/apply/status, editable conflict result, Git capture/cherry-pick and operation persistence |
+
+`editor/colors/uzume.lua` loads `uzume/ui/theme.lua`: the named default palette.
+It temporarily configures the pinned Rose Pine renderer, restores that plugin's
+options/palette cache even on failure, and reports `colors_name = "uzume"`.
+Do not leave global palette overrides or a ColorScheme hook on other themes.
+See [colorscheme](features/colorscheme.md) and ADR 0011. The trial remains on
+`spike/uzume-palette`; its launcher and selector are not production features.
 
 See the [Lua directory map](../editor/lua/README.md). Feature helpers now live
 under `agents/`, `review/`, `integration/`, `layout/`, `ui/` and `core/`. Public

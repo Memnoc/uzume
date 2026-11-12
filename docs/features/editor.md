@@ -2,14 +2,14 @@
 
 The editor restores the familiar reading and editing workflow before agent
 sessions return. It is an independent Lua configuration using selected plugins;
-it owns its configuration directly. [ui.lua](../../editor/lua/uzume/editor/ui.lua) configures
-Rose Pine, the dashboard, Snacks, WhichKey, bufferline, lualine, Git signs,
+it owns its configuration directly. [ui.lua](../../editor/lua/uzume/editor/ui.lua) selects the Uzume colorscheme and configures
+the dashboard, Snacks, WhichKey, bufferline, lualine, Git signs,
 Flash and paired delimiters. [keymaps.lua](../../editor/lua/uzume/editor/keymaps.lua)
 is the complete mapping reference.
 
 ## Appearance and discovery
 
-Rose Pine supplies the theme. The dashboard provides entry points when starting
+Uzume supplies its own named dark colorscheme, built on the pinned Rose Pine renderer. The dashboard provides entry points when starting
 without a file; bufferline shows open buffers and diagnostics, while lualine
 shows mode, branch, file, diagnostics and position. Snacks supplies file icons,
 indent guides, status-column UI, input prompts and warning/error notifications.
@@ -28,46 +28,18 @@ focus. **Space n** opens notification history to reread longer messages. Agent
 shortcut failures identify the attempted action in the title and omit Lua source
 locations; invalid file selections include the next available actions.
 
-Uzume gives Rose Pine's main variant a gentle mauve text palette: ordinary text
-uses `#e0d4eb`, comments and secondary text `#a99ab8`, and muted text `#8b7c98`.
-The dashboard's logo, headings, and navigation icons use iris (`#c4a7e7`), labels
-and filenames use the pale mauve text color, and shortcut letters use rose
-(`#ebbcba`). Mauve/iris is also the interface accent: floating borders and titles,
-command/search prompt icons, input dialogs, picker prompts and shortcut keys,
-and WhichKey group headings use `#c4a7e7`. Noice's format-specific border/title
-links inherit the scoped accent, including `:lua`, help and search prompts.
-Filetype icons retain their own recognizable colors. The base,
-surface, and overlay backgrounds, programming-language syntax, diagnostics and
-Git diff colors remain upstream defaults. Markdown headings and list markers use
-mauve (`#c4a7e7`); links and inline code use warm orange (`#f6ad75`), preserving
-existing underline, italic and bold attributes. Shared HTML/Vimwiki/Neorg aliases
-resolve to their original colors before Markdown overrides apply. Both native
-Markdown syntax and Markdown-specific Tree-sitter captures are covered; the
-current bundle uses native Markdown syntax. These settings live in [ui.lua](../../editor/lua/uzume/editor/ui.lua)
-and use Rose Pine's palette and `before_highlight` callback, scoped to its main
-variant. No global `ColorScheme` hook forces these colors onto other themes.
-**Space uC** can switch to another installed colorscheme;
-its own colors take over. Rose Pine Moon and Dawn keep their original palettes.
-Switching back to Rose Pine main restores the mauve tint. To use its unmodified
-palette and dashboard colors, remove the `palette.main` overrides and the
-`before_highlight` callback from the setup table.
-Startup checks compared the main editor backgrounds and syntax, diagnostic, and
-diff highlights against stock Rose Pine, then verified switching to Habamax,
-Moon, and Dawn and back without the mauve settings leaking into those themes.
-The first palette-only change left the dashboard cyan because Snacks links its
-header and labels to accent groups. A subsequent PTY check inspects the actual
-dashboard extmarks and resolved highlight colors, covering the logo, headings,
-navigation icons, labels, and shortcut keys.
-The 2026-11-12 accent check inspected the live command popup's format-specific
-border/title/icon groups, picker/input groups, semantic syntax/diagnostic/diff
-colors and switching through Moon, Dawn, Habamax and back. The existing command-line
-smoke test also passed after the accent update.
-The Markdown palette was accepted from `spike/markdown-mauve`; the trial launcher
-and comparison commands remain on that branch. Normal `uzume` now uses the chosen
-colors automatically, without a saved preference or an extra plugin. Headless
-checks on Neovim 0.11 and the local development version verified the chosen colors,
-preserved text attributes and shared aliases, unchanged syntax/diagnostics/diffs,
-and switching through Moon, Dawn and Habamax before returning to main.
+The default **Uzume** colorscheme combines mauve controls and keywords, orange
+functions and Markdown links/code, soft gold strings, sage types, rose values,
+and pale lavender parameters. Backgrounds remain dark and diagnostic/diff colors
+retain their distinct meanings. Inlay hints use readable secondary text.
+See the [colorscheme guide](colorscheme.md) for the palette, contrast measurements,
+implementation, and compatibility boundaries.
+
+**Space uC** opens the installed colorscheme picker. `:colorscheme uzume` restores
+the default; `:colorscheme rose-pine` selects the original Rose Pine palette.
+Moon, Dawn and Neovim's bundled themes remain available. Theme selection is local
+to this editor process unless a startup preference is supplied; the guide shows
+how to set one without editing distribution files.
 
 The home screen centers a two-color cave-and-sun emblem above the Uzume
 wordmark, closely following the repository SVG. The shared artwork lives in

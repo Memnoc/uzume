@@ -63,6 +63,13 @@ Run `uzume path/to/file` to open a file directly. Plain `nvim` keeps your existi
 configuration. Upgrading an older preview? Follow the
 [namespace migration guide](docs/features/namespace-migration.md).
 
+## Colorscheme
+
+Uzume's default palette pairs mauve and warm orange with gold strings and sage types.
+Use **Space uC** to choose another installed theme, including original Rose Pine,
+Moon and Dawn. See the [colorscheme guide](docs/features/colorscheme.md) for colors,
+visibility checks and startup preferences.
+
 ## Shortcuts
 
 **Space** is the leader key. Press it and pause to browse the menus, or press

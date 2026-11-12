@@ -11,7 +11,7 @@ live `package.loaded` entries are not migrated in place.
 | `uzume/review/` | Stable review UI, snapshot-anchored comments and feedback delivery |
 | `uzume/integration/` | Local task integration and conflict-resolution controls |
 | `uzume/layout/` | Pane animation and saved mode preference |
-| `uzume/ui/` | Shared input behavior, shortcut search and floating command line |
+| `uzume/ui/` | Named colorscheme, shared input behavior, shortcut search and floating command line |
 | `uzume/extras/` | Declarative user language packs, guided creation and shared tool identities |
 | `uzume/core/` | Shared resource location, independent of module nesting |
 | `uzume/editor/` | Existing editor configuration, tools/languages, projects, navigation and native pane operations |
