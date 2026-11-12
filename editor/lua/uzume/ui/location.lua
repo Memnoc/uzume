@@ -83,6 +83,13 @@ end
 
 function M.show()
   local info = M.get()
+  -- A file opened directly has not necessarily visited a project-aware action.
+  -- Adopt it on this explicit command, never while rendering the statusline or
+  -- when a task already owns the checkout (including external reference files).
+  if not info.root and vim.bo.buftype == "" and api.nvim_buf_get_name(0) ~= "" then
+    require("uzume.editor.sessions").adopt()
+    info = M.get()
+  end
   if not info.root then
     return vim.notify("Open a project first with Space ap, then N.", vim.log.levels.INFO, { title = "Window context" })
   end

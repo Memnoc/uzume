@@ -16,6 +16,12 @@ def resize(rows, columns):
 
 try:
     wait(lambda: lua('vim.v.vim_did_enter') == '1')
+    # A directly opened file must expose context before any project menu is used.
+    keys(' wi')
+    assert lua('vim.bo.filetype') == 'uzume_location', 'Space wi did not open context for a directly opened file'
+    assert str(project/'example.txt') in '\n'.join(js('vim.api.nvim_buf_get_lines(0,0,-1,false)'))
+    keys('<Esc>')
+    assert location()['root'] == str(project)
     do('require("smear_cursor").enabled=false; require("uzume.editor.sessions").adopt()')
     source_tab = js('vim.api.nvim_get_current_tabpage()')
     branch = git('branch', '--show-current')

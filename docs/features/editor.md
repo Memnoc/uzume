@@ -241,7 +241,11 @@ The statusline identifies **Project**, **Task** or **Integration**, followed by 
 actual branch of that window's checkout. It does not take the branch from an
 unrelated file you happen to open. Long project/branch labels shorten to fit.
 **Space wi** opens the complete project/window labels, branch, checkout directory,
-project directory and current file. Press **r** to refresh; **q/Esc** closes.
+project directory and current file. A directly opened file is registered with
+its detected project on first use, so visiting the project navigator first is
+not required. Existing task checkouts keep their identity, even with a reference
+file open. An empty, unassigned window prompts you to open a project instead.
+Press **r** to refresh; **q/Esc** closes.
 
 Opening a file outside the checkout displays **Outside checkout** in the
 statusline. The context dialog explains that edits affect that file; opening it

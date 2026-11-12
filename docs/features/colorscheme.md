@@ -114,3 +114,13 @@ vision accessibility or comfort. Terminal opacity, fonts, truecolor support and
 external application palettes affect the result. Truecolor, opaque backgrounds are
 the reference configuration. No claim of exhaustive language or terminal coverage is
 made; real-project feedback remains valuable.
+
+## Statusline
+
+Uzume's statusline uses mauve for the mode badge and position indicator in
+Normal and Terminal modes, with dark lettering. Project/checkout text is mauve,
+and the filename stays pale on a dark surface.
+Insert uses sage, Visual orange, Replace rose and Command gold to keep mode
+changes visible. Inactive sections use readable secondary text.
+`editor/lua/lualine/themes/uzume.lua` is discovered by lualine's existing `auto`
+setting; selecting another colorscheme restores that theme's statusline behavior.
