@@ -144,15 +144,31 @@ The Uzume name and cave-and-sun logo are established. Rust component boundaries 
 
 ## Architecture
 
+Uzume runs inside Neovim. Lua handles the editor and user interaction; Python
+helpers manage agent processes and Git operations.
+
 ```text
-Neovim UI (Lua)
-    │
-    ▼
-Process and Git helpers (Python)
-    │
-    ▼
-Git · Codex · Claude
+Neovim interface · Lua                       editor/lua/uzume/
+  ├─ Editing, language tools, theme and file navigation
+  ├─ Projects → Windows → Panes (native splits and floats)
+  └─ Agent controls, diff review and review comments
+       │
+       │ launches helpers and displays their results
+       ▼
+Local helpers · Python                      editor/agent/, editor/review/
+  ├─ Start/stop agents and deliver queued feedback
+  ├─ Create isolated task worktrees and capture review snapshots
+  └─ Apply reviewed changes and track integration conflicts
+       │
+       ├─ Git                Branches, worktrees, diffs and local commits
+       └─ Codex / Claude     Official CLIs, running in terminal panes
 ```
 
-The editor lives in `editor/`; installation, tests and documentation live in
-`installer/`, `tests/` and `docs/`. See the [Lua map](editor/lua/README.md) for module details.
+Each independent agent task works in its own Git worktree. You review its changes
+in the editor, send feedback, then integrate the result into a chosen local branch.
+Publishing remains a separate action. Agent CLIs handle their own authentication.
+
+Around this runtime, `setup-editor` and `installer/` install pinned dependencies
+and register the launcher; `tests/` exercises real editor and Git workflows in
+isolated environments; `docs/` holds feature guides, decisions and the handoff.
+See the [Lua module map](editor/lua/README.md) for the breakdown by editor feature.
