@@ -137,10 +137,14 @@ The Uzume name and cave-and-sun logo are established. Rust component boundaries 
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    editor["Neovim UI · Lua"] --> helpers["Process and Git helpers · Python"]
-    helpers --> tools["Git · Codex · Claude"]
+```text
+Neovim UI (Lua)
+    │
+    ▼
+Process and Git helpers (Python)
+    │
+    ▼
+Git · Codex · Claude
 ```
 
 The editor lives in `editor/`; installation, tests and documentation live in
