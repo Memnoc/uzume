@@ -37,8 +37,13 @@ command/search prompt icons, input dialogs, picker prompts and shortcut keys,
 and WhichKey group headings use `#c4a7e7`. Noice's format-specific border/title
 links inherit the scoped accent, including `:lua`, help and search prompts.
 Filetype icons retain their own recognizable colors. The base,
-surface, and overlay backgrounds and the syntax/diagnostic accent palette remain
-upstream defaults. These settings live in [ui.lua](../../editor/lua/uzume/editor/ui.lua)
+surface, and overlay backgrounds, programming-language syntax, diagnostics and
+Git diff colors remain upstream defaults. Markdown headings and list markers use
+mauve (`#c4a7e7`); links and inline code use warm orange (`#f6ad75`), preserving
+existing underline, italic and bold attributes. Shared HTML/Vimwiki/Neorg aliases
+resolve to their original colors before Markdown overrides apply. Both native
+Markdown syntax and Markdown-specific Tree-sitter captures are covered; the
+current bundle uses native Markdown syntax. These settings live in [ui.lua](../../editor/lua/uzume/editor/ui.lua)
 and use Rose Pine's palette and `before_highlight` callback, scoped to its main
 variant. No global `ColorScheme` hook forces these colors onto other themes.
 **Space uC** can switch to another installed colorscheme;
@@ -57,6 +62,12 @@ The 2026-11-12 accent check inspected the live command popup's format-specific
 border/title/icon groups, picker/input groups, semantic syntax/diagnostic/diff
 colors and switching through Moon, Dawn, Habamax and back. The existing command-line
 smoke test also passed after the accent update.
+The Markdown palette was accepted from `spike/markdown-mauve`; the trial launcher
+and comparison commands remain on that branch. Normal `uzume` now uses the chosen
+colors automatically, without a saved preference or an extra plugin. Headless
+checks on Neovim 0.11 and the local development version verified the chosen colors,
+preserved text attributes and shared aliases, unchanged syntax/diagnostics/diffs,
+and switching through Moon, Dawn and Habamax before returning to main.
 
 The home screen centers a two-color cave-and-sun emblem above the Uzume
 wordmark, closely following the repository SVG. The shared artwork lives in

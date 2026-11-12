@@ -40,6 +40,46 @@ for group, link in pairs(accent_links) do
   highlight_groups[group] = { link = link }
 end
 
+-- Resolve shared aliases before the Markdown colors change. Rose Pine resolves
+-- empty overrides against its original highlights before calling before_highlight.
+for _, group in ipairs({ "htmlLink", "VimwikiLink" }) do
+  highlight_groups[group] = {}
+end
+for level = 1, 6 do
+  accents["markdownH" .. level] = "iris"
+  for _, group in ipairs({
+    "htmlH" .. level,
+    "VimwikiHeader" .. level,
+    "NeorgHeading" .. level .. "Prefix",
+    "NeorgHeading" .. level .. "Title",
+  }) do
+    highlight_groups[group] = {}
+  end
+end
+local markdown_links = {
+  markdownListMarker = "htmlTagName",
+  markdownOrderedListMarker = "markdownListMarker",
+  ["@markup.heading.markdown"] = "@markup.heading",
+  ["@markup.list.markdown"] = "@markup.list",
+}
+for group, link in pairs(markdown_links) do
+  accents[group] = "iris"
+  highlight_groups[group] = { link = link }
+end
+local markdown_orange = {
+  markdownUrl = true,
+  markdownLinkText = true,
+  markdownCode = true,
+  mkdCode = true,
+  ["@markup.link.label.markdown_inline"] = true,
+  ["@markup.link.url.markdown_inline"] = true,
+  ["@markup.raw.markdown_inline"] = true,
+}
+for group in pairs(markdown_orange) do
+  -- Retain underline/italic attributes from the upstream definition.
+  highlight_groups[group] = {}
+end
+
 require("rose-pine").setup({
   variant = "main",
   -- A gentle mauve tint for neutral text, scoped to Rose Pine's main variant.
@@ -53,10 +93,19 @@ require("rose-pine").setup({
   -- Register upstream fallback links so Moon and Dawn retain their look.
   highlight_groups = highlight_groups,
   before_highlight = function(group, highlight, palette)
+    if require("rose-pine.config").options.variant ~= "main" then
+      return
+    end
     local accent = accents[group]
-    if accent and require("rose-pine.config").options.variant == "main" then
+    if accent then
       highlight.link = nil
       highlight.fg = palette[accent]
+    elseif markdown_orange[group] then
+      highlight.link = nil
+      highlight.fg = "#f6ad75"
+      if highlight.sp then
+        highlight.sp = "#f6ad75"
+      end
     end
   end,
 })
