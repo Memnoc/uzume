@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="#development-approach"><img src="https://img.shields.io/badge/status-prototype-eb6f92" alt="Status: prototype"></a>
+  <a href="docs/releases/v0.1.0.md"><img src="https://img.shields.io/badge/release-v0.1.0_preview-eb6f92" alt="Release: v0.1.0 preview"></a>
   <a href="editor/README.md#installation-and-pins"><img src="https://img.shields.io/badge/Neovim-0.11%2B-c4a7e7" alt="Requires Neovim 0.11 or newer"></a>
   <a href="docs/features/installation.md#verification-and-remaining-work"><img src="https://img.shields.io/badge/preview-macOS_ARM64%20%7C%20Linux_x86__64-9ccfd8" alt="Tested preview: macOS ARM64 and Linux x86_64"></a>
 </p>
@@ -49,7 +49,7 @@ Uzume takes its name from **Ame-no-Uzume**, the Japanese goddess whose dance hel
 With Neovim 0.11+, Python 3.12+, Git, ripgrep, fd and a C compiler installed:
 
 ```sh
-git clone https://github.com/Memnoc/uzume.git ~/Code/uzume
+git clone --branch v0.1.0 https://github.com/Memnoc/uzume.git ~/Code/uzume
 cd ~/Code/uzume
 python3 setup-editor --register
 ~/.local/bin/uzume
@@ -58,6 +58,8 @@ python3 setup-editor --register
 No existing Neovim config or caches are needed. See the
 [installation guide](docs/features/installation.md) for platform status, language
 tools and adding the launcher to PATH.
+Read the [v0.1.0 release notes](docs/releases/v0.1.0.md) for included features,
+tested platforms and known limitations.
 
 Run `uzume path/to/file` to open a file directly. Plain `nvim` keeps your existing
 configuration. Upgrading an older preview? Follow the

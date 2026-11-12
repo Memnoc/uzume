@@ -15,7 +15,7 @@ Install these prerequisites on PATH:
 Then run:
 
 ```sh
-git clone https://github.com/Memnoc/uzume.git ~/Code/uzume
+git clone --branch v0.1.0 https://github.com/Memnoc/uzume.git ~/Code/uzume
 cd ~/Code/uzume
 python3 setup-editor --register
 ~/.local/bin/uzume
@@ -33,10 +33,11 @@ flows. Node/npm are needed for Mason's web language tools; Rust projects need
 their Rust toolchain. See [tool installation](tool-installation.md) for tool-specific
 requirements. The editor can start before either agent CLI is installed.
 
-Cache-free installation and all 16 regression cases have passed on macOS ARM64
+Cache-free installation and all 28 regression cases have passed on macOS ARM64
 and Ubuntu 24.04 x86_64. Linux CI checks Neovim 0.11.0 and 0.12.6. See the
 [Linux guide](linux.md) for prerequisites, coverage and platform limits.
 Linux ARM64, Intel Mac and hands-on Linux terminal validation remain pending.
+The [v0.1.0 notes](../releases/v0.1.0.md) record release scope and known limitations.
 
 ## How it works
 
@@ -91,6 +92,11 @@ For subsequent updates, re-run `python3 setup-editor` after a lockfile change,
 before restarting. Existing settings, tool references and older package bundles
 are retained. Registration is optional if the config link already targets the
 same checkout. New installs use `python3 setup-editor --register` directly.
+
+Release installs check out the `v0.1.0` tag, so they do not follow `main` on a
+routine pull. To select another published version, close Uzume, preserve local
+changes, fetch tags and explicitly check out the desired tag before rerunning
+the installer. Do not force a checkout over local edits.
 
 ## Stored state
 

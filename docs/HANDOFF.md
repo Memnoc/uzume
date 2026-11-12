@@ -2,8 +2,9 @@
 
 Updated 2026-11-12. Read this first, then [CONTEXT.md](../CONTEXT.md), the
 [ADR index](adr/README.md), and the relevant [feature guide](features/README.md).
-This is a working prototype baseline. It is not a declaration of production
-readiness or completion of every item in the original design interview.
+This is the v0.1.0 public preview baseline. It is not a declaration of production
+readiness or completion of every item in the original design interview. See the
+[release notes](releases/v0.1.0.md) for scope, installation and verified platforms.
 
 ## Product intent and working agreement
 

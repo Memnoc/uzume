@@ -3,7 +3,7 @@
 The editor preview provides native project, window, and pane management alongside
 code navigation, language tools, and discoverable keyboard controls.
 
-This first increment supplies Rose Pine, a Snacks sidebar and floating pickers,
+The v0.1.0 preview supplies the Uzume colorscheme, a Snacks sidebar and floating pickers,
 WhichKey's Helix leader menus, buffer/status lines, Git signs and hunk actions,
 Flash navigation, paired delimiters, and the familiar shell terminal shortcuts.
 The base and optional plugins are pinned to exact commits and loaded with
@@ -140,7 +140,7 @@ Formatting runs on explicit saves by default; **Space uf** toggles it globally,
 ## Installation and pins
 
 ```sh
-git clone https://github.com/Memnoc/uzume.git ~/Code/uzume
+git clone --branch v0.1.0 https://github.com/Memnoc/uzume.git ~/Code/uzume
 cd ~/Code/uzume
 python3 setup-editor --register
 ~/.local/bin/uzume
@@ -154,8 +154,10 @@ separately; Node/npm and language toolchains are needed for the relevant Extras.
 
 See [Installation](../docs/features/installation.md) for prerequisites, optional
 caches, XDG paths, existing-install updates, tests and uninstall instructions.
-Source builds support macOS/Linux; the verified platform remains macOS ARM64.
-Neovim itself is still user-installed, and release/rollback management is pending.
+Source builds are verified on macOS ARM64 and Ubuntu 24.04 x86_64. Linux CI checks
+Neovim 0.11.0 and 0.12.6; hands-on Linux terminal validation remains pending.
+Neovim itself is still user-installed, and automatic update/rollback management is
+pending. See the [v0.1.0 release notes](../docs/releases/v0.1.0.md).
 
 Keep this checkout while its config link is installed. Re-run the installer after
 updates that change pins, before restarting the editor. Existing task worktrees,

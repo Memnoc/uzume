@@ -69,9 +69,9 @@ are pinned. Each job runs:
 
 1. Fresh installation, all nine parser/query sets, launcher startup and a repeat
    installation using disposable XDG directories.
-2. All 16 regression cases: migration, installation, dashboard, pane motion,
-   agent lifetimes, inherited edits, task navigation/launch, review/comments,
-   Codex/Claude feedback and normal/diff3 integration.
+2. All 28 regression cases: migration/installation, editor UI, language packs,
+   shortcuts, pane motion, agent lifetimes, inherited edits, task navigation/launch,
+   cleanup/recovery, review/comments, Codex/Claude feedback and normal/diff3 integration.
 3. Log retention for diagnosing failures. Bash pipeline failure propagation
    prevents `tee` from hiding a failing Python test.
 
@@ -93,4 +93,5 @@ trials. The installer currently validates a user-installed Neovim; managed
 Neovim releases and an update/rollback UI remain future work.
 
 See the [verification record](../verification-namespace-linux-2026-11-11.md)
-for exact results and the [handoff](../HANDOFF.md) for follow-up work.
+for the original port, the [v0.1.0 notes](../releases/v0.1.0.md) for release evidence,
+and the [handoff](../HANDOFF.md) for follow-up work.
