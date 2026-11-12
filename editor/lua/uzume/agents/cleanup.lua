@@ -3,10 +3,12 @@ local M = {}
 local api = vim.api
 local paths = require("uzume.core.paths")
 local window
+local inspection
 local function protect(fn)
   require("uzume.agents.context").run(fn, "Task cleanup")
 end
-local function request(project, action, values, done)
+local function request(project, action, values, done, opts)
+  opts = opts or {}
   local payload = vim.tbl_extend("force", {
     action = action,
     project = project,
@@ -21,7 +23,14 @@ local function request(project, action, values, done)
       timeout = 180000,
     },
     vim.schedule_wrap(function(result)
+      if opts.valid and not opts.valid() then
+        return
+      end
       protect(function()
+        if result.code ~= 0 and opts.failed then
+          opts.failed(vim.trim(result.stderr) ~= "" and vim.trim(result.stderr) or "Task check failed or timed out.")
+          return
+        end
         assert(result.code == 0, vim.trim(result.stderr))
         done(vim.json.decode(result.stdout))
       end)
@@ -54,12 +63,13 @@ local function blockers(task)
   return result
 end
 local function close()
+  inspection = nil
   if window then
     window:close()
     window = nil
   end
 end
-local function show(title, filetype, lines, actions)
+local function show(title, filetype, lines, actions, back)
   close()
   window = Snacks.win({
     text = lines,
@@ -69,13 +79,22 @@ local function show(title, filetype, lines, actions)
     border = "rounded",
     title = " " .. title .. " ",
     title_pos = "center",
-    footer = actions["?"] and " ? keys · q / Esc keep & close " or " q / Esc close ",
+    footer = back and (" Esc / b back to tasks · q close " .. (actions["?"] and "· ? keys " or ""))
+      or " q / Esc close ",
     footer_pos = "center",
     bo = { filetype = filetype, modifiable = false, bufhidden = "wipe" },
     wo = { wrap = true, linebreak = true, number = false, relativenumber = false },
+    on_close = function(closed)
+      if window == closed then
+        inspection, window = nil, nil
+      end
+    end,
   })
   actions.q = { close, "Close Task Details" }
-  actions["<Esc>"] = actions.q
+  actions["<Esc>"] = back and { back, "Back to Retained Tasks" } or actions.q
+  if back then
+    actions.b = actions["<Esc>"]
+  end
   for key, action in pairs(actions) do
     vim.keymap.set("n", key, function()
       protect(action[1])
@@ -127,6 +146,9 @@ local function recovery(receipt)
   }, {})
 end
 function M.history(project)
+  if inspection then
+    close()
+  end
   project = project or assert(require("uzume.editor.projects").current(), "Open a project first").root
   request(project, "history", {}, function(items)
     if #items == 0 then
@@ -146,9 +168,26 @@ function M.history(project)
     end)
   end)
 end
-local inspect
-inspect = function(project, branch)
+local inspect, browse
+inspect = function(project, branch, view)
+  local function back()
+    close()
+    browse(view)
+  end
+  show("Task details", "uzume_task_checking", {
+    "Checking task…",
+    "Branch: " .. branch,
+    "Project: " .. vim.fn.fnamemodify(project, ":~"),
+    "",
+    "Checking saved changes, integration history and removal guards.",
+    "You can leave this screen while the read-only check finishes.",
+    "",
+    "Esc / b Back to tasks     q Close (keep task)",
+  }, {}, back)
+  local ticket = {}
+  inspection = ticket
   request(project, "inspect", { branch = branch }, function(row)
+    inspection = nil
     local task = row.task
     local reasons = vim.list_extend(vim.deepcopy(row.blockers), blockers(task))
     local lines = {
@@ -157,7 +196,8 @@ inspect = function(project, branch)
       "Saved changes: " .. row.changes,
       "Integration destinations: " .. (#row.integrated > 0 and table.concat(row.integrated, ", ") or "None verified"),
       "",
-      "q Keep task     v Review / integrate     x Remove task",
+      "Esc / b Back to tasks     q Close (keep task)",
+      "v Review / integrate     x Remove task",
       "r Refresh      h Recovery history        ? All controls",
       "",
     }
@@ -179,7 +219,8 @@ inspect = function(project, branch)
     })
     local function help()
       require("uzume.ui.help").open("Task cleanup keys", {
-        "q / Esc keep the task and close",
+        "Esc / b back to tasks, keeping the search and selection",
+        "q close and keep the task",
         "v review saved task changes; i in review integrates",
         "x previewed task removal, then type its exact branch name",
         "r refresh status",
@@ -187,11 +228,11 @@ inspect = function(project, branch)
         "Running agents, open task windows, ignored files and unfinished operations block removal.",
       })
     end
-    show("Task cleanup", "uzume_task_cleanup", lines, {
+    show("Task details", "uzume_task_cleanup", lines, {
       ["?"] = { help, "Task Cleanup Key Guide" },
       r = {
         function()
-          inspect(project, branch)
+          inspect(project, branch, view)
         end,
         "Refresh Task Cleanup",
       },
@@ -254,27 +295,68 @@ inspect = function(project, branch)
         end,
         "Remove Task with Recovery Snapshot",
       },
-    })
+    }, back)
+  end, {
+    valid = function()
+      return inspection == ticket
+    end,
+    failed = function(message)
+      show("Task check failed", "uzume_task_check_failed", {
+        "Could not check " .. branch,
+        "",
+        message,
+        "",
+        "This check did not change any files or branches.",
+        "r Retry     Esc / b Back to tasks     q Close",
+      }, {
+        r = {
+          function()
+            inspect(project, branch, view)
+          end,
+          "Retry Task Inspection",
+        },
+      }, back)
+    end,
+  })
+end
+browse = function(view)
+  Snacks.picker.select(view.items, {
+    prompt = "Retained tasks",
+    format_item = function(row)
+      return row.task.branch .. " · " .. row.status .. (#blockers(row.task) > 0 and " · Open in editor" or "")
+    end,
+    snacks = {
+      pattern = view.pattern or "",
+      on_show = function(picker)
+        if view.cursor then
+          picker.list:view(view.cursor, view.top)
+        end
+      end,
+      on_close = function(picker)
+        view.pattern = picker.input:get()
+        view.cursor, view.top = picker.list.cursor, picker.list.top
+      end,
+      layout = {
+        config = function(layout)
+          layout.layout[1].footer = " Type to filter · Enter inspect · Esc close "
+          layout.layout[1].footer_pos = "center"
+        end,
+      },
+    },
+  }, function(row)
+    if row then
+      inspect(view.project, row.task.branch, view)
+    end
   end)
 end
 function M.open()
+  close()
   local project = assert(require("uzume.editor.projects").current(), "Open a project first: Space ap").root
   request(project, "list", {}, function(result)
     if #result.tasks == 0 then
       return vim.notify("No retained tasks for this project.", vim.log.levels.INFO, { title = "Task cleanup" })
     end
-    Snacks.picker.select(result.tasks, {
-      prompt = "Retained tasks · Enter inspect",
-      format_item = function(row)
-        return row.task.branch .. " · " .. row.status .. (#blockers(row.task) > 0 and " · Open in editor" or "")
-      end,
-    }, function(row)
-      if row then
-        vim.schedule(function()
-          inspect(project, row.task.branch)
-        end)
-      end
-    end)
+    browse({ project = project, items = result.tasks })
   end)
 end
 return M

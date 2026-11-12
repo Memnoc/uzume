@@ -339,3 +339,27 @@ opening review; integration fixtures wait for CLI readiness before emitting hook
 All 25 cases passed across the suite and targeted reruns of the affected cases.
 The new cleanup UI also passed on Neovim 0.11.0. Cleanup and recovery assertions
 use disposable worktrees only; no real model calls or user task removals occurred.
+
+## Task browser navigation polish (2026-11-12)
+
+- Completed: details return via Esc/b with filter, selected row and scroll position
+  preserved; q explicitly ends the visit. The list and detail footers explain the
+  difference. A new Space at refreshes discovery and starts a new visit.
+- Completed: a checking screen identifies branch/project and allows back/close;
+  failed requests offer retry. Each inspection has an in-memory identity. Closing
+  its window or replacing the view invalidates it before late callbacks can show
+  results or errors. The read-only helper is allowed to finish; never apply this
+  dismissal policy to archive/remove operations.
+- Boundary: list items are retained only for that visit, while every selection
+  and removal still checks current Git state. No persisted authorization/status
+  cache, new dependency or Python protocol change was introduced.
+- Coverage: `tests/task_browser.py` uses real keys, pinned Snacks and disposable
+  Git checkouts, including a controlled slow Git call and externally removed task.
+  Existing cleanup UI coverage continues to exercise review, removal cancellation,
+  safeguards and recovery. See the feature guide for controls and limits.
+- Verification: browser navigation/progress/retry passed on development Neovim
+  and 0.11.0; existing cleanup UI and inventory regressions passed, as did Lua
+  formatting and whitespace checks. The unrelated full suite was not repeated.
+- Deferred: consistent project/branch labeling across all review/integration
+  surfaces and a guided restore-to-new-branch action were suggestions, not part
+  of this two-item polish pass. Recovery still presents explicit Git commands.

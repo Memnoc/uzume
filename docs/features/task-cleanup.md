@@ -13,12 +13,34 @@ evidence and removal guards. The list itself never authorizes removal.
 | Control | Action |
 | --- | --- |
 | Space at | List retained tasks; Enter opens their details |
-| q / Esc | Keep the task and close |
+| Esc / b in details | Back to the task list, preserving search, selection and scroll position |
+| q in details | Close the browser and keep the task |
+| Esc in the list | Close the browser |
 | v | Review the retained task without starting an agent; use i in review to integrate |
 | x | Remove the selected task after typing its exact branch name |
 | r | Refresh the preview and guards |
 | h / Space aT | View local recovery history |
 | ? | Show the complete key guide |
+
+## Browsing without losing your place
+
+Type in the list to filter, move to a task and press **Enter**. The list footer
+shows these controls. Details show **Esc / b Back to tasks** separately from
+**q Close**, both in the action text and the bottom border. Returning with Esc/b
+restores your filter, highlighted row and scroll position. Closing with q (or Esc
+from the list) ends that visit; a new **Space at** starts a fresh list.
+
+While inspection runs, **Checking task…** identifies the branch and project and
+explains what is being checked. Esc/b returns to the same list, and q closes.
+Leaving dismisses the result; the read-only helper may finish in the background,
+but it cannot reopen details or steal focus. A failed request shows its error
+with **r Retry**, **Esc/b Back** and **q Close**. Retrying inspects current state.
+
+Returning reuses the discovered list for that visit; reopening Space at refreshes
+the inventory if another tool created or removed tasks. Every selection still
+inspects live state, and removal keeps its separate fresh validation. Search and
+selection are transient UI state, not a cached removal decision. Review and
+recovery remain separate views with their own existing controls.
 
 Close the task's window with **Space wd** before removing it. This stops its agent
 and retains files. Wait for shutdown, then inspect the retained task from another
@@ -124,3 +146,14 @@ longer for a large selected checkout.
 The latency fix passed the inventory and cleanup backend regressions, plus the
 real-editor cleanup flow on the local development Neovim and minimum 0.11.0.
 The full unrelated editor suite was not repeated for this backend-only change.
+
+`tests/task_browser.py` covers filtered return navigation, selection restoration,
+explicit close, slow inspection, ignored late results and retry after an external
+task change. It drives real editor keys and Git in disposable state, delaying Git
+at the subprocess boundary to make the progress behavior reproducible. The test
+is included in the consolidated runner.
+
+The navigation polish passed that browser test on the local development Neovim
+and minimum 0.11.0, the existing cleanup UI regression on the development build,
+the inventory work-budget regression, and Lua formatting/whitespace checks.
+Unrelated editor tests were not rerun for this UI-only change.

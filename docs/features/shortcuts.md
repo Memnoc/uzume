@@ -115,6 +115,8 @@ third-party language packs remain separate work. LSP attachment and optional
 plugin availability affect the live menu; a missing inactive-provider action is
 not a shortcut collision.
 
-Retained-task details offer **q/Esc** to keep, **v** to review, **x** for removal
+Retained-task details offer **Esc/b** to return to the filtered list with its
+selection preserved, **q** to close and keep, **v** to review, **x** for removal
 with exact branch confirmation, **r** to refresh and **h** for recovery history.
+During inspection Esc/b goes back and q closes; a failed check also offers r to retry.
 See [task cleanup](task-cleanup.md) for its guards and archive limits.

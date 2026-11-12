@@ -24,6 +24,7 @@ CASES = [
     ('workspace-context', ['workspace_context.py'], {}),
     ('task-cleanup', ['task_cleanup.py'], {}),
     ('task-inventory', ['task_inventory.py'], {}),
+    ('task-browser', ['task_browser.py'], {}),
     ('task-cleanup-ui', ['task_cleanup_ui.py'], {}),
     ('named-launch', ['named_launch.py'], {}),
     ('branch-launch', ['branch_launch.py'], {}),
