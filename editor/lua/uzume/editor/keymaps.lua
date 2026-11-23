@@ -224,6 +224,7 @@ local function terminal(position, cwd)
     env = { UZUME_TERMINAL_STYLE = position }, -- Separate right/float terminal identities.
     win = {
       position = position,
+      border = position == "float" and "rounded" or nil,
       keys = {
         term_normal = {
           "<Esc>",

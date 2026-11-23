@@ -180,6 +180,8 @@ The first-save behavior is implemented in [save.lua](../../editor/lua/uzume/edit
 
 The shells use Snacks terminals and Neovim terminal buffers. Separate terminal
 identities prevent the right and floating shortcuts from opening the same pane.
+Floating shells (**Space 9**, **Space ft**, **Space fT**) have a rounded outline
+like Uzume's other floats; the right-side shell stays a borderless split.
 Hiding a terminal preserves its job; confirmed navigator close terminates the
 affected terminal. Managed [agent terminals](agents.md) use double Escape for
 editor controls and pass single Escape, jk and Ctrl-w through to the CLI.
