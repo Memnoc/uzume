@@ -158,7 +158,7 @@ terminal's original directory. `rg` and `fd` provide external search tools.
 | Space pd / wd | Confirm close pane / whole window |
 | Space aw / Space ap | Window navigator / project navigator (Space as is an alias) |
 | Ctrl-/ | Toggle right-side shell |
-| Space 9 | Toggle floating shell |
+| Space 9 | Toggle floating shell (rounded outline, like other floats) |
 | Space ft / fT | Floating shell at project root / cwd |
 | Esc or jk in terminal input | Return to terminal Normal mode |
 | Ctrl-s / :w | Save source file; Ctrl-s prompts for a filename on first save |

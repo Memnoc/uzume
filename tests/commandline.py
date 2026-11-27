@@ -30,7 +30,13 @@ try:
             conf = entry['config']
             assert conf['width'] <= columns - 2, conf
         keys('<Esc>')
-    print('PASS: floating command line, native editing/execution/history/completion, cancellation and narrow sizes')
+    do('vim.cmd.stopinsert()')
+    keys(' 9')
+    wait(lambda: lua('vim.bo.filetype') == 'snacks_terminal')
+    config = js('vim.api.nvim_win_get_config(0)')
+    assert config['relative'] == 'editor' and config['border'][0] == '╭', ('Floating terminal has no outline', config.get('border'))
+    keys('<Esc>'); do('vim.api.nvim_win_close(0,true)')
+    print('PASS: floating command line, native editing/execution/history/completion, cancellation and narrow sizes; outlined floating terminal')
 finally:
     if proc.poll() is None:
         try: do('vim.cmd("qa!")')
