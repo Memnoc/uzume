@@ -9,6 +9,7 @@ prompt. tmux is not required.
 
 | Shortcut | Action |
 | --- | --- |
+| Space ai / Space aI | Toggle a Codex / Claude project chat (no branch) |
 | Space ac / Space aC | Codex / Claude with the current file |
 | Space ae / Space aE | Empty Codex / Claude workspace |
 | Space ab / Space aB | Choose an existing starting branch or continue a Codex / Claude task |
@@ -26,6 +27,26 @@ prompt. tmux is not required.
 
 `:UzumeAgent codex` and `:UzumeAgent claude` use the current file. Append `empty`
 for an empty workspace. Instructions belong in the terminal, not this command.
+
+## Project chat
+
+**Space ai / aI** opens a Codex / Claude CLI in a right-hand split, running in
+the current file's checkout (a task window uses its task checkout). No branch,
+worktree or task is created; the CLI sees the whole checkout as its working
+directory. Press the same key, or **q** after **Esc Esc**, to hide it; the
+conversation keeps running and returns on the next toggle, moving into the
+current product Window if needed. One chat exists per checkout and CLI kind.
+
+On every submitted prompt the hook supplies the file and line you last focused
+in an editor pane of that checkout, plus whether its buffer has unsaved edits.
+Only the path is supplied, not file contents; the CLI reads it under its normal
+permissions. Edits the chat makes land directly in that checkout, so use a task
+(Space ac / aC) for isolated changes.
+
+Implementation: `uzume/agents/chat.lua` reuses `agent/supervisor.py` and its
+hooks; `focus` in the chat's `context.json` is read by `agent/hook.py`. Chats are
+not listed in Space aa and do not report attention. Closing the owning product
+Window stops the CLI. Verification: `tests/agent_chat.py`.
 
 ## Branch selection and preflight
 

@@ -19,6 +19,7 @@ CASES = [
     ('pane-motion', ['pane_motion.py'], {}),
     ('agents', ['agents.py'], {}),
     ('agents-crash', ['agents.py', '--crash'], {}),
+    ('agent-chat', ['agent_chat.py'], {}),
     ('inheritance', ['inheritance.py'], {}),
     ('task-navigation', ['task_navigation.py'], {}),
     ('workspace-context', ['workspace_context.py'], {}),

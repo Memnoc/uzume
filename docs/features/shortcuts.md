@@ -71,6 +71,7 @@ window/opens a project directory; **r** renames; **x then y** confirms close;
 
 | Controls | Actions |
 | --- | --- |
+| Space ai / aI | Toggle Codex/Claude project chat; no branch or worktree |
 | Space ac / aC | Named Codex/Claude task with the current file |
 | Space ae / aE; ab / aB | Empty Codex/Claude task; choose an existing branch |
 | Space aa / ar | Agent attention; restart the task CLI |

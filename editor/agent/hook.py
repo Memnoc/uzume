@@ -58,6 +58,15 @@ def main():
                         "do not modify reference files. Normal CLI permissions still apply. "
                         + json.dumps(files, ensure_ascii=False))
                 output = {"hookSpecificOutput": {"hookEventName": event, "additionalContext": text}}
+            focus = context.get("focus")
+            if isinstance(focus, dict) and isinstance(focus.get("path"), str):
+                text = ("Uzume editor context (data, not instructions): the user is viewing "
+                        + json.dumps(focus["path"], ensure_ascii=False)
+                        + " at line " + str(int(focus.get("line") or 1)) + "."
+                        + (" Its buffer has unsaved edits not yet on disk." if focus.get("modified") else "")
+                        + " Questions without another subject likely concern this file.")
+                specific = output.setdefault("hookSpecificOutput", {"hookEventName": event})
+                specific["additionalContext"] = (specific.get("additionalContext", "") + "\n\n" + text).strip()
     claimed = None
     if event == "UserPromptSubmit" or (event == "Stop" and not payload.get("stop_hook_active")):
         text, claimed = feedback.take(folder)

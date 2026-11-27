@@ -34,6 +34,7 @@ controls remain primary. Preserve plain `nvim` and its existing configuration.
 | Checkout visibility | Statusline uses the window checkout branch; Space wi shows full paths and warns about an outside file | Async cached read-only Git; opening a reference does not switch checkout or supply agent context |
 | Multiplexing | Project → Windows → Panes; native tabpages, splits and floats; Space w and Space p menus; ps/pS split down/up, pv/pV right/left | No tmux requirement, no second renderer, no extra session concept |
 | Pane motion | Slide enabled by default; Space uA selects Slide, Instant, Pulse or Spring | Native geometry, interruption handling, no extra renderer or dependency |
+| Chat | Space ai/aI toggles a Codex/Claude CLI in the current checkout; the last focused file and line are supplied on each prompt | Plain questions should not cost a branch/worktree; the CLI keeps its own permission prompts for edits |
 | Tasks | Space ac/aC names a Codex/Claude branch and opens its worktree beside an idle CLI; ae/aE starts without a marked file; ab/aB selects/continues a branch | Separate writable directories prevent independent agents colliding; branch names alone do not |
 | Starting state | Saved source edits/new files inherited via a private index and task baseline commit; original index/HEAD/files unchanged | Prevent the apparent loss of edits on switching into a task |
 | Context | Explicit marked file list, including cross-project references; supplied with a prompt | Opening a file alone is not authorization to send it |

@@ -99,6 +99,7 @@ The home screen also offers **k · Search Keymaps**.
 | **Space pN h/j/k/l** | Create a shell pane left / down / up / right |
 | **Ctrl-h/j/k/l** | Focus the pane to the left / down / up / right |
 | **Space pf** / **Space pm** | Float or dock a pane / fullscreen or restore it |
+| **Space ai** / **Space aI** | Toggle a Codex / Claude chat about this project and current file |
 | **Space ac** / **Space aC** | Start a Codex / Claude task on a named branch |
 | **Space aa** | Find agents needing attention |
 | **Space at** / **Space aT** | Inspect/clean up retained tasks / history and guided recovery |
